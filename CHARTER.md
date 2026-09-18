@@ -1,7 +1,7 @@
 # Project Charter · Skin Lesion Assistant
 
 **Team:** Ifat Davidson · Roi Budnitsky · Tami Kazma · Yuval Rubenchuk   | **Course:** BIU DS23 Capstone | **Date:** 25.9.2026
-**Retrieval asset:** the module 5 grounded assistant, contributed by Ifat Davidson. **Evidence:** `notebooks/01_eda_data_sources.ipynb`, [`docs/DATA_DECISIONS.md`](docs/DATA_DECISIONS.md).
+**Retrieval asset:** the module 5 grounded assistant, contributed by _______
 
 ## 1 · Problem and user
 **User:** an adult who notices a mole that worries them and has only a smartphone.
