@@ -90,10 +90,10 @@ flowchart LR
 
 | Hat | Owner | Owns |
 |---|---|---|
-| Data | [assign] | Pipeline, splits, leakage checks, data dictionary |
-| Model | [assign] | Baselines, fine-tuning, thresholds, error analysis |
-| Agent | [assign] | Tools, loop, guardrails, M4 set |
-| Product | [assign] | User story, safety wording, README, deck |
+| Data | Ifat Davidson | Pipeline, splits, leakage checks, data dictionary |
+| Model | Roi Budnitsky | Baselines, fine-tuning, thresholds, error analysis |
+| Agent | Tami Kazma | Tools, loop, guardrails, M4 set |
+| Product | Yuval Rubenchuk | User story, safety wording, README, deck |
 
 ---
 ¹ Murad H et al. *Measuring geographical disparities in waiting times for community-based specialist care.* Israel Journal of Health Policy Research, 2025. [doi:10.1186/s13584-025-00702-7](https://doi.org/10.1186/s13584-025-00702-7). Covers all dermatologists in all four health funds, 2019–2023.
