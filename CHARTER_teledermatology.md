@@ -1,19 +1,19 @@
-# Project Charter · Skin Lesion Triage (option 1: dermatologist queue)
+# Project Charter · Smart Screening: Optimizing the Healthcare Pipeline from Primary Care to Specialist
 
 **Team:** Ifat Davidson · Roi Budnitsky · Yuval Rubenchuk · Tami Khazma | **Course:** BIU DS23 Capstone | **Date:** 25.9.2026
-**Retrieval asset:** the module 5 grounded assistant, contributed by ___________
+**Retrieval asset:** the module 5 grounded assistant.
 
 ## 1 · Problem and user
-**User:** a dermatologist in a health fund who reviews mole referrals from family doctors.
+**User:** General Practitioners (GPs) / Primary Care Physicians equipped with a Mobile Dermatoscope
 
-**Pain:** today moles cannot be handled remotely at all.
-- Both Clalit's and Maccabi's online dermatology services explicitly exclude moles and suspected skin cancer, because these need a physical exam.²
-- So every mole goes into the in-person queue: a median wait of **24.5 days**, rising by **8.5 days a year**, and 40–42 days in Tel Aviv and Jerusalem.¹
-- In that queue a melanoma waits exactly as long as a benign nevus, because the order is first come, first served.
+**Pain:** The Specialist Shortage: Severe shortage of dermatologists leads to waiting times of up to 4–6 months for a routine skin check.The Survival Window: During this critical delay, dangerous malignancies like Melanoma can aggressively metastasize, significantly reducing patient survival rates.Systemic Inefficiency: Millions of dollars and thousands of clinical hours are wasted on unnecessary specialist referrals for benign moles (false alarms), clogging the entire 
 
-**What we build:** the family doctor attaches a dermoscopic photo, plus age, lesion site and a few clinical answers, to the referral. The system **ranks the dermatologist's queue by urgency** and writes a short triage note for each case, with cited reasons. The dermatologist still reviews every case. The system changes only the order, and never closes a case.
-
-**AI-deletion test:** without AI, the problem remains. The dermatologist has no way to know which referral in a queue of dozens hides the melanoma, except to review them all in arrival order.
+**What we build:** A Data-Driven Clinical Decision Support Tool that integrates with primary care workflows
+* Instantaneous Screening: The system analyzes dermatoscopic images taken by the GP on the spot, using advanced imaging data (trained on the gold-standard HAM10000
+* Multi-Class Differentiation: It instantly classifies lesions across 7 distinct benign and malignant types (including Melanoma, BCC, and pre-cancerous conditions)
+* Smart Triage Pipeline: It enables the GP to confidently reassure patients with benign moles—eliminating unnecessary referrals—while automatically fast-tracking high-risk cancer patients to a specialist within days
+  
+**AI-deletion test:** Today, there is a severe disconnect between primary care and specialists. Lacking proper diagnostic tools, General Practitioners refer almost every suspicious mole to a dermatologist just to be safe—flooding the system with false alarms and creating months-long waiting lists.Our application bridges this gap. By allowing the GP to capture an image of the lesion on the spot, our technology instantly analyzes the data and provides immediate diagnostic context. This filters out the false alarms at the frontline, ensuring high-risk cancer patients are immediately fast-tracked to the specialist.
 
 ## 2 · Success metrics (fixed before any code)
 All metrics are measured on **simulated referral queues** of 100 held-out lesions each (split by lesion). Malignant prevalence is set at 5%, 10% and 20%, because the real referral mix is unknown.
