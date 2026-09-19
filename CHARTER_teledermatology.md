@@ -1,6 +1,6 @@
 # Project Charter · Skin Lesion Triage (option 1: dermatologist queue)
 
-**Team:** Ifat Davidson · Roi Budnitsky · Yuval Rubenchuk · Tami Kazma | **Course:** BIU DS23 Capstone | **Date:** 25.9.2026
+**Team:** Ifat Davidson · Roi Budnitsky · Yuval Rubenchuk · Tami Khazma | **Course:** BIU DS23 Capstone | **Date:** 25.9.2026
 **Retrieval asset:** the module 5 grounded assistant, contributed by ___________
 
 ## 1 · Problem and user
