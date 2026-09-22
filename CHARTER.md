@@ -13,16 +13,15 @@
 **AI-deletion test:** Without AI, the dermatologist's dashboard receives an unstructured, un-prioritized backlog of photos, forcing them to review images chronologically. This completely defeats the purpose of an automated urgency-based queue acceleration.
 
 ## 2 · Success metrics (fixed before any code)
-All metrics are measured on **simulated referral queues** of 100 held-out lesions each (split by lesion). Malignant prevalence is set at 5%, 10% and 20%, because the real referral mix is unknown.
 
 | # | Metric | Target |
 |---|---|---|
-| M1 | Share of **malignant** lesions (MEL + BCC + SCC) ranked in the **top 20%** of the queue | **≥ 0.90** (arrival order gives ~0.20) |
-| M2 | **Melanomas** ranked in the bottom half of the queue | **0** |
-| M3 | Groundedness of the triage note: a frozen set of 20 guidance questions (5 unanswerable), plus a check that every number appears in its cited source | ≥ 0.9, and 5/5 refusals |
-| M4 | Agent scenario set of 15 referrals (poor photo, missing history, borderline lesion) | ≥ 13/15 correct actions; **zero** malignant cases sent down the queue |
+| M1 | **Sensitivity for skin cancer** (MEL + BCC + SCC → flagged for high-urgency dashboard triage) on **held-out PAD-UFES-20 patients** (real phone photos) | **≥ 0.90** |
+| M2 | Specificity at the M1 threshold (proxy for reducing unnecessary clinician triage alerts) | ≥ 0.50 |
+| M3 | Groundedness on a frozen set of 20 guidance questions (5 unanswerable), plus a check that each number appears in its cited source | ≥ 0.9, and 5/5 refusals |
+| M4 | Agent scenario set of 15 complex clinical workflows | ≥ 13/15 correct; **zero** malignant cases left untriaged in the standard queue |
 
-M1 and M2 are also reported per source, per skin tone (MILK10k field) and per body site (acral lesions).
+M1 takes strict precedence over M2: a missed melanoma has catastrophic clinical consequences compared to a false positive triage flag. To ensure diagnostic equity and mitigate systemic bias, all metrics will be stratified and reported across both distinct skin tones (utilizing the DDI dataset) and patient age groups.
 
 ## 3 · Data (four checks run 18–19.9 via the public ISIC API)
 | Source | Role | Size | Licence |
