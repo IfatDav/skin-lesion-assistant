@@ -66,16 +66,15 @@ To justify the multi-modal design, the pipeline will be benchmarked against the 
   * Explicit "I don't know" fallback if clinical inquiries fall outside the verified NCI PDQ guidance corpus.
   * Users under the age of 18 are automatically routed to direct clinical review regardless of AI score.
 
-
 ## 6 · Risks and cut line
 | Risk | Mitigation |
 |---|---|
-| **The dermatologist's pain is not yet validated** | Interview at least one dermatologist before 4.10; adjust the metric to what they actually lose time on |
-| **Do family doctors have dermatoscopes?** (unknown for Israel) | Ask in the same interview; the fallback is referral from a dermoscopy nurse or a mole-mapping clinic |
-| **Duplicates across collections** (HAM10000 and BCN20000 inside ISIC; MILK10k lesions may have earlier ISIC images) | Deduplicate by ISIC ID and lesion; remove any MILK10k lesion seen in training |
-| **Prevalence mismatch** (training data is biopsy-heavy) | Queue metrics at three prevalence levels; never present the score as a probability |
+| **Missing fields leak the label** (In PAD-UFES-20, missing field counts alone yield an artifactual AUC of 0.83) | Explicitly restrict training to the subset of features uniformly collected by the app's mandatory onboarding flow. |
+| **Patient data leakage** (Naive splits place different photos of the same patient across train/test splits) | Split data strictly at the **Patient ID** level, ensuring a patient's images never span across both training and evaluation sets. |
+| **Prevalence mismatch** (The clinical datasets feature artificial, heavily inflated rates of malignancy) | Dynamically tune the classification threshold to prioritize M1 (Sensitivity); represent outputs to doctors as risk tiers, never raw statistical probabilities. |
+| **Data domain gap** (Patients shooting photos with poor lighting, blurry focus, or lens artifacts) | Use the DDI and PAD-UFES-20 datasets to explicitly train the input filter to reject unreadable images and prompt immediate re-takes. |
 
-**Cut line:** *if only two weeks remain, we drop the agent and case retrieval, and ship a ranked queue + fixed guidance paragraph per score band.*
+**Cut line:** *If the implementation timeline is compressed to under two weeks, drop the dynamic agent logic and focus entirely on deploying the core pipeline: Smartphone Photo + Symptom Form → Algorithmic Urgency Tiering → Dermatologist Dashboard UI.*
 
 ## 7 · Milestones and hats
 | Date | Deliverable |
