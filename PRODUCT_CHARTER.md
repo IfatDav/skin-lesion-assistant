@@ -37,20 +37,25 @@ M1 takes strict precedence over M2: a missed melanoma has catastrophic clinical 
 
 ## 4 · Architecture
 
-The core MVP system runs end-to-end as a multi-modal pipeline without requiring an autonomous generative agent layer. 
+The system runs end-to-end as a multi-modal pipeline, utilizing an orchestrating agent to manage quality checks and contextual delivery to the clinician.
 
-The architecture consists of a dual-input pipeline:
-1. An **Image Classification Model** (Convolutional Neural Network / Vision Transformer) that extracts visual risk features from the smartphone photo.
-2. A **Tabular Symptom Model** that processes the patient's categorical clinical checklist (e.g., bleeding, itching, rapid evolution).
-
-The outputs of both models are fused into a single **Urgency Tier Matrix**, which populates the **Dermatologist Triage Dashboard** alongside a RAG-generated (Retrieval-Augmented Generation) clinical context summary derived from the NCI PDQ corpus.
+```mermaid
+flowchart LR
+    A[Phone photo + symptom answers] --> B[Quality check + lesion crop]
+    B --> C[Image model<br/>fine-tuned on ISIC & PAD clinical]
+    A --> S[Symptom model<br/>trained on PAD-UFES-20]
+    C & S --> D[Urgency level calculation]
+    D --> E[RAG over NCI PDQ<br/>Chroma DB + citations]
+    E --> F[Dermatologist Dashboard Alert]
+    G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & E
+```
 
 ### Baseline Evaluation Table
-To justify the complexity of the multi-modal design, the system will be benchmarked against the following baselines (evaluated strictly on the same held-out PAD-UFES-20 test patients):
-
-1. **Metadata Only (The Floor):** A standard Logistic Regression model trained purely on patient age, sex, and the 5-point symptom checklist. *The baseline bar to beat is an AUC of 0.90 established during Exploratory Data Analysis (EDA).*
-2. **Image Model Alone:** The vision component evaluated independently (fine-tuned on ISIC clinical close-ups and PAD-UFES-20 training images) to isolate the predictive power of visual features.
+To justify the multi-modal design, the pipeline will be benchmarked against the following baselines (evaluated strictly on the same held-out PAD-UFES-20 test patients):
+1. **Metadata Only (The Floor):** A standard Logistic Regression model trained purely on patient age, sex, and the symptom checklist. *The baseline bar to beat is an AUC of 0.90 established during Exploratory Data Analysis (EDA).*
+2. **Image Model Alone:** The vision component evaluated independently (fine-tuned on clinical images) to isolate the predictive power of visual features.
 3. **The Selected Integrated MVP System (Multi-modal):** The full pipeline combining the Image Model + Symptom Model + RAG clinical explanation, routed directly into the Dermatologist Dashboard.
+
 
 
 ## 4 · Architecture
