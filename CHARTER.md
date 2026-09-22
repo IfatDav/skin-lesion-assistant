@@ -79,19 +79,18 @@ To justify the multi-modal design, the pipeline will be benchmarked against the 
 ## 7 · Milestones and hats
 | Date | Deliverable |
 |---|---|
-| 25.9 / 4.10 | Charter (internal target / official deadline); dermatologist interview |
-| 2.10 | Deduplicated dataset, lesion-level splits, queue simulator, data dictionary |
-| **18.10 · CP1** | End to end without the agent; 5-row baseline table; M3 measured |
-| **30.10 · CP2** | Agent integrated; M4 scored; 1-minute demo |
-| 12.11 | Repo freeze and deck |
+| 25.9 | Finalized Product Charter & Data Verification ✅ |
+| 2.10 | Patient-level data splitting, leakage audits, and cross-dataset dictionary alignment |
+| **18.10 · CP1** | Core End-to-End Pipeline (No Agent); Baseline Evaluation; M3 Groundedness Benchmark |
+| **1.11 · CP2** | Agent Orchestration Layer Integrated; M4 Validation; 1-Minute Live Demo |
+| 12.11 | Codebase Freeze, Repository Cleanup, and Stakeholder Presentation Deck |
 
-| Hat | Owner | Owns |
+| Hat | Owner | Responsibility |
 |---|---|---|
-| Data | [assign] | ISIC pipeline, deduplication, splits, queue simulator, data dictionary |
-| Model | [assign] | Baselines, image model, ranking metrics, error analysis |
-| Agent | [assign] | Tools, loop, guardrails, M4 scenario set |
-| Product | [assign] | Dermatologist interview, triage-note wording, README, deck |
+| Data | Ifat Davidson | Pipeline architecture, strict patient-level splitting, data cleaning, and leakage mitigation |
+| Model | Tami Khazma | Training baselines, model fine-tuning, threshold tuning, and multi-ethnic performance analysis |
+| Agent | Roi Budnitsky | Agent tool building, orchestration loops, safety guardrails, and M4 validation set execution |
+| Product | Yuval Rubenchuk | Clinician workflow UX, patient-facing safety copy, README documentation, and final fund presentation deck |
 
 ---
-¹ Murad H et al. *Measuring geographical disparities in waiting times for community-based specialist care.* Israel Journal of Health Policy Research, 2025. [doi:10.1186/s13584-025-00702-7](https://doi.org/10.1186/s13584-025-00702-7)
-² Maccabi, [online dermatologist consultation](https://www.maccabi4u.co.il/31276/digital-services/communication/consultation_dermatologists/): "not intended for urgent cases or for diagnosing moles and skin lesions". Clalit, [online dermatologists](https://www.clalit.co.il/he/online_doctors/Pages/dermatologist_on_line.aspx): excludes "diagnosis and assessment of nevi" and suspected skin cancer. Both checked 18.9.2026.
+¹ Murad H et al. *Measuring geographical disparities in waiting times for community-based specialist care.* Israel Journal of Health Policy Research, 2025. [doi:10.1186/s13584-025-00702-7](https://doi.org/10.1186/s13584-025-00702-7). Covers all dermatologists in all four health funds, 2019–2023.
