@@ -86,6 +86,18 @@ flowchart LR
   - Out-of-domain queries return a strict "I don't know" response.
   - User text inputs are parsed purely as data, preventing prompt injection attacks.
   - Minor patients (under 18) are flagged for human review by default.
+ 
+## 6 · Risks and Cut Line
+
+| Risk | Mitigation |
+|---|---|
+| **Missing fields leak the label** (in PAD, the count of missing fields alone reaches AUC 0.83) | Explicitly restrict the tabular model to fields the app forces the patient to answer (mandatory checkboxes). |
+| **Data leakage via patient duplicates** (naive splits place images of the same patient in both train and test sets) | Enforce strict patient-level splitting (or lesion-level where patient IDs are missing). Cross-check and remove any overlap between ISIC and PAD subsets. |
+| **Prevalence mismatch** (training sets contain artificially inflated percentages of malignant images compared to real-world queues) | Calibrate classification thresholds specifically to optimize M1 (Sensitivity); never expose raw AI probability percentages to clinicians or patients. |
+
+**Cut Line:** *If development falls behind schedule, we will drop the autonomous agent layer and photo tracking features. The shipped MVP will rely strictly on the static phone photo + symptom form pipeline mapping directly to the urgency tier and RAG-generated context on the clinician dashboard.*
+
+---
 
 ## 6 · Risks and cut line
 | Risk | Mitigation |
