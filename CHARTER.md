@@ -1,4 +1,4 @@
-# Project Charter · Smart Screening: Optimizing the Healthcare Pipeline from Primary Care to Specialist
+# Project Charter · Skin Lesion Triage for Healthcare Providers
 
 **Team:** Ifat Davidson · Tami Khazma · Roi Budnitsky · Yuval Rubenchuk | **Course:** BIU DS23 Capstone | **Date:** 25.9.2026
 **Retrieval asset:** the module 5 grounded assistant.
