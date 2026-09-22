@@ -23,18 +23,19 @@
 
 M1 takes strict precedence over M2: a missed melanoma has catastrophic clinical consequences compared to a false positive triage flag. To ensure diagnostic equity and mitigate systemic bias, all metrics will be stratified and reported across both distinct skin tones (utilizing the DDI dataset) and patient age groups.
 
-## 3 · Data (four checks run 18–19.9 via the public ISIC API)
-| Source | Role | Size | Licence |
-|---|---|---|---|
-| **ISIC Archive**, dermoscopic images | Main training pool (deduplicated) | 124,961 images: **10,482 melanomas**, 21,652 malignant, 48,463 nevi. Includes HAM10000 (11,719) and BCN20000 (18,946) | Per image: CC-0 / CC-BY / CC-BY-NC |
-| **MILK10k**, dermoscopic half | **External test set** | 5,240 lesions, 95.7% confirmed by histopathology, skin tone 0–5 | CC-BY-NC |
-| **HAM10000** (Harvard Dataverse) | Development subset and baselines | 10,015 images, 1,113 melanomas | CC BY-NC 4.0 |
-| **NCI PDQ** (health-professional summaries) | Guidance corpus for the triage note | ~10–20 documents | Free of copyright; credit NCI |
+## 3 · Data (all four checks passed, 18–19.9)
+| Source | Role | Size | Layout / Image Type | Skin Tone Bias Mitigation |
+|---|---|---|---|---|
+| **PAD-UFES-20** | Main training & testing data | 2,298 images, 1,373 patients, 52 melanomas | **Smartphone (Clinical)** close-ups; includes rich patient metadata (age, sex, itch, bleed, history) | Includes diverse, multi-ethnic patient samples from Brazil. |
+| **DDI (Diverse Dermatology Images)** | Skin-tone validation and bias test set | 656 images | **Smartphone & Clinical** images with verified biopsy gold standards | **Crucial MVP Addition:** Perfectly balanced across Fitzpatrick skin tones (I-VI) to test and prevent algorithmic bias on dark skin. |
+| **ISIC Archive** (Clinical subsets) | Supplementary training | 8,837 images, 522 melanomas | Filtered explicitly for **Clinical/Macro images** (excluding dermoscopic) | Primarily light skin tones; used strictly for structural feature extraction. |
+| **NCI PDQ** patient summaries | Guidance corpus for RAG | ~10–20 documents | Clinical text reference | N/A |
 
-**Patient data available:** age, sex, body site (all sources); skin tone (MILK10k). Symptoms (changed, bleeds) are **not** in dermoscopic datasets. The agent asks the referring doctor for them, and their weight comes from the guidelines, not from training data.
-
-**Plan B:** if harmonizing the full ISIC pool takes too long, train on HAM10000 only and keep MILK10k as the external test. That combination is enough for every metric.
-
+**Rejected:** 
+- `HAM10000` & `BCN20000`: Completely dermoscopic. Since our MVP relies on patient-shot smartphone photos, dermoscopic data introduces an unacceptable domain gap.
+- `marmal88/skin_cancer`: High data leakage (80% of its test set is present in the training set).
+- `Fitzpatrick 17k`: More than 75% of the original image URLs are dead.
+- 
 ## 4 · Architecture
 ```mermaid
 flowchart LR
