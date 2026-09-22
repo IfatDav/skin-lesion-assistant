@@ -12,7 +12,7 @@
 ## 2 · Success metrics (fixed before any code)
 | # | Metric | Target |
 |---|---|---|
-| M1 | **Sensitivity for skin cancer** (MEL + BCC + SCC → "flagged as urgent") on **held-out PAD-UFES-20 patients** (real phone photos) | **≥ 0.90** |
+| M1 | **Sensitivity for skin cancer** (MEL + BCC + SCC → "High-Urgency Dashboard Triage") on **held-out PAD-UFES-20 patients** (real phone photos) | **≥ 0.90** |
 | M2 | Specificity at the M1 threshold (proxy for fewer unnecessary dermatologist flags) | ≥ 0.50 |
 | M3 | Groundedness on a frozen set of 20 guidance questions (5 unanswerable), plus a check that each number appears in its cited source | ≥ 0.9, and 5/5 refusals |
 | M4 | Agent scenario set of 15 cases | ≥ 13/15 correct; **zero** malignant cases reassured |
