@@ -35,28 +35,27 @@ M1 takes strict precedence over M2: a missed melanoma has catastrophic clinical 
 - `HAM10000` & `BCN20000`: Completely dermoscopic. Since our MVP relies on patient-shot smartphone photos, dermoscopic data introduces an unacceptable domain gap.
 - `marmal88/skin_cancer`: High data leakage (80% of its test set is present in the training set).
 - `Fitzpatrick 17k`: More than 75% of the original image URLs are dead.
-- 
+  
 ## 4 · Architecture
+
+The system runs end-to-end as a multi-modal pipeline, utilizing an orchestrating agent to manage quality checks and contextual delivery to the clinician.
+
 ```mermaid
 flowchart LR
-    R[Referral: dermoscopic photo + age, site, answers] --> Q[Quality check]
-    Q --> M[Image model + metadata<br/>trained on ISIC dermoscopic]
-    M --> P[Priority score]
-    R --> K[Similar confirmed cases<br/>image-embedding search]
-    P & K --> G[RAG over NCI PDQ<br/>Chroma + citations]
-    G --> N[Ranked queue + triage note]
-    A((Agent · reserved seat)) -. orchestrates .-> Q & M & K & G
+    A[Phone photo + symptom answers] --> B[Quality check + lesion crop]
+    B --> C[Image model<br/>fine-tuned on ISIC & PAD clinical]
+    A --> S[Symptom model<br/>trained on PAD-UFES-20]
+    C & S --> D[Urgency level calculation]
+    D --> E[RAG over NCI PDQ<br/>Chroma DB + citations]
+    E --> F[Dermatologist Dashboard Alert]
+    G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & E
 ```
-**It works end to end without the agent:** the model scores each referral, the queue is sorted by score, and each case gets a fixed guidance paragraph for its score band.
 
-This keeps both RAG paths from the original draft: path 1 retrieves prior confirmed cases, path 2 retrieves guidelines.
-
-**Baseline table** (same queues, same metrics):
-1. **Arrival order.** This is today's practice.
-2. Metadata only: logistic regression on age, sex and site.
-3. The classic ABCD dermoscopy score (TDS).
-4. The image model alone.
-5. The chosen system: image model plus metadata.
+### Baseline Evaluation Table
+To justify the multi-modal design, the pipeline will be benchmarked against the following baselines (evaluated strictly on the same held-out PAD-UFES-20 test patients):
+1. **Metadata Only (The Floor):** A standard Logistic Regression model trained purely on patient age, sex, and the symptom checklist. *The baseline bar to beat is an AUC of 0.90 established during Exploratory Data Analysis (EDA).*
+2. **Image Model Alone:** The vision component evaluated independently (fine-tuned on clinical images) to isolate the predictive power of visual features.
+3. **The Selected Integrated MVP System (Multi-modal):** The full pipeline combining the Image Model + Symptom Model + RAG clinical explanation, routed directly into the Dermatologist Dashboard.
 
 ## 5 · Agent seat
 - **Decision (what a script can't do):** for each referral, decide whether the photo is usable or the doctor must retake it, which missing clinical facts to request (a change over time matters for melanoma; bleeding points to BCC), which similar cases and guideline passages support the priority, and when uncertainty should raise the case rather than lower it.
