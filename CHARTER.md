@@ -66,7 +66,6 @@ To justify the multi-modal design, the pipeline will be benchmarked against the 
   * Explicit "I don't know" fallback if clinical inquiries fall outside the verified NCI PDQ guidance corpus.
   * Users under the age of 18 are automatically routed to direct clinical review regardless of AI score.
 
----
 
 ## 6 · Risks and cut line
 | Risk | Mitigation |
