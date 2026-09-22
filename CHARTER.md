@@ -10,7 +10,7 @@
 
 **What we build:** The patient uploads a smartphone photograph of the lesion and fills out a brief symptom form via the healthcare fund's app. This data is **forwarded directly to a dermatologist's triage dashboard**. The AI analyzes the inputs to calculate a **preliminary risk score and flags high-urgency cases**, allowing the dermatologist to review the image remotely and fast-track urgent appointments (e.g., within 48 hours) or initiate immediate clinical workflows. This optimizes the queue system without rendering an autonomous, final diagnosis to the patient.
   
-**AI-deletion test:** Today, there is a severe disconnect between primary care and specialists. Lacking proper diagnostic tools, General Practitioners refer almost every suspicious mole to a dermatologist just to be safe—flooding the system with false alarms and creating months-long waiting lists.Our application bridges this gap. By allowing the GP to capture an image of the lesion on the spot, our technology instantly analyzes the data and provides immediate diagnostic context. This filters out the false alarms at the frontline, ensuring high-risk cancer patients are immediately fast-tracked to the specialist.
+**AI-deletion test:** Without AI, the dermatologist's dashboard receives an unstructured, un-prioritized backlog of photos, forcing them to review images chronologically. This completely defeats the purpose of an automated urgency-based queue acceleration.
 
 ## 2 · Success metrics (fixed before any code)
 All metrics are measured on **simulated referral queues** of 100 held-out lesions each (split by lesion). Malignant prevalence is set at 5%, 10% and 20%, because the real referral mix is unknown.
