@@ -57,15 +57,16 @@ To justify the multi-modal design, the pipeline will be benchmarked against the 
 2. **Image Model Alone:** The vision component evaluated independently (fine-tuned on clinical images) to isolate the predictive power of visual features.
 3. **The Selected Integrated MVP System (Multi-modal):** The full pipeline combining the Image Model + Symptom Model + RAG clinical explanation, routed directly into the Dermatologist Dashboard.
 
-## 5 · Agent seat
-- **Decision (what a script can't do):** for each referral, decide whether the photo is usable or the doctor must retake it, which missing clinical facts to request (a change over time matters for melanoma; bleeding points to BCC), which similar cases and guideline passages support the priority, and when uncertainty should raise the case rather than lower it.
-- **Tools:** `check_image_quality`, `score_lesion`, `find_similar_cases`, `request_info_from_referrer`, `retrieve_guidance`, `write_triage_note`.
-- **On failure:** fall back to ranking by model score only. Any error or low confidence moves the case **up** the queue, never down.
+## 5 · Agent Seat
+- **Decision:** Determines whether the uploaded smartphone photo meets clinical quality standards, decides which specific follow-up context is required, and orchestrates the fusion of visual risk scores, clinical history, and symptoms into a final dashboard prioritization tier.
+- **Tools:** `check_image_quality`, `predict_visual_risk`, `score_symptoms`, `retrieve_guidance_context`, `flag_high_urgency`.
+- **On failure:** Fall back to the non-agent path. Any error, low confidence, or missing data defaults to **"High Urgency / Refer to Clinician Immediately"**.
 - **Guardrails:**
-  - never closes or dismisses a referral;
-  - never states a diagnosis, only a priority with cited reasons;
-  - "I don't know" outside the guidance corpus;
-  - referral text is treated as data, not instructions.
+  * Strict prohibition of "benign" or "safe" diagnostic wording in the dashboard or patient communications.
+  * Explicit "I don't know" fallback if clinical inquiries fall outside the verified NCI PDQ guidance corpus.
+  * Users under the age of 18 are automatically routed to direct clinical review regardless of AI score.
+
+---
 
 ## 6 · Risks and cut line
 | Risk | Mitigation |
