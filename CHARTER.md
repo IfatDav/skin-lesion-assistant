@@ -4,7 +4,7 @@
 **Retrieval asset:** the module 5 grounded assistant.
 
 ## 1 · Problem & User
-**User:** General Practitioners (GPs) / Primary Care Physicians equipped with a Mobile Dermatoscope
+**User:** A dermatologist working within an Israeli healthcare fund (e.g., Clalit, Maccabi) who manages an overloaded appointment queue, alongside a patient who captures a photo of a worrying mole using their smartphone.
 
 **Pain:** The Specialist Shortage: Severe shortage of dermatologists leads to waiting times of up to 4–6 months for a routine skin check.The Survival Window: During this critical delay, dangerous malignancies like Melanoma can aggressively metastasize, significantly reducing patient survival rates.Systemic Inefficiency: Millions of dollars and thousands of clinical hours are wasted on unnecessary specialist referrals for benign moles (false alarms), clogging the entire 
 
