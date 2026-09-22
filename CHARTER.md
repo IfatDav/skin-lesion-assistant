@@ -1,6 +1,6 @@
 # Project Charter · Smart Screening: Optimizing the Healthcare Pipeline from Primary Care to Specialist
 
-**Team:** Ifat Davidson · Roi Budnitsky · Yuval Rubenchuk · Tami Khazma | **Course:** BIU DS23 Capstone | **Date:** 25.9.2026
+**Team:** Ifat Davidson · Tami Khazma · Roi Budnitsky · Yuval Rubenchuk | **Course:** BIU DS23 Capstone | **Date:** 25.9.2026
 **Retrieval asset:** the module 5 grounded assistant.
 
 ## 1 · Problem & User
