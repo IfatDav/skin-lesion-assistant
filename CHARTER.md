@@ -61,6 +61,7 @@ flowchart LR
     E --> F[Dermatologist Dashboard Alert]
     G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & E
 ```
+**It works end to end without the agent:** both models score each patient, the top-scored cases fill the day's 10 slots, and each case gets a fixed reason for its score band.
 
 ### Baseline Evaluation Table
 To justify the multi-modal design, the pipeline will be benchmarked against the following baselines (evaluated strictly on the same held-out PAD-UFES-20 test patients):
