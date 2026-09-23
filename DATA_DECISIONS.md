@@ -30,49 +30,6 @@ This file backs the data section of [CHARTER.md](../CHARTER.md). All numbers com
 3. **Age shortcut:** sensitivity for users under 40.
 4. **Overlap check:** MILK10k lesions that also appear in HAM10000 (via the ISIC ID in the MILK10k metadata) are removed before pretraining and evaluation.
 
-flowchart LR
-    %% הגדרת סגנון לבוקסים
-    classDef step fill:#ffffff,stroke:#333333,stroke-width:2px;
-    classDef agent fill:#e0f7fa,stroke:#006064,stroke-width:2px;
-
-    %% תזמור וזיכרון (החלק העליון/מרכזי)
-    Agent((Agent)):::agent
-    Memory[(memory)]:::step
-    Memory <--> Agent
-
-    %% זרימת הנתונים הראשונית (משמאל לימין)
-    USER[USER Access msg]:::step --> trigger[trigger]:::step
-    trigger --> transcribe[transcribe]:::step
-    
-    %% פיצול למודלים השונים (Multimodal Split)
-    transcribe --> Intent[Spesific intent]:::step
-    transcribe --> Crop[Quality check & lesion crop]:::step
-
-    %% עיבוד במודלים ואימות
-    Intent --> SymptomModel[Symptom model<br/>trained on PAD-UFES-20]:::step
-    Crop --> ImageModel[Image model<br/>fine-tuned on ISIC & PAD clinical]:::step
-    ImageModel --> DeletionTest[AI-deletion test<br/>Explainability Validation]:::step
-
-    %% מנוע הידע וה-RAG
-    VectorDB[(Vector DB)]:::step <--> RAG[RAG over NCI PDQ<br/>Chroma DB + citations]:::step
-
-    %% חיבור הסוכן לניהול הרכיבים המרכזיים
-    Agent -. orchestrates .-> Intent
-    Agent -. orchestrates .-> ImageModel
-    Agent -. orchestrates .-> RAG
-
-    %% שלב קבלת ההחלטות והפלט (Triage & Dashboard)
-    SymptomModel --> Triage[Urgency level calculation]:::step
-    DeletionTest --> Triage:::step
-    RAG --> Triage:::step
-
-    Triage --> Dashboard[Dermatologist Dashboard Alert<br/>Optimized Appointment Scheduling]:::step
-    Dashboard --> Feedback[Dr. feedback]:::step
-    
-    %% לולאת משוב לשיפור המודלים
-    Feedback -.-> |Model improvement| ImageModel & SymptomModel
-
-
 ## 5 · Licensing and the path to a real product
 Most images are CC-BY-NC, which is fine for the course. A commercial pilot would need:
 - data licences from the contributing institutions, **or** our own data collection with Helsinki-committee approval and informed consent;
