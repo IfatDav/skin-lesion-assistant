@@ -91,6 +91,7 @@ To justify the multi-modal design, the pipeline will be benchmarked against the 
 | **Patient data leakage** (Naive splits place different photos of the same patient across train/test splits) | Split data strictly at the **Patient ID** level, ensuring a patient's images never span across both training and evaluation sets. |
 | **Prevalence mismatch** (51% of the ISIC clinical images are malignant, because they are lesions that were chosen for biopsy) | **Fill a fixed daily capacity (top-10) rather than rely on a probability threshold**; present cases to the dermatologist as a ranked list, never as raw probabilities. |
 | **Data domain gap** (Patients shooting photos with poor lighting, blurry focus, or lens artifacts) | Use the DDI and PAD-UFES-20 datasets to explicitly train the input filter to reject unreadable images and prompt immediate re-takes. |
+| **No verified dark-skin test data.** Both skin-tone sources skew light | Report M2 per Fitzpatrick bin with confidence intervals; state that Fitzpatrick V–VI performance is unvalidated, and list it as the first requirement for a clinical pilot |
 
 **Cut line:** *If the implementation timeline is compressed to under two weeks, drop the dynamic agent logic and focus entirely on deploying the core pipeline: Smartphone Photo + Symptom Form → Algorithmic Urgency Tiering → Dermatologist Dashboard UI.*
 
