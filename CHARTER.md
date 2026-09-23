@@ -64,7 +64,7 @@ flowchart LR
     E --> F[Dermatologist:<br/>move earlier / pre-issue biopsy referral / leave]
     G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & L & E
 ```
-**It works end to end without the agent: both models score each patient, the deterministic ranking policy fills the day's urgent slots, and each case receives a fixed model-evidence summary containing the relevant score bands, symptom flags and image-quality status
+It works end to end without the agent: both models score each patient, the deterministic ranking policy fills the day's urgent slots, and each case receives a fixed model-evidence summary containing the relevant score bands, symptom flags and image-quality status
 
 ### Baseline Evaluation Table
 To justify the multi-modal design, the pipeline will be benchmarked against the following baselines (evaluated strictly on the same held-out PAD-UFES-20 test patients):
