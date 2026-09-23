@@ -114,4 +114,4 @@ To justify the multi-modal design, the pipeline will be benchmarked against the 
 
 ---
 ¹ Murad H et al. *Measuring geographical disparities in waiting times for community-based specialist care.* Israel Journal of Health Policy Research, 2025. [doi:10.1186/s13584-025-00702-7](https://doi.org/10.1186/s13584-025-00702-7). Covers all dermatologists in all four health funds, 2019–2023.
-² Maccabi, online dermatologist consultation: "not intended for urgent cases or for diagnosing moles and skin lesions". Clalit, online dermatologists: excludes "diagnosis and assessment of nevi" and suspected skin cancer. Both checked 18.9.2026.
+² Maccabi, [online dermatologist consultation](https://www.maccabi4u.co.il/31276/digital-services/communication/consultation_dermatologists/): "not intended for urgent cases or for diagnosing moles and skin lesions". Clalit, [online dermatologists](https://www.clalit.co.il/he/online_doctors/Pages/dermatologist_on_line.aspx): excludes "diagnosis and assessment of nevi" and suspected skin cancer. Both checked 18.9.2026.
