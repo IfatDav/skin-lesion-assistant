@@ -11,7 +11,8 @@ A public-system dermatologist appointment in Israel takes a median of **24.5 day
 In that queue a melanoma waits exactly as long as a harmless mole, and the dermatologist has no way to know which patient it is until the visit itself.
 
 **What we build:** while waiting for their appointment, The patient uploads a smartphone photograph of the lesion and fills out a brief symptom form via the healthcare fund's app. The system scores every patient on the waiting list. Every morning it shows the dermatologist a **short list of up to 10 suspicious cases**, each with the photo, the answers and cited reasons.
-- For each case the dermatologist decides whether to **move the patient to an earlier in-person appointment** and whether to **issue a biopsy referral in advance**, so the biopsy is done at the first visit instead of a second one.
+For each case the dermatologist decides whether to **move the patient to an earlier in-person appointment** and whether to 
+**issue a biopsy referral in advance**, so the biopsy is done at the first visit instead of a second one.
 **Safety principle:** the system can only move a patient *earlier*. A patient who is not flagged keeps their regular appointment, so a miss costs at most today's situation. The patient never sees a risk score or a diagnosis, and the dermatologist decides on every case.
   
 **AI-deletion test:** Without AI the problem remains: dozens of photos arrive every day, and no dermatologist can review them all in time to find the few that cannot wait.
