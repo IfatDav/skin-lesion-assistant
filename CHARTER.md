@@ -76,8 +76,8 @@ To justify the multi-modal design, the pipeline will be benchmarked against the 
 The RAG explanation layer is evaluated separately under M3 and is not counted as part of predictive performance.
 
 ## 5 · Agent Seat
-- **Decision: Determines which tools and contextual checks are needed for each clinician-facing case, handles image-quality and missing-information workflows, retrieves grounded clinical guidance, and assembles the evidence shown to the dermatologist. The agent does not set, modify or override the validated patient risk score or the deterministic daily ranking policy.**
-- **Tools:** `check_image_quality`, `predict_visual_risk`, `score_symptoms`, `retrieve_guidance_context`, **`build_daily_list`**, **`draft_biopsy_referral`**.
+- **Decision (what a fixed script cannot do):** for each case the agent decides whether the photo is usable or the patient must be asked for a retake, **which follow-up question is worth asking** (a change over time is the melanoma signal, 16.8% vs 0.5%; bleeding points to BCC), which guideline passages support this particular case, and when missing information should send the case to manual review instead of into the automated flow. It assembles the evidence the dermatologist sees. **It never sets, modifies or overrides the validated risk score or the deterministic ranking that fills the daily slots.**
+- **Tools:** `check_image_quality`, `request_retake`, `ask_patient`, `predict_visual_risk`, `score_symptoms`, `retrieve_guidance_context`, `draft_biopsy_referral`.
 - On failure: Fall back to the non-agent path. Any tool error, low confidence or missing critical input routes the case to a separate manual-review queue and never lowers its validated model priority or removes its regular appointment.
 - **Guardrails:**
   * **The agent never issues a biopsy referral and never books an appointment on its own. It only drafts, and the dermatologist approves every action.**
