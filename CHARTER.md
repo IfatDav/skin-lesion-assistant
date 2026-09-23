@@ -8,6 +8,7 @@
 
 **Pain:**  the dermatologist cannot tell which patient on the waiting list cannot wait.
 A public-system dermatologist appointment in Israel takes a median of **24.5 days**, rising by **8.5 days a year**, and reaches **40–42 days** in Tel Aviv and Jerusalem ¹.
+Clalit's and Maccabi's online dermatology services explicitly exclude moles and suspected skin cancer.² So every mole goes into the same first-come, first-served in-person queue.
 In that queue a melanoma waits exactly as long as a harmless mole, and the dermatologist has no way to know which patient it is until the visit itself.
 
 **What we build:** while waiting for their appointment, The patient uploads a smartphone photograph of the lesion and fills out a brief symptom form via the healthcare fund's app. The system scores every patient on the waiting list. Every morning it shows the dermatologist a **short list of up to 10 suspicious cases**, each with the photo, the answers and cited reasons.
@@ -111,3 +112,4 @@ To justify the multi-modal design, the pipeline will be benchmarked against the 
 
 ---
 ¹ Murad H et al. *Measuring geographical disparities in waiting times for community-based specialist care.* Israel Journal of Health Policy Research, 2025. [doi:10.1186/s13584-025-00702-7](https://doi.org/10.1186/s13584-025-00702-7). Covers all dermatologists in all four health funds, 2019–2023.
+² Maccabi, online dermatologist consultation: "not intended for urgent cases or for diagnosing moles and skin lesions". Clalit, online dermatologists: excludes "diagnosis and assessment of nevi" and suspected skin cancer. Both checked 18.9.2026.
