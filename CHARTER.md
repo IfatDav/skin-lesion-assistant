@@ -78,7 +78,7 @@ The RAG explanation layer is evaluated separately under M3 and is not counted as
 ## 5 · Agent Seat
 - **Decision: Determines which tools and contextual checks are needed for each clinician-facing case, handles image-quality and missing-information workflows, retrieves grounded clinical guidance, and assembles the evidence shown to the dermatologist. The agent does not set, modify or override the validated patient risk score or the deterministic daily ranking policy.**
 - **Tools:** `check_image_quality`, `predict_visual_risk`, `score_symptoms`, `retrieve_guidance_context`, **`build_daily_list`**, **`draft_biopsy_referral`**.
-- **On failure: Fall back to the non-agent path. Any tool error, low confidence or missing critical input routes the case to a separate manual-review queue and never lowers its validated model priority or removes its regular appointment.
+- On failure: Fall back to the non-agent path. Any tool error, low confidence or missing critical input routes the case to a separate manual-review queue and never lowers its validated model priority or removes its regular appointment.
 - **Guardrails:**
   * **The agent never issues a biopsy referral and never books an appointment on its own. It only drafts, and the dermatologist approves every action.**
   * Strict prohibition of "benign" or "safe" diagnostic wording in the dashboard or patient communications.
