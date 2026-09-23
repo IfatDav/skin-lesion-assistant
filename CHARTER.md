@@ -55,12 +55,13 @@ The system runs end-to-end as a multi-modal pipeline, utilizing an orchestrating
 ```mermaid
 flowchart LR
     A[Phone photo + symptom answers] --> B[Quality check + lesion crop]
-    B --> C[Image model<br/>fine-tuned on ISIC & PAD clinical]
+    B --> C[Image model<br/>pretrained on HAM10000,<br/>fine-tuned on ISIC clinical]
     A --> S[Symptom model<br/>trained on PAD-UFES-20]
-    C & S --> D[Urgency level calculation]
-    D --> E[RAG over NCI PDQ<br/>Chroma DB + citations]
-    E --> F[Dermatologist Dashboard Alert]
-    G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & E
+    C & S --> D[Risk score per patient]
+    D --> L[Daily top-10 list<br/>within urgent-slot capacity]
+    L --> E[RAG over NCI PDQ<br/>Chroma DB + citations]
+    E --> F[Dermatologist:<br/>move earlier / pre-issue biopsy referral / leave]
+    G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & L & E
 ```
 **It works end to end without the agent:** both models score each patient, the top-scored cases fill the day's 10 slots, and each case gets a fixed reason for its score band.
 
