@@ -17,7 +17,6 @@ For each case the dermatologist decides whether to **move the patient to an earl
 **Safety principle:** the system can only move a patient *earlier*. A patient who is not flagged keeps their regular appointment, so a miss costs at most today's situation. The patient never sees a risk score or a diagnosis, and the dermatologist decides on every case.
   
 **AI-deletion test:** Without AI the problem remains: dozens of photos arrive every day, and no dermatologist can review them all in time to find the few that cannot wait.
-The AI-deletion test is integrated into the system to validate the algorithm's clinical reasoning, ensuring that urgency-triage decisions are based on actual dermatological anomalies rather than visual noise, thereby optimizing clinic scheduling and reducing false-positive appointments 
 
 ## 2 · Success metrics (fixed before any code)
 
