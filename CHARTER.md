@@ -62,7 +62,10 @@ flowchart LR
     D --> L[Daily top-10 list<br/>within urgent-slot capacity]
     L --> E[RAG over NCI PDQ<br/>Chroma DB + citations]
     E --> F[Dermatologist:<br/>move earlier / pre-issue biopsy referral / leave]
-    G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & L & E
+    B -. unusable photo .-> M[Manual review queue<br/>tool error · low confidence · missing input]
+    M --> F
+    G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & E
+    G -. on failure .-> M
 ```
 It works end to end without the agent: both models score each patient, the deterministic ranking policy fills the day's urgent slots, and each case receives a fixed model-evidence summary containing the relevant score bands, symptom flags and image-quality status
 
