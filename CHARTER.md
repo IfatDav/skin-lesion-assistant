@@ -72,12 +72,15 @@ To justify the multi-modal design, the pipeline will be benchmarked against the 
 4. **The Selected Integrated MVP System (Multi-modal):** The full pipeline combining the Image Model + Symptom Model + RAG clinical explanation, routed directly into the Dermatologist Dashboard.
 
 ## 5 · Agent Seat
-- **Decision:** Determines whether the uploaded smartphone photo meets clinical quality standards, decides which specific follow-up context is required, and orchestrates the fusion of visual risk scores, clinical history, and symptoms into a final dashboard prioritization tier.
-- **Tools:** `check_image_quality`, `predict_visual_risk`, `score_symptoms`, `retrieve_guidance_context`, `flag_high_urgency`.
-- **On failure:** Fall back to the non-agent path. Any error, low confidence, or missing data defaults to **"High Urgency / Refer to Clinician Immediately"**.
+- **Decision:** Determines whether the uploaded smartphone photo meets clinical quality standards, decides which specific follow-up context is required, orchestrates the fusion of visual risk scores, clinical history and symptoms into a prioritization tier, and **decides how to fill a limited number of urgent slots: which cases make the day's list of 10, and what evidence to show the dermatologist for each one.**
+- **Tools:** `check_image_quality`, `predict_visual_risk`, `score_symptoms`, `retrieve_guidance_context`, **`build_daily_list`**, **`draft_biopsy_referral`**.
+- **On failure:** Fall back to the non-agent path. Any error, low confidence or missing data puts the case **onto** the dermatologist's list rather than off it. No patient ever loses their regular appointment.
 - **Guardrails:**
+  * **The agent never issues a biopsy referral and never books an appointment on its own. It only drafts, and the dermatologist approves every action.**
   * Strict prohibition of "benign" or "safe" diagnostic wording in the dashboard or patient communications.
+  * The patient receives a neutral message ("your photo was received and will be reviewed") and never a risk estimate.
   * Explicit "I don't know" fallback if clinical inquiries fall outside the verified NCI PDQ guidance corpus.
+  * Patient-submitted text is treated as data, never as instructions.
   * Users under the age of 18 are automatically routed to direct clinical review regardless of AI score.
 
 ## 6 · Risks and cut line
