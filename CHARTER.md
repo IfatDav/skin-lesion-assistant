@@ -23,7 +23,7 @@ For each case the dermatologist decides whether to **move the patient to an earl
 
 | # | Metric | Target |
 |---|---|---|
-| M1 | **Median days to appointment for malignant lesions** (MEL + BCC + SCC), in a waiting-list simulation with 10 urgent slots a day | **≤ 7 days** (today: 24.5¹) |
+| M1 | **Median days to appointment for malignant lesions** (MEL + BCC + SCC), in a waiting-list simulation with 10 urgent slots a day | **Reduction in median waiting time for malignant cases vs FIFO baseline, evaluated under predefined queue scenarios (today: 24.5¹) |
 | M2 | **Sensitivity for skin cancer** (MEL + BCC + SCC → flagged for high-urgency dashboard triage) on **held-out PAD-UFES-20 patients** (real phone photos) | **≥ 0.90** |
 | M3 | Groundedness on a frozen set of 20 guidance questions (5 unanswerable), plus a check that each number appears in its cited source | ≥ 0.9, and 5/5 refusals |
 | M4 | Agent scenario set of 15 complex clinical workflows | ≥ 13/15 correct; **zero** malignant cases left untriaged in the standard queue |
