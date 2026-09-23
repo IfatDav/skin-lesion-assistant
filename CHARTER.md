@@ -8,12 +8,10 @@
 
 **Pain:**  the dermatologist cannot tell which patient on the waiting list cannot wait.
 A public-system dermatologist appointment in Israel takes a median of **24.5 days**, rising by **8.5 days a year**, and reaches **40–42 days** in Tel Aviv and Jerusalem ¹.
-Clalit's and Maccabi's online dermatology services explicitly exclude moles and suspected skin cancer.² So every mole goes into the same first-come, first-served in-person queue.
-In that queue a melanoma waits exactly as long as a harmless mole, and the dermatologist has no way to know which patient it is until the visit itself.
+Clalit's and Maccabi's online dermatology services explicitly exclude moles and suspected skin cancer.² These cases therefore require in-person assessment. In the absence of a dedicated pre-visit image-triage mechanism, the waiting list itself does not reveal which lesions are most urgent. A malignant lesion may therefore remain in the standard queue until it is reviewed by a clinician.
 
 **What we build:** while waiting for their appointment, The patient uploads a smartphone photograph of the lesion and fills out a brief symptom form via the healthcare fund's app. The system scores every patient on the waiting list. Every morning it shows the dermatologist a **short list of up to 10 suspicious cases**, each with the photo, the answers and cited reasons.
-For each case the dermatologist decides whether to **move the patient to an earlier in-person appointment** and whether to 
-**issue a biopsy referral in advance**, so the biopsy is done at the first visit instead of a second one.
+For each case, the dermatologist decides whether to move the patient to an earlier in-person appointment and, where clinically and operationally appropriate, whether to issue a biopsy referral in advance to accelerate the diagnostic workup.
 
 **Safety principle:** the system can only move a patient *earlier*. A patient who is not flagged keeps their regular appointment, so a miss costs at most today's situation. The patient never sees a risk score or a diagnosis, and the dermatologist decides on every case.
   
@@ -23,12 +21,15 @@ For each case the dermatologist decides whether to **move the patient to an earl
 
 | # | Metric | Target |
 |---|---|---|
-| M1 | **Median days to appointment for malignant lesions** (MEL + BCC + SCC), in a waiting-list simulation with 10 urgent slots a day | **Reduction in median waiting time for malignant cases vs FIFO baseline, evaluated under predefined queue scenarios (today: 24.5¹) |
-| M2 | **Sensitivity for skin cancer** (MEL + BCC + SCC → flagged for high-urgency dashboard triage) on **held-out PAD-UFES-20 patients** (real phone photos) | **≥ 0.90** |
+M1 | Median simulated days to appointment for patients with malignant lesions (MEL + BCC + SCC), under the predefined waiting-list scenarios and fixed urgent-slot capacity | ≤ 7 days in the primary simulation scenario; always reported alongside the absolute and percentage reduction versus the FIFO baseline |
+M2 | Patient-level sensitivity for skin cancer (MEL + BCC + SCC → flagged for high-urgency dashboard triage) on held-out PAD-UFES-20 patients (real phone photos) | ≥ 0.90, reported with 95% confidence intervals and absolute TP/FN counts. Melanoma sensitivity is also reported separately. |
 | M3 | Groundedness on a frozen set of 20 guidance questions (5 unanswerable), plus a check that each number appears in its cited source | ≥ 0.9, and 5/5 refusals |
-| M4 | Agent scenario set of 15 complex clinical workflows | ≥ 13/15 correct; **zero** malignant cases left untriaged in the standard queue |
+M4 | Agent scenario set of 15 complex workflow cases | ≥ 13/15 correct; zero cases in which the agent suppresses, downgrades or removes a patient who was flagged by the validated deterministic triage policy. |
+
+All predictive metrics are computed at the patient level. For patients with multiple images, the aggregation rule is defined and frozen before test-set evaluation.
 
 Sensitivity comes before list length: a missed melanoma costs far more than one extra case for the dermatologist to review. All metrics are stratified by skin tone (the PAD Fitzpatrick field and the MILK10k skin-tone field) and by patient age group. The simulation is run at 5, 10 and 15 urgent slots a day, and at 5%, 10% and 20% malignant prevalence, because the real mix is unknown.
+Because the real-world prevalence is unknown, queue-level metrics are interpreted as scenario results rather than estimates of current healthcare-fund performance.
 
 ## 3 · Data (all four checks run 18–19.9; details in [`docs/DATA_DECISIONS.md`](docs/DATA_DECISIONS.md))
 | Source | Role | Size | Why | Licence |
@@ -63,7 +64,7 @@ flowchart LR
     E --> F[Dermatologist:<br/>move earlier / pre-issue biopsy referral / leave]
     G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & L & E
 ```
-**It works end to end without the agent:** both models score each patient, the top-scored cases fill the day's 10 slots, and each case gets a fixed reason for its score band.
+**It works end to end without the agent: both models score each patient, the deterministic ranking policy fills the day's urgent slots, and each case receives a fixed model-evidence summary containing the relevant score bands, symptom flags and image-quality status
 
 ### Baseline Evaluation Table
 To justify the multi-modal design, the pipeline will be benchmarked against the following baselines (evaluated strictly on the same held-out PAD-UFES-20 test patients):
@@ -71,12 +72,13 @@ To justify the multi-modal design, the pipeline will be benchmarked against the 
 1. **Arrival order (today's practice):** every patient waits for their regular slot, a median of 24.5 days.¹ This is what M1 is measured against, and the only baseline that represents the current system.
 2. **Metadata Only (The Floor):** A standard Logistic Regression model trained purely on patient age, sex, and the symptom checklist. *The baseline bar to beat is an AUC of 0.90 established during Exploratory Data Analysis (EDA).*
 3. **Image Model Alone:** The vision component evaluated independently (fine-tuned on clinical images) to isolate the predictive power of visual features.
-4. **The Selected Integrated MVP System (Multi-modal):** The full pipeline combining the Image Model + Symptom Model + RAG clinical explanation, routed directly into the Dermatologist Dashboard.
+4. The Selected Integrated Triage Model (Multi-modal): Image Model + Symptom Model + fusion layer, evaluated against M1 and M2.
+The RAG explanation layer is evaluated separately under M3 and is not counted as part of predictive performance.
 
 ## 5 · Agent Seat
-- **Decision:** Determines whether the uploaded smartphone photo meets clinical quality standards, decides which specific follow-up context is required, orchestrates the fusion of visual risk scores, clinical history and symptoms into a prioritization tier, and **decides how to fill a limited number of urgent slots: which cases make the day's list of 10, and what evidence to show the dermatologist for each one.**
+- **Decision: Determines which tools and contextual checks are needed for each clinician-facing case, handles image-quality and missing-information workflows, retrieves grounded clinical guidance, and assembles the evidence shown to the dermatologist. The agent does not set, modify or override the validated patient risk score or the deterministic daily ranking policy.**
 - **Tools:** `check_image_quality`, `predict_visual_risk`, `score_symptoms`, `retrieve_guidance_context`, **`build_daily_list`**, **`draft_biopsy_referral`**.
-- **On failure:** Fall back to the non-agent path. Any error, low confidence or missing data puts the case **onto** the dermatologist's list rather than off it. No patient ever loses their regular appointment.
+- **On failure: Fall back to the non-agent path. Any tool error, low confidence or missing critical input routes the case to a separate manual-review queue and never lowers its validated model priority or removes its regular appointment.
 - **Guardrails:**
   * **The agent never issues a biopsy referral and never books an appointment on its own. It only drafts, and the dermatologist approves every action.**
   * Strict prohibition of "benign" or "safe" diagnostic wording in the dashboard or patient communications.
