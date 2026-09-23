@@ -94,7 +94,7 @@ To justify the multi-modal design, the pipeline will be benchmarked against the 
 | **Data domain gap** (Patients shooting photos with poor lighting, blurry focus, or lens artifacts) | Use PAD-UFES-20, the only source actually shot on smartphones, to train the input filter to reject unreadable images and prompt an immediate re-take. |
 | **No verified dark-skin test data.** Both skin-tone sources skew light | Report M2 per Fitzpatrick bin with confidence intervals; state that Fitzpatrick V–VI performance is unvalidated, and list it as the first requirement for a clinical pilot |
 
-**Cut line:** *If the implementation timeline is compressed to under two weeks, drop the dynamic agent logic and focus entirely on deploying the core pipeline: Smartphone Photo + Symptom Form → Algorithmic Urgency Tiering → Dermatologist Dashboard UI.*
+**Cut line:** *If only two weeks remain, we drop the agent and the biopsy-referral draft, and ship the core pipeline: smartphone photo + symptom form → ranked waiting list → daily top-10 with a fixed reason per score band.*
 
 ## 7 · Milestones and hats
 | Date | Deliverable |
