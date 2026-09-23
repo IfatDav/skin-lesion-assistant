@@ -27,7 +27,7 @@ For each case the dermatologist decides whether to **move the patient to an earl
 | M3 | Groundedness on a frozen set of 20 guidance questions (5 unanswerable), plus a check that each number appears in its cited source | ≥ 0.9, and 5/5 refusals |
 | M4 | Agent scenario set of 15 complex clinical workflows | ≥ 13/15 correct; **zero** malignant cases left untriaged in the standard queue |
 
-Sensitivity comes before list length: a missed melanoma has catastrophic clinical consequences compared to a false positive triage flag. To ensure diagnostic equity and mitigate systemic bias, all metrics will be stratified and reported across both distinct skin tones (utilizing the DDI dataset) and patient age groups.
+Sensitivity comes before list length: a missed melanoma costs far more than one extra case for the dermatologist to review. All metrics are stratified by skin tone (the PAD Fitzpatrick field and the MILK10k skin-tone field) and by patient age group. The simulation is run at 5, 10 and 15 urgent slots a day, and at 5%, 10% and 20% malignant prevalence, because the real mix is unknown.
 
 ## 3 · Data (all four checks run 18–19.9; details in [`docs/DATA_DECISIONS.md`](docs/DATA_DECISIONS.md))
 | Source | Role | Size | Why | Licence |
