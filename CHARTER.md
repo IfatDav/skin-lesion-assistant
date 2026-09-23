@@ -30,18 +30,23 @@ The AI-deletion test is integrated into the system to validate the algorithm's c
 
 Sensitivity comes before list length: a missed melanoma has catastrophic clinical consequences compared to a false positive triage flag. To ensure diagnostic equity and mitigate systemic bias, all metrics will be stratified and reported across both distinct skin tones (utilizing the DDI dataset) and patient age groups.
 
-## 3 · Data (all four checks passed, 18–19.9)
-| Source | Role | Size | Layout / Image Type | Skin Tone Bias Mitigation |
+## 3 · Data (all four checks run 18–19.9; details in [`docs/DATA_DECISIONS.md`](docs/DATA_DECISIONS.md))
+| Source | Role | Size | Why | Licence |
 |---|---|---|---|---|
-| **ISIC Archive** (Clinical subsets) |Main training & testing data| 8,837 images, 522 melanomas | Filtered explicitly for **Clinical/Macro images** (excluding dermoscopic) | Primarily light skin tones; used strictly for structural feature extraction. |
-| **PAD-UFES-20** | Supplementary training | 2,298 images, 1,373 patients, 52 melanomas | **Smartphone (Clinical)** close-ups; includes rich patient metadata (age, sex, itch, bleed, history) | Includes diverse, multi-ethnic patient samples from Brazil. |
-| **DDI (Diverse Dermatology Images)** | Skin-tone validation and bias test set | 656 images | **Smartphone & Clinical** images with verified biopsy gold standards | **Crucial MVP Addition:** Perfectly balanced across Fitzpatrick skin tones (I-VI) to test and prevent algorithmic bias on dark skin. |
-| **NCI PDQ** patient summaries | Guidance corpus for RAG | ~10–20 documents | Clinical text reference | N/A |
+| **ISIC Archive**, clinical (non-dermoscopic) images, incl. MILK10k | **Main training data** | 8,837 images, **522 melanomas**, 1,005 nevi | The largest pool of non-dermoscopic images with enough melanomas; the closest public proxy for a phone photo | CC-BY-NC / CC-BY (per image) |
+| **PAD-UFES-20** | **Test set** of real phone photos; the only source with symptoms; training only from patients outside the test split | 2,298 images, 1,373 patients, **52 melanomas** | The only source actually shot on smartphones, and the only one with the symptom answers our app collects. Too small to train on alone | CC BY 4.0 |
+| **HAM10000** | **Pretraining only** | 10,015 images, 1,113 melanomas | Dermoscopic (10× magnification, polarised light), so it shows subsurface structures a phone cannot capture. Useful as a starting point for the network, never as the target domain | CC BY-NC 4.0 |
+| **NCI PDQ** patient summaries | Guidance corpus for the RAG | ~10–20 documents | Official, citable text for the reasons shown to the dermatologist | Free of copyright; credit NCI |
 
-**Rejected:** 
-- `HAM10000` & `BCN20000`: Completely dermoscopic. Since our MVP relies on patient-shot smartphone photos, dermoscopic data introduces an unacceptable domain gap.
-- `marmal88/skin_cancer`: High data leakage (80% of its test set is present in the training set).
-- `Fitzpatrick 17k`: More than 75% of the original image URLs are dead.
+**PAD appears twice** (on Mendeley and inside the ISIC Archive). We use one copy only; otherwise every PAD image would be duplicated across train and test.
+
+**Rejected:**
+- `BCN20000`: dermoscopic only, so beyond HAM10000 it adds volume and no new domain.
+- `marmal88/skin_cancer`: a re-upload whose 13,354 rows hold only 10,015 unique images. **79.8% of its test images are also in train.**
+- `Fitzpatrick 17k`: atlas photos, mostly non-cancerous conditions, with no age, sex or body site. Only **10 of 40 sampled image links still work**. Its advantage, diverse skin tones, does not survive the dead links.
+- **Generative phone-to-dermoscopic conversion**: a generator would invent subsurface structures that the phone never captured. Unsafe for a medical product.
+
+**Skin-tone reporting without DDI:** M2 is stratified by the Fitzpatrick field in PAD-UFES-20 (our test set) and the MILK10k skin-tone field (0–5) inside ISIC. Both skew light, so performance on Fitzpatrick V–VI stays an **open limitation** that we state rather than hide.
   
 ## 4 · Architecture
 
