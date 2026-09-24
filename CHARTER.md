@@ -54,7 +54,7 @@ Because the real-world prevalence is unknown, queue-level metrics are interprete
 The system runs end-to-end as a multi-modal pipeline, utilizing an orchestrating agent to manage quality checks and contextual delivery to the clinician.
 
 ```mermaid
-flowchart LR
+flowchart TD
     A[Phone photo + symptom answers] --> B[Quality check + lesion crop]
     B --> C[Image model<br/>pretrained on HAM10000,<br/>fine-tuned on ISIC clinical]
     A --> S[Symptom model<br/>trained on PAD-UFES-20]
