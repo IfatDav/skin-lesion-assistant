@@ -37,7 +37,7 @@ Most images are CC-BY-NC, which is fine for the course. A commercial pilot would
 - regulatory approval as a medical device (in Israel from the MoH medical-device division, AMAR; CE in Europe; FDA in the US);
 - legal advice on whether a model trained on non-commercial data may be used commercially.
 
-![Dermatology AI Triage Architecture](https://mermaid.ink
+
 ```mermaid
 flowchart LR
     %% Data Input & Quality Routing
