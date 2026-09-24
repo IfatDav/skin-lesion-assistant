@@ -49,37 +49,6 @@ Because the real-world prevalence is unknown, queue-level metrics are interprete
 
 **Skin-tone reporting without DDI:** M2 is stratified by the Fitzpatrick field in PAD-UFES-20 (our test set) and the MILK10k skin-tone field (0–5) inside ISIC. Both skew light, so performance on Fitzpatrick V–VI stays an **open limitation** that we state rather than hide.
 
-```mermaid
-flowchart LR
-    %% Data Input & Quality Routing
-    A[Phone photo + symptom answers] --> B[Quality check + lesion crop]
-    
-    %% Error and Low-Confidence Routing (Fail-safe)
-    B -. unusable photo / low confidence .-> M[Manual review queue<br/>tool error · missing input]
-    M --> F[Dermatologist:<br/>move earlier / pre-issue biopsy / leave]
-
-    %% Core Machine Learning Pipeline
-    B --> C[Image model<br/>pretrained on HAM10000,<br/>fine-tuned on ISIC clinical]
-    A --> S[Symptom model<br/>trained on PAD-UFES-20]
-    
-    %% NEW: Explainability Verification (AI-Deletion Test)
-    C --> XAI[AI-deletion test<br/>Explainability Validation]
-
-    %% Knowledge Base Layer (Fixed Position)
-    VectorDB[(Vector DB)] <--> RAG[RAG over NCI PDQ<br/>Chroma DB + citations]
-
-    %% Core Logic & Capacity Management
-    XAI & S & RAG --> D[Risk score per patient]
-    D --> L[Daily top-10 list<br/>within urgent-slot capacity]
-    L --> F
-
-    %% Human-in-the-Loop Feedback Loop (Continuous Learning)
-    F -.-> |Model improvement feedback| C & S
-
-    %% Agent Supervision Layer
-    G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & RAG & D
-    G -. on failure .-> M
-  
 ## 4 · Architecture
 
 The system runs end-to-end as a multi-modal pipeline, utilizing an orchestrating agent to manage quality checks and contextual delivery to the clinician.
