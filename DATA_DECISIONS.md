@@ -39,7 +39,7 @@ Most images are CC-BY-NC, which is fine for the course. A commercial pilot would
 
 
 ```mermaid
-flowchart LR
+flowchart TD
     %% Data Input & Quality Routing
     A[Phone photo + symptom answers] --> B[Quality check + lesion crop]
     
