@@ -55,18 +55,35 @@ The system runs end-to-end as a multi-modal pipeline, utilizing an orchestrating
 
 ```mermaid
 flowchart TD
+    %% Data Input & Quality Routing
     A[Phone photo + symptom answers] --> B[Quality check + lesion crop]
+    
+    %% Error and Low-Confidence Routing (Fail-safe)
+    B -. unusable photo / low confidence .-> M[Manual review queue<br/>tool error · missing input]
+    M --> F[Dermatologist:<br/>move earlier / pre-issue biopsy / leave]
+
+    %% Core Machine Learning Pipeline
     B --> C[Image model<br/>pretrained on HAM10000,<br/>fine-tuned on ISIC clinical]
     A --> S[Symptom model<br/>trained on PAD-UFES-20]
-    C & S --> D[Risk score per patient]
+    
+    %% NEW: Explainability Verification (AI-Deletion Test)
+    C --> XAI[AI-deletion test<br/>Explainability Validation]
+
+    %% Knowledge Base Layer (Fixed Position)
+    VectorDB[(Vector DB)] <--> RAG[RAG over NCI PDQ<br/>Chroma DB + citations]
+
+    %% Core Logic & Capacity Management
+    XAI & S & RAG --> D[Risk score per patient]
     D --> L[Daily top-10 list<br/>within urgent-slot capacity]
-    L --> E[RAG over NCI PDQ<br/>Chroma DB + citations]
-    E --> F[Dermatologist:<br/>move earlier / pre-issue biopsy referral / leave]
-    B -. unusable photo .-> M[Manual review queue<br/>tool error · low confidence · missing input]
-    M --> F
-    G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & E
+    L --> F
+
+    %% Human-in-the-Loop Feedback Loop (Continuous Learning)
+    F -.-> |Model improvement feedback| C & S
+
+    %% Agent Supervision Layer
+    G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & RAG & D
     G -. on failure .-> M
-```
+  ```
 It works end to end without the agent: both models score each patient, the deterministic ranking policy fills the day's urgent slots, and each case receives a fixed model-evidence summary containing the relevant score bands, symptom flags and image-quality status
 
 ### Baseline Evaluation Table
