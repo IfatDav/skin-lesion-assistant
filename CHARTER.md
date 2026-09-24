@@ -49,6 +49,7 @@ Because the real-world prevalence is unknown, queue-level metrics are interprete
 
 **Skin-tone reporting without DDI:** M2 is stratified by the Fitzpatrick field in PAD-UFES-20 (our test set) and the MILK10k skin-tone field (0–5) inside ISIC. Both skew light, so performance on Fitzpatrick V–VI stays an **open limitation** that we state rather than hide.
 
+```mermaid
 flowchart LR
     %% Data Input & Quality Routing
     A[Phone photo + symptom answers] --> B[Quality check + lesion crop]
@@ -78,7 +79,6 @@ flowchart LR
     %% Agent Supervision Layer
     G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & RAG & D
     G -. on failure .-> M
-
   
 ## 4 · Architecture
 
