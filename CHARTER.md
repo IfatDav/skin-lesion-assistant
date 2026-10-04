@@ -121,7 +121,7 @@ The RAG explanation layer is evaluated separately under M3 and is not counted as
 ## 7 · Milestones and hats
 | Date | Deliverable |
 |---|---|
-| 25.9 | Finalized Product Charter & Data Verification ✅ |
+| 4.10 | Finalized Product Charter & Data Verification ✅ |
 | 2.10 | Patient-level data splitting, leakage audits, and cross-dataset dictionary alignment |
 | **18.10 · CP1** | Core End-to-End Pipeline (No Agent); Baseline Evaluation; M3 Groundedness Benchmark |
 | **1.11 · CP2** | Agent Orchestration Layer Integrated; M4 Validation; 1-Minute Live Demo |
