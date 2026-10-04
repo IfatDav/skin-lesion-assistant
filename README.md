@@ -1,7 +1,7 @@
 # Project Charter · Skin Lesion Triage for Healthcare Providers
 
-**Team:** Ifat Davidson · Tami Khazma · Roi Budnitsky · Yuval Rubenchuk | **Course:** BIU DS23 Capstone | **Date:** 25.9.2026
-**Retrieval asset:** the module 5 grounded assistant.
+**Team:** Ifat Davidson · Tami Khazma · Roi Budnitsky · Yuval Rubenchuk | **Course:** BIU DS23 Capstone 
+
 
 ## 1 · Problem & User
 **User:** A dermatologist working within an Israeli healthcare fund (e.g., Clalit, Maccabi) who manages an overloaded appointment queue.
