@@ -54,3 +54,12 @@ flowchart TD
     G -. on failure .-> M
   ```
 It works end to end without the agent: both models score each patient, the deterministic ranking policy fills the day's urgent slots, and each case receives a fixed model-evidence summary containing the relevant score bands, symptom flags and image-quality status
+
+##  Team
+
+| Hat | Owner | Responsibility |
+|---|---|---|
+| Data | Ifat Davidson | Pipeline architecture, strict patient-level splitting, data cleaning, and leakage mitigation |
+| Model | Tami Khazma | Training baselines, model fine-tuning, threshold tuning, and multi-ethnic performance analysis |
+| Agent | Roi Budnitsky | Agent tool building, orchestration loops, safety guardrails, and M4 validation set execution |
+| Product | Yuval Rubenchuk | Clinician workflow UX, patient-facing safety copy, README documentation, and final fund presentation deck |
