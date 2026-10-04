@@ -1,6 +1,6 @@
 # Project Charter · Skin Lesion Triage for Healthcare Providers
 
-**Team:** Ifat Davidson · Tami Khazma · Roi Budnitsky · Yuval Rubenchuk | **Course:** BIU DS23 Capstone 
+**Team:** Ifat Davidson · Tami Khazma · Roi Budnitsky · Yuval Rubenchuk | **Course:** BIU DS23
 
 
 ## 1 · Problem & User
