@@ -26,7 +26,7 @@ M2 | Patient-level sensitivity for skin cancer (MEL + BCC + SCC → flagged for 
 | M3 | Groundedness on a frozen set of 20 guidance questions (5 unanswerable), plus a check that each number appears in its cited source | ≥ 0.9, and 5/5 refusals |
 M4 | Agent scenario set of 15 complex workflow cases | ≥ 13/15 correct; zero cases in which the agent suppresses, downgrades or removes a patient who was flagged by the validated deterministic triage policy. |
 
-All predictive metrics are computed at the patient level. For patients with multiple images, the aggregation rule is defined and frozen before test-set evaluation.
+All reported metrics are computed at the patient level on the PAD-UFES-20 test set, which carries patient IDs. Training sources without a patient ID are split at the lesion level instead; this is a limitation we state rather than hide. For patients with multiple images, the aggregation rule is defined and frozen before test-set evaluation.
 
 Sensitivity comes before list length: a missed melanoma costs far more than one extra case for the dermatologist to review. All metrics are stratified by skin tone (the PAD Fitzpatrick field and the MILK10k skin-tone field) and by patient age group. The simulation is run at 5, 10 and 15 urgent slots a day, and at 5%, 10% and 20% malignant prevalence, because the real mix is unknown.
 Because the real-world prevalence is unknown, queue-level metrics are interpreted as scenario results rather than estimates of current healthcare-fund performance.
@@ -34,12 +34,14 @@ Because the real-world prevalence is unknown, queue-level metrics are interprete
 ## 3 · Data (all four checks run 18–19.9; details in [`docs/DATA_DECISIONS.md`](docs/DATA_DECISIONS.md))
 | Source | Role | Size | Why | Licence |
 |---|---|---|---|---|
-| **ISIC Archive**, clinical (non-dermoscopic) images, incl. MILK10k | **Main training data** | 8,837 images, **522 melanomas**, 1,005 nevi | The largest pool of non-dermoscopic images with enough melanomas; the closest public proxy for a phone photo | CC-BY-NC / CC-BY (per image) |
+| **ISIC Archive**, clinical (non-dermoscopic) images, incl. MILK10k | **Main training data** | 6,539 images, 470 melanomas, 761 nevi (after removing PAD and the unlabelled benchmark) | The largest pool of non-dermoscopic images with enough melanomas; the closest public proxy for a phone photo | CC-BY-NC / CC-BY (per image) |
 | **PAD-UFES-20** | **Test set** of real phone photos; the only source with symptoms; training only from patients outside the test split | 2,298 images, 1,373 patients, **52 melanomas** | The only source actually shot on smartphones, and the only one with the symptom answers our app collects. Too small to train on alone | CC BY 4.0 |
 | **HAM10000** | **Pretraining only** | 10,015 images, 1,113 melanomas | Dermoscopic (10× magnification, polarised light), so it shows subsurface structures a phone cannot capture. Useful as a starting point for the network, never as the target domain | CC BY-NC 4.0 |
 | **NCI PDQ** patient summaries | Guidance corpus for the RAG | ~10–20 documents | Official, citable text for the reasons shown to the dermatologist | Free of copyright; credit NCI |
 
-**PAD appears twice** (on Mendeley and inside the ISIC Archive). We use one copy only; otherwise every PAD image would be duplicated across train and test.
+**De-duplication rule (frozen). PAD appears twice: on Mendeley and inside the ISIC Archive as collection 406. The training pull is therefore defined as every ISIC image with image_type:"clinical: close-up" excluding collection 406 (PAD) and collection 424 (MILK10k Benchmark, whose labels are not released). That is 9,316 − 2,298 − 479 = 6,539 images, of which 470 are melanomas and 761 nevi. Without this exclusion every PAD image would appear in both train and test, and the melanoma count would be inflated from 470 to 522.
+
+Plan B. If the ISIC API or S3 is unavailable, MILK10k ships as a frozen challenge zip (MILK10k_Training_Input.zip, 314 MB, with its ground-truth and metadata CSVs), PAD-UFES-20 has an independent copy on Mendeley (doi:10.17632/zr7vgbcyr2.1), and HAM10000 has a third copy on Harvard Dataverse (doi:10.7910/DVN/DBW86T). These independent sources provide a fallback so no single host is a single point of failure.
 
 **Rejected:**
 - `BCN20000`: dermoscopic only, so beyond HAM10000 it adds volume and no new domain.
@@ -90,13 +92,13 @@ It works end to end without the agent: both models score each patient, the deter
 To justify the multi-modal design, the pipeline will be benchmarked against the following baselines (evaluated strictly on the same held-out PAD-UFES-20 test patients):
 
 1. **Arrival order (today's practice):** every patient waits for their regular slot, a median of 24.5 days.¹ This is what M1 is measured against, and the only baseline that represents the current system.
-2. **Metadata Only (The Floor):** A standard Logistic Regression model trained purely on patient age, sex, and the symptom checklist. *The baseline bar to beat is an AUC of 0.90 established during Exploratory Data Analysis (EDA).*
+2. **Metadata Only (The Floor):** A standard Logistic Regression model trained purely on patient age, sex, and the symptom checklist. *EDA put this at AUC 0.90, but that figure was measured before the missing-field artefact below was controlled for. It is therefore treated as provisional: the bar is re-established at CP1 using only the fields the app's mandatory flow collects, and the re-measured number is what the image and fusion models must beat.*
 3. **Image Model Alone:** The vision component evaluated independently (fine-tuned on clinical images) to isolate the predictive power of visual features.
 4. The Selected Integrated Triage Model (Multi-modal): Image Model + Symptom Model + fusion layer, evaluated against M1 and M2.
 The RAG explanation layer is evaluated separately under M3 and is not counted as part of predictive performance.
 
 ## 5 · Agent Seat
-- **Decision (what a fixed script cannot do):** for each case the agent decides whether the photo is usable or the patient must be asked for a retake, **which follow-up question is worth asking** (a change over time is the melanoma signal, 16.8% vs 0.5%; bleeding points to BCC), which guideline passages support this particular case, and when missing information should send the case to manual review instead of into the automated flow. It assembles the evidence the dermatologist sees. **It never sets, modifies or overrides the validated risk score or the deterministic ranking that fills the daily slots.**
+- **Decision (what a fixed script cannot do): for each case the agent orchestrates the available tools, handles photo-quality and missing-information workflows, retrieves the most relevant verified guideline passages, and assembles the evidence shown to the dermatologist. When critical information is missing or a tool fails, it routes the case to manual review. It never sets, modifies or overrides the validated risk score or the deterministic ranking that fills the daily slots.**
 - **Tools:** `check_image_quality`, `request_retake`, `ask_patient`, `predict_visual_risk`, `score_symptoms`, `retrieve_guidance_context`, `draft_biopsy_referral`.
 - On failure: Fall back to the non-agent path. Any tool error, low confidence or missing critical input routes the case to a separate manual-review queue and never lowers its validated model priority or removes its regular appointment.
 - **Guardrails:**
