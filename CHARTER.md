@@ -129,7 +129,7 @@ The RAG explanation layer is evaluated separately under M3 and is not counted as
 | 12.11 | Codebase Freeze, Repository Cleanup, and Stakeholder Presentation Deck |
 
 | Hat | Owner | Responsibility |
-|---|---|---|Ifat Davidson
+|---|---|---|
 | Data | Tami Khazma | Pipeline architecture, strict patient-level splitting, data cleaning, and leakage mitigation |
 | Model | Roi Budnitsky | Training baselines, model fine-tuning, threshold tuning, and multi-ethnic performance analysis |
 | Agent | Yuval Rubenchuk | Agent tool building, orchestration loops, safety guardrails, and M4 validation set execution |
