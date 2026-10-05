@@ -61,31 +61,26 @@ The system runs end-to-end as a multi-modal pipeline, utilizing an orchestrating
 flowchart TD
     %% Data Input & Quality Routing
     A[Phone photo + symptom answers] --> B[Quality check + lesion crop]
-    
-    %% Error and Low-Confidence Routing (Fail-safe)
-    B -. unusable photo / low confidence .-> M[Manual review queue<br/>tool error · missing input]
-    M --> F[Dermatologist:<br/>move earlier / pre-issue biopsy / leave]
+
+    %% Error and Low-Confidence Routing
+    B -. unusable photo / missing input .-> M[Manual review queue<br/>tool error · missing input]
+    M --> F[Dermatologist:<br/>move earlier / approve referral draft / leave]
 
     %% Core Machine Learning Pipeline
     B --> C[Image model<br/>pretrained on HAM10000,<br/>fine-tuned on ISIC clinical]
-    A --> S[Symptom model<br/>trained on PAD-UFES-20]
-    
-    %% NEW: Explainability Verification (AI-Deletion Test)
-    C --> XAI[AI-deletion test<br/>Explainability Validation]
+    A --> S[Symptom model<br/>trained on PAD train/validation only]
 
-    %% Knowledge Base Layer (Fixed Position)
+    %% Risk Fusion & Capacity Management
+    C & S --> D[Fusion + patient-level risk score<br/>trained/calibrated on PAD train/validation only]
+    D --> L[Deterministic ranking policy<br/>daily top-10 within urgent-slot capacity]
+
+    %% Knowledge & Explanation Layer
     VectorDB[(Vector DB)] <--> RAG[RAG over NCI PDQ<br/>Chroma DB + citations]
-
-    %% Core Logic & Capacity Management
-    XAI & S & RAG --> D[Risk score per patient]
-    D --> L[Daily top-10 list<br/>within urgent-slot capacity]
-    L --> F
-
-    %% Human-in-the-Loop Feedback Loop (Continuous Learning)
-    F -.-> |Model improvement feedback| C & S
+    L --> RAG
+    RAG --> F
 
     %% Agent Supervision Layer
-    G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & RAG & D
+    G((Agent · Clinician Seat)) -. orchestrates tools and retrieval .-> B & C & S & RAG
     G -. on failure .-> M
   ```
 It works end to end without the agent: both models score each patient, the deterministic ranking policy fills the day's urgent slots, and each case receives a fixed model-evidence summary containing the relevant score bands, symptom flags and image-quality status.
