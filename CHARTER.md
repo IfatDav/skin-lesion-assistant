@@ -127,11 +127,11 @@ The RAG explanation layer is evaluated separately under M3 and is not counted as
 | 12.11 | Codebase Freeze, Repository Cleanup, and Stakeholder Presentation Deck |
 
 | Hat | Owner | Responsibility |
-|---|---|---|
-| Data | Ifat Davidson | Pipeline architecture, strict patient-level splitting, data cleaning, and leakage mitigation |
-| Model | Tami Khazma | Training baselines, model fine-tuning, threshold tuning, and multi-ethnic performance analysis |
-| Agent | Roi Budnitsky | Agent tool building, orchestration loops, safety guardrails, and M4 validation set execution |
-| Product | Yuval Rubenchuk | Clinician workflow UX, patient-facing safety copy, README documentation, and final fund presentation deck |
+|---|---|---|Ifat Davidson
+| Data | Tami Khazma | Pipeline architecture, strict patient-level splitting, data cleaning, and leakage mitigation |
+| Model | Roi Budnitsky | Training baselines, model fine-tuning, threshold tuning, and multi-ethnic performance analysis |
+| Agent | Yuval Rubenchuk | Agent tool building, orchestration loops, safety guardrails, and M4 validation set execution |
+| Product | Ifat Davidson | Clinician workflow UX, patient-facing safety copy, README documentation, and final fund presentation deck |
 
 ---
 ¹ Murad H et al. *Measuring geographical disparities in waiting times for community-based specialist care.* Israel Journal of Health Policy Research, 2025. [doi:10.1186/s13584-025-00702-7](https://doi.org/10.1186/s13584-025-00702-7). Covers all dermatologists in all four health funds, 2019–2023.
