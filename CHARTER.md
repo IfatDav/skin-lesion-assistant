@@ -10,21 +10,21 @@
 A public-system dermatologist appointment in Israel takes a median of **24.5 days**, rising by **8.5 days a year**, and reaches **40–42 days** in Tel Aviv and Jerusalem ¹.
 Clalit's and Maccabi's online dermatology services explicitly exclude moles and suspected skin cancer.² These cases therefore require in-person assessment. In the absence of a dedicated pre-visit image-triage mechanism, the waiting list itself does not reveal which lesions are most urgent. A malignant lesion may therefore remain in the standard queue until it is reviewed by a clinician.
 
-**What we build:** while waiting for their appointment, The patient uploads a smartphone photograph of the lesion and fills out a brief symptom form via the healthcare fund's app. The system scores every patient on the waiting list. Every morning it shows the dermatologist a **short list of up to 10 suspicious cases**, each with the photo, the answers and cited reasons.
+**What we build:** while waiting for their appointment, the patient uploads a smartphone photograph of the lesion and fills out a brief symptom form via the healthcare fund's app. The system scores every patient on the waiting list. Every morning it shows the dermatologist a **short list of up to 10 suspicious cases**, each with the photo, the answers and cited reasons.
 For each case, the dermatologist decides whether to move the patient to an earlier in-person appointment and, where clinically and operationally appropriate, whether to issue a biopsy referral in advance to accelerate the diagnostic workup.
 
 **Safety principle:** the system can only move a patient *earlier*. A patient who is not flagged keeps their regular appointment, so a miss costs at most today's situation. The patient never sees a risk score or a diagnosis, and the dermatologist decides on every case.
   
-**AI-deletion test:** Without AI the problem remains: dozens of photos arrive every day, and no dermatologist can review them all in time to find the few that cannot wait..
+**AI-deletion test:** Without AI the problem remains: dozens of photos arrive every day, and no dermatologist can review them all in time to find the few that cannot wait.
 
 ## 2 · Success metrics (fixed before any code)
 
 | # | Metric | Target |
 |---|---|---|
-M1 | Median simulated days to appointment for patients with malignant lesions (MEL + BCC + SCC), under the predefined waiting-list scenarios and fixed urgent-slot capacity | ≤ 7 days in the primary simulation scenario; always reported alongside the absolute and percentage reduction versus the FIFO baseline |
-M2 | Patient-level sensitivity for skin cancer (MEL + BCC + SCC → flagged for high-urgency dashboard triage) on held-out PAD-UFES-20 patients (real phone photos) | ≥ 0.90, reported with 95% confidence intervals and absolute TP/FN counts. Melanoma sensitivity is also reported separately. |
+| M1 | Median simulated days to appointment for patients with malignant lesions (MEL + BCC + SCC), under the predefined waiting-list scenarios and fixed urgent-slot capacity | ≤ 7 days in the primary simulation scenario; always reported alongside the absolute and percentage reduction versus the FIFO baseline |
+| M2 | Patient-level sensitivity for skin cancer (MEL + BCC + SCC → flagged for high-urgency dashboard triage) on held-out PAD-UFES-20 patients (real phone photos) | ≥ 0.90, reported with 95% confidence intervals and absolute TP/FN counts. Melanoma sensitivity is also reported separately. |
 | M3 | Groundedness on a frozen set of 20 guidance questions (5 unanswerable), plus a check that each number appears in its cited source | ≥ 0.9, and 5/5 refusals |
-M4 | Agent scenario set of 15 complex workflow cases | ≥ 13/15 correct; zero cases in which the agent suppresses, downgrades or removes a patient who was flagged by the validated deterministic triage policy. |
+| M4 | Agent scenario set of 15 complex workflow cases | ≥ 13/15 correct; zero cases in which the agent suppresses, downgrades or removes a patient who was flagged by the validated deterministic triage policy. |
 
 All reported metrics are computed at the patient level on the PAD-UFES-20 test set, which carries patient IDs. Training sources without a patient ID are split at the lesion level instead; this is a limitation we state rather than hide. For patients with multiple images, the aggregation rule is defined and frozen before test-set evaluation.
 
@@ -41,7 +41,9 @@ Because the real-world prevalence is unknown, queue-level metrics are interprete
 
 **De-duplication rule (frozen). PAD appears twice: on Mendeley and inside the ISIC Archive as collection 406. The training pull is therefore defined as every ISIC image with image_type:"clinical: close-up" excluding collection 406 (PAD) and collection 424 (MILK10k Benchmark, whose labels are not released). That is 9,316 − 2,298 − 479 = 6,539 images, of which 470 are melanomas and 761 nevi. Without this exclusion every PAD image would appear in both train and test, and the melanoma count would be inflated from 470 to 522.
 
-Plan B. If the ISIC API or S3 is unavailable, MILK10k ships as a frozen challenge zip (MILK10k_Training_Input.zip, 314 MB, with its ground-truth and metadata CSVs), PAD-UFES-20 has an independent copy on Mendeley (doi:10.17632/zr7vgbcyr2.1), and HAM10000 has a third copy on Harvard Dataverse (doi:10.7910/DVN/DBW86T). These independent sources provide a fallback so no single host is a single point of failure.
+**Plan B.** If the ISIC API or S3 is unavailable, MILK10k ships as a frozen challenge zip (MILK10k_Training_Input.zip, 314 MB, with its ground-truth and metadata CSVs), PAD-UFES-20 has an independent copy on Mendeley (doi:10.17632/zr7vgbcyr2.1), and HAM10000 has a third copy on Harvard Dataverse (doi:10.7910/DVN/DBW86T). These independent sources provide a fallback so no single host is a single point of failure.
+
+**PAD split rule (frozen).** The PAD-UFES-20 patient split is created and frozen before model development. The symptom model, multimodal fusion/calibration layer, image-quality component, and all threshold or ranking-policy tuning use PAD training/validation patients only. Held-out PAD test patients are never used for model selection, calibration, threshold setting, or policy tuning.
 
 **Rejected:**
 - `BCN20000`: dermoscopic only, so beyond HAM10000 it adds volume and no new domain.
@@ -86,7 +88,7 @@ flowchart TD
     G((Agent · Clinician Seat)) -. orchestrates .-> B & C & S & RAG & D
     G -. on failure .-> M
   ```
-It works end to end without the agent: both models score each patient, the deterministic ranking policy fills the day's urgent slots, and each case receives a fixed model-evidence summary containing the relevant score bands, symptom flags and image-quality status
+It works end to end without the agent: both models score each patient, the deterministic ranking policy fills the day's urgent slots, and each case receives a fixed model-evidence summary containing the relevant score bands, symptom flags and image-quality status.
 
 ### Baseline Evaluation Table
 To justify the multi-modal design, the pipeline will be benchmarked against the following baselines (evaluated strictly on the same held-out PAD-UFES-20 test patients):
@@ -113,20 +115,24 @@ The RAG explanation layer is evaluated separately under M3 and is not counted as
 | Risk | Mitigation |
 |---|---|
 | **Missing fields leak the label** (In PAD-UFES-20, missing field counts alone yield an artifactual AUC of 0.83) | Explicitly restrict training to the subset of features uniformly collected by the app's mandatory onboarding flow. |
-| **Patient data leakage** (Naive splits place different photos of the same patient across train/test splits) | Split data strictly at the **Patient ID** level, ensuring a patient's images never span across both training and evaluation sets. |
-| **Prevalence mismatch** (51% of the ISIC clinical images are malignant, because they are lesions that were chosen for biopsy) | **Fill a fixed daily capacity (top-10) rather than rely on a probability threshold**; present cases to the dermatologist as a ranked list, never as raw probabilities. |
-| **Data domain gap** (Patients shooting photos with poor lighting, blurry focus, or lens artifacts) | Use PAD-UFES-20, the only source actually shot on smartphones, to train the input filter to reject unreadable images and prompt an immediate re-take. |
+| **Patient / lesion leakage** (Naive splits may place different photos of the same patient or lesion across train and test; HAM10000's 10,015 images represent only 7,470 distinct lesions, and MILK10k does not expose a patient ID) | Split at the **Patient ID** level wherever one exists (PAD-UFES-20), and at the lesion level where it does not (MILK10k, HAM10000). Splits are generated once, frozen, and reused by every experiment. |
+| **Prevalence mismatch** (about 57% of the clinical images in the training pool are malignant because these datasets over-represent lesions selected for biopsy; real-world prevalence is much lower) | Use capacity-based ranking rather than a fixed probability threshold, and evaluate the system at 5%, 10% and 20% malignant prevalence. Report sensitivity / recall@k at fixed review capacity. Prevalence shift remains an explicit limitation. |
+| **Data domain gap** (patients may submit photos with poor lighting, blur, framing problems or lens artefacts) | Build an image-quality dataset by manually labelling ~300 PAD images against a written usable/unusable rubric. Split these labels at the patient level; apply synthetic degradations (blur, under-/over-exposure, colour cast) only to the training portion, and evaluate the quality filter on held-out manually labelled patients. |
 | **No verified dark-skin test data.** Both skin-tone sources skew light | Report M2 per Fitzpatrick bin with confidence intervals; state that Fitzpatrick V–VI performance is unvalidated, and list it as the first requirement for a clinical pilot |
+| **Melanoma-specific statistics are thin.** PAD-UFES-20 contains only 52 melanomas in total, so the held-out test split will contain a relatively small number of melanoma patients. | Report melanoma sensitivity with 95% confidence intervals and raw TP/FN counts. Treat the headline M2 target as applying to skin cancer overall (MEL + BCC + SCC), while melanoma performance is reported separately and interpreted cautiously. |
 
-**Cut line:** *If only two weeks remain, we drop the agent and the biopsy-referral draft, and ship the core pipeline: smartphone photo + symptom form → ranked waiting list → daily top-10 with a fixed reason per score band.*
+**Cut line:** *If only two weeks remain, we drop the biopsy-referral draft and advanced agent workflows. We keep a minimal agent that invokes the quality check, retrieves grounded guidance, and assembles clinician-facing evidence. The core triage pipeline remains deterministic: smartphone photo + symptom form → patient-level risk score → ranked waiting list → daily top-10.*
 
 ## 7 · Milestones and hats
 | Date | Deliverable |
 |---|---|
-| 4.10 | Finalized Product Charter & Data Verification ✅ |
-| **18.10 · CP1** | Core End-to-End Pipeline (No Agent); Baseline Evaluation; M3 Groundedness Benchmark |
-| **1.11 · CP2** | Agent Orchestration Layer Integrated; M4 Validation; 1-Minute Live Demo |
-| 12.11 | Codebase Freeze, Repository Cleanup, and Stakeholder Presentation Deck |
+| 4.10 | Finalized Product Charter & Data Verification |
+| **18.10 · CP1** | Core End-to-End Pipeline (No Agent); Baseline Evaluation incl. re-measured metadata floor; M3 Groundedness Benchmark |
+| **30.10 · CP2** | Agent Orchestration Layer Integrated; M4 Validation; 1-Minute Live Demo |
+| **1.11** | Repo frozen ahead of the mentoring session |
+| **4.11** | Individual mentoring session (working system + draft deck) |
+| 12.11 | Repository cleanup, final evaluation, and stakeholder presentation deck |
+| **15.11 / 18.11** | Project presentations |
 
 | Hat | Owner | Responsibility |
 |---|---|---|
