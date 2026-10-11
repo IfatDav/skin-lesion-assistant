@@ -1,2 +1,10 @@
+# Ignore raw data and heavy images across the entire project
+data/raw/
+data/processed/
 *.csv
 *.jpg
+*.jpeg
+*.png
+*.PNG
+*.JPG
+.ipynb_checkpoints/
