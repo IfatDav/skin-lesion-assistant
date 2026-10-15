@@ -28,7 +28,7 @@ For each case, the dermatologist decides whether to move the patient to an earli
 
 All reported metrics are computed at the patient level on the PAD-UFES-20 test set, which carries patient IDs. Training sources without a patient ID are split at the lesion level instead; this is a limitation we state rather than hide. For patients with multiple images, the aggregation rule is defined and frozen before test-set evaluation.
 
-Sensitivity comes before list length: a missed melanoma costs far more than one extra case for the dermatologist to review. All metrics are stratified by skin tone (the PAD Fitzpatrick field and the MILK10k skin-tone field) and by patient age group. The simulation is run at 5, 10 and 15 urgent slots a day, and at 5%, 10% and 20% malignant prevalence, because the real mix is unknown.
+Sensitivity comes before list length: a missed melanoma costs far more than one extra case for the dermatologist to review. All metrics are stratified by skin tone where a verified skin-tone field is available, and by patient age group. PAD-UFES-20 provides a Fitzpatrick field for the held-out test set. Within the ISIC clinical training pool, Fitzpatrick values are available for 1,247 images, almost entirely from the Memorial Sloan Kettering Cancer Center contribution; MILK10k does not expose Fitzpatrick values in the ISIC metadata used here. The simulation is run at 5, 10 and 15 urgent slots a day, and at 5%, 10% and 20% malignant prevalence, because the real mix is unknown.
 Because the real-world prevalence is unknown, queue-level metrics are interpreted as scenario results rather than estimates of current healthcare-fund performance.
 
 ## 3 · Data (all four checks run 18–19.9; details in [`docs/DATA_DECISIONS.md`](docs/DATA_DECISIONS.md))
@@ -51,7 +51,7 @@ Because the real-world prevalence is unknown, queue-level metrics are interprete
 - `Fitzpatrick 17k`: atlas photos, mostly non-cancerous conditions, with no age, sex or body site. Only **10 of 40 sampled image links still work**. Its advantage, diverse skin tones, does not survive the dead links.
 - **Generative phone-to-dermoscopic conversion**: a generator would invent subsurface structures that the phone never captured. Unsafe for a medical product.
 
-**Skin-tone reporting without DDI:** M2 is stratified by the Fitzpatrick field in PAD-UFES-20 (our test set) and the MILK10k skin-tone field (0–5) inside ISIC. Both skew light, so performance on Fitzpatrick V–VI stays an **open limitation** that we state rather than hide.
+Skin-tone reporting without DDI: M2 is stratified by the Fitzpatrick field in PAD-UFES-20, our held-out test set. In the ISIC clinical training pool, Fitzpatrick values are available for 1,247 of 6,539 images and come almost entirely from the Memorial Sloan Kettering Cancer Center contribution; the MILK10k images in our ISIC pull have no Fitzpatrick values. Because skin-tone coverage is incomplete and source-dependent, performance on Fitzpatrick V–VI remains an open limitation that we report explicitly.
 
 ## 4 · Architecture
 
