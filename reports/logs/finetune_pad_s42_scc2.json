@@ -1,0 +1,80 @@
+{
+ "config": {
+  "seed": 42,
+  "scc_boost": 2.0,
+  "epochs": 10,
+  "patience": 3,
+  "lr": 3e-05,
+  "start_checkpoint": "convnext_milk_s42.pt",
+  "trainable": "stages 2-3 + head",
+  "n_train_images": 1430,
+  "n_train_patients": 878,
+  "n_val_patients": 220,
+  "class_weights": {
+   "MEL": 1.6759999990463257,
+   "SCC": 1.781000018119812,
+   "BCC": 0.4390000104904175,
+   "AK": 0.4569999873638153,
+   "NEV": 0.8500000238418579,
+   "BKL": 0.7960000038146973
+  }
+ },
+ "epochs": [
+  {
+   "epoch": 1,
+   "train_loss": 1.3588,
+   "val_patient_auc": 0.9218,
+   "seconds": 47
+  },
+  {
+   "epoch": 2,
+   "train_loss": 1.1443,
+   "val_patient_auc": 0.945,
+   "seconds": 7
+  },
+  {
+   "epoch": 3,
+   "train_loss": 1.0711,
+   "val_patient_auc": 0.9495,
+   "seconds": 7
+  },
+  {
+   "epoch": 4,
+   "train_loss": 1.0054,
+   "val_patient_auc": 0.9486,
+   "seconds": 7
+  },
+  {
+   "epoch": 5,
+   "train_loss": 0.9782,
+   "val_patient_auc": 0.9554,
+   "seconds": 7
+  },
+  {
+   "epoch": 6,
+   "train_loss": 0.9266,
+   "val_patient_auc": 0.9556,
+   "seconds": 7
+  },
+  {
+   "epoch": 7,
+   "train_loss": 0.9087,
+   "val_patient_auc": 0.952,
+   "seconds": 7
+  },
+  {
+   "epoch": 8,
+   "train_loss": 0.8786,
+   "val_patient_auc": 0.9544,
+   "seconds": 7
+  },
+  {
+   "epoch": 9,
+   "train_loss": 0.8722,
+   "val_patient_auc": 0.9542,
+   "seconds": 7
+  }
+ ],
+ "val_patient_auc_before": 0.7783,
+ "best_epoch": 6
+}

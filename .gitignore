@@ -8,3 +8,13 @@ data/processed/
 *.PNG
 *.JPG
 .ipynb_checkpoints/
+
+# Small files that must be shared: frozen splits, the ink labelling sheet, report figures
+!data/splits/*.csv
+!evaluation/*.csv
+!reports/figures/*.png
+
+# Environments, caches and model weights
+.venv/
+__pycache__/
+models/*.pt

@@ -1,0 +1,338 @@
+<title>דוח מודל התמונה לנגעי עור</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700&family=IBM+Plex+Sans+Hebrew:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column with a sticky contents rail; same clinical-notebook system as the modelling guide (gentian-violet accent). */
+:root{
+  --paper:#F5F6F9; --sheet:#FFFFFF; --ink:#1B1E27; --muted:#5D6374; --rule:#DCDFE7;
+  --violet:#5A3E9E; --violet-wash:#EEEAF7;
+  --urgent:#B42318; --urgent-wash:#FDECEA; --refer:#9A5806; --refer-wash:#FDF1DF; --routine:#2F6B4F; --routine-wash:#E5F2EA;
+  --code-bg:#F0F1F5;
+  --c-img:#5A3E9E; --c-fused:#0F7B7B; --c-q:#B26B00; --c-isic:#9AA0AE; --c-best:#5D6374;
+  --f-display:"Frank Ruhl Libre","David Libre","Times New Roman",serif;
+  --f-body:"IBM Plex Sans Hebrew","Segoe UI","Arial Hebrew",Arial,sans-serif;
+  --f-mono:"IBM Plex Mono",Consolas,"Courier New",monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#111319; --sheet:#181B23; --ink:#E6E8EE; --muted:#9BA1B1; --rule:#2B2F3B;
+  --violet:#B19BEA; --violet-wash:#241D37;
+  --urgent:#F28B80; --urgent-wash:#3A1D1B; --refer:#EAAA55; --refer-wash:#36270F; --routine:#7CCAA1; --routine-wash:#16301F;
+  --code-bg:#1F232D;
+  --c-img:#B19BEA; --c-fused:#4FC3C3; --c-q:#EAAA55; --c-isic:#6B7180; --c-best:#9BA1B1; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#111319; --sheet:#181B23; --ink:#E6E8EE; --muted:#9BA1B1; --rule:#2B2F3B;
+  --violet:#B19BEA; --violet-wash:#241D37;
+  --urgent:#F28B80; --urgent-wash:#3A1D1B; --refer:#EAAA55; --refer-wash:#36270F; --routine:#7CCAA1; --routine-wash:#16301F;
+  --code-bg:#1F232D;
+  --c-img:#B19BEA; --c-fused:#4FC3C3; --c-q:#EAAA55; --c-isic:#6B7180; --c-best:#9BA1B1; color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16.5px;line-height:1.75;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+.wrap{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:200px minmax(0,1fr);gap:48px}
+@media (max-width:880px){.wrap{grid-template-columns:minmax(0,1fr);gap:0}.toc{display:none}}
+main{min-width:0;max-width:74ch}
+header.top{grid-column:1/-1;padding-block:56px 28px;border-bottom:1px solid var(--rule);margin-bottom:8px}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;color:var(--violet);font-weight:600}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(2rem,4.4vw,3rem);line-height:1.15;margin:.3em 0 .35em;text-wrap:balance}
+.lede{font-size:1.12rem;color:var(--muted);max-width:64ch;margin:0}
+.meta{margin-top:18px;display:flex;flex-wrap:wrap;gap:8px 18px;font-size:.85rem;color:var(--muted)}
+.meta b{color:var(--ink);font-weight:600}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 24px);align-self:start;padding-top:36px;font-size:.88rem}
+.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:4px;counter-reset:t}
+.toc li{counter-increment:t}
+.toc a{display:flex;gap:10px;color:var(--muted);text-decoration:none;padding:4px 0;border-inline-start:2px solid transparent;padding-inline-start:10px}
+.toc a::before{content:counter(t);font-family:var(--f-mono);font-size:.8rem;color:var(--violet);min-width:1ch}
+.toc a:hover,.toc a:focus-visible{color:var(--ink);border-inline-start-color:var(--violet);outline:none}
+section{padding-block:40px 8px;border-bottom:1px solid var(--rule)}
+section:last-of-type{border-bottom:0}
+h2{font-family:var(--f-display);font-weight:700;font-size:1.75rem;line-height:1.25;margin:0 0 .5em;text-wrap:balance;display:flex;gap:.5em;align-items:baseline}
+h2 .n{font-family:var(--f-mono);font-size:.9rem;font-weight:500;color:var(--violet)}
+h3{font-size:1.08rem;font-weight:600;margin:1.6em 0 .4em}
+p{margin:0 0 1em}
+strong,b{font-weight:600}
+code{font-family:var(--f-mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:4px;direction:ltr;unicode-bidi:isolate}
+.summary{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;padding:22px 24px;margin:28px 0 8px}
+.summary h2{font-size:1.25rem;margin-bottom:.6em}
+.summary ul{margin:0;padding-inline-start:1.1em;display:grid;gap:6px}
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid var(--rule)}
+.fig b{display:block;font-family:var(--f-mono);font-size:1.45rem;font-weight:500;font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
+.fig span{font-size:.82rem;color:var(--muted);line-height:1.4;display:block}
+.tbl{overflow-x:auto;margin:14px 0 18px;border:1px solid var(--rule);border-radius:8px;background:var(--sheet)}
+table{border-collapse:collapse;width:100%;font-size:.92rem;line-height:1.5}
+th,td{text-align:right;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:600;font-size:.8rem;letter-spacing:.03em;color:var(--muted);background:var(--paper)}
+tr:last-child td{border-bottom:0}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap;direction:ltr;text-align:right}
+.ci{color:var(--muted);font-size:.85em}
+tr.best-row td{background:var(--violet-wash)}
+.chip{display:inline-block;font-size:.76rem;font-weight:600;padding:1px 9px;border-radius:999px;white-space:nowrap}
+.u{color:var(--urgent);background:var(--urgent-wash)} .r{color:var(--refer);background:var(--refer-wash)} .g{color:var(--routine);background:var(--routine-wash)}
+.note{border-inline-start:3px solid var(--violet);background:var(--violet-wash);padding:12px 16px;border-radius:0 6px 6px 0;margin:16px 0;font-size:.95rem}
+.note.warn{border-inline-start-color:var(--refer);background:var(--refer-wash)}
+.note.fix{border-inline-start-color:var(--urgent);background:var(--urgent-wash)}
+.note b:first-child{display:block;margin-bottom:2px}
+.steps{list-style:none;margin:16px 0;padding:0;display:grid;gap:10px;counter-reset:s}
+.steps>li{counter-increment:s;background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:14px 16px 12px;display:grid;grid-template-columns:2.2em minmax(0,1fr);gap:4px 10px}
+.steps>li::before{content:counter(s);font-family:var(--f-mono);font-size:.9rem;color:var(--violet);font-weight:500;grid-row:1/3;padding-top:2px}
+.steps .t{font-weight:600}
+.steps .d{font-size:.93rem}
+.steps .k{color:var(--muted);font-size:.86rem}
+.chart{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;padding:12px 12px 6px;margin:14px 0 6px;overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:520px;height:auto}
+.chart .g{stroke:var(--rule);stroke-width:1}
+.chart .ax{fill:var(--muted);font:12px var(--f-mono)}
+.chart .axh{fill:var(--muted);font:13px var(--f-body)}
+.chart .mark{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.chart .ln{fill:none;stroke-width:2.4;stroke-linejoin:round}
+.chart .ln.img{stroke:var(--c-img);stroke-width:3}
+.chart .ln.fused{stroke:var(--c-fused)}
+.chart .ln.q{stroke:var(--c-q)}
+.chart .ln.isic{stroke:var(--c-isic);stroke-dasharray:5 4}
+.chart .ln.best{stroke:var(--c-best);stroke-width:1.2;stroke-dasharray:2 3}
+.chart .pt{stroke:var(--sheet);stroke-width:1.5}
+.chart .pt.img{fill:var(--c-img)} .chart .pt.fused{fill:var(--c-fused)} .chart .pt.q{fill:var(--c-q)} .chart .pt.isic{fill:var(--c-isic)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.84rem;color:var(--muted);margin:4px 0 14px}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-inline-end:6px}
+td.cm{font-family:var(--f-mono);text-align:center;background:color-mix(in srgb,var(--violet) var(--a),transparent)}
+td.cm.diag{font-weight:600;outline:1px solid var(--violet);outline-offset:-1px}
+.mono-tbl th{font-size:.76rem}
+.layers{overflow-x:auto;margin:14px 0 6px}
+.lg{display:grid;grid-template-columns:7.5em repeat(6,minmax(62px,1fr));gap:4px;min-width:540px;font-size:.8rem}
+.lg .h{color:var(--muted);text-align:center;font-weight:600;padding:4px 2px;line-height:1.3}
+.lg .rl{font-weight:600;display:flex;align-items:center;font-size:.84rem}
+.lg .c{border-radius:5px;height:32px;display:flex;align-items:center;justify-content:center;font-family:var(--f-mono);font-size:.72rem}
+.lg .on{background:var(--violet);color:var(--sheet)}
+.lg .off{background:repeating-linear-gradient(-45deg,var(--code-bg) 0 6px,var(--paper) 6px 12px);color:var(--muted);border:1px solid var(--rule)}
+pre{direction:ltr;text-align:left;background:var(--code-bg);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;overflow-x:auto;font-family:var(--f-mono);font-size:.8rem;line-height:1.6;margin:14px 0}
+ul.plain{padding-inline-start:1.1em;display:grid;gap:8px;margin:10px 0 16px}
+:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+
+<div class="wrap" dir="rtl" lang="he">
+  <header class="top">
+    <div class="eyebrow">BIU DS23 · פרויקט גמר · כובע המודל · ענף feature/cv-baseline</div>
+    <h1>דוח מודל התמונה לנגעי עור</h1>
+    <p class="lede">איך בנינו את מודל התמונה שמדרג את רשימת ההמתנה לרופא עור, מה יצא, ולמה אפשר להאמין לתוצאה. כל מספר בדוח נלקח אוטומטית מקובץ התוצאות במאגר.</p>
+    <div class="meta"><span><b>תאריך:</b> 26.10.2026</span><span><b>נמדד על:</b> 220 מטופלי הוולידציה של PAD</span><span><b>סט הבדיקה:</b> סגור, לא נטען</span><span><b>זמן קריאה:</b> כ־10 דקות</span></div>
+  </header>
+
+  <nav class="toc" aria-label="תוכן">
+    <ol>
+      <li><a href="#job">מה המוצר צריך</a></li>
+      <li><a href="#data">הדאטה</a></li>
+      <li><a href="#train">האימון</a></li>
+      <li><a href="#rules">החלטות מראש</a></li>
+      <li><a href="#results">התוצאות</a></li>
+      <li><a href="#trust">למה להאמין</a></li>
+      <li><a href="#errors">איפה הוא טועה</a></li>
+      <li><a href="#risks">סיכונים</a></li>
+      <li><a href="#next">מה נשאר</a></li>
+      <li><a href="#repo">מה בענף</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <div class="summary">
+      <h2>השורה התחתונה</h2>
+      <ul>
+        <li><strong>מודל התמונה מדרג את המטופלים טוב יותר מהשאלון:</strong> AUC של 0.956 מול 0.867. ההפרש <bdi>+0.089</bdi> מובהק, והוא נמדד על אותם מטופלים בדיוק.</li>
+        <li><strong>בתרחיש הראשי, 10 מקומות דחופים ל־100 פונים,</strong> הוא מכניס לרשימה 60% מחולי הסרטן, לעומת 52% של השאלון. עם 15 מקומות: 81%.</li>
+        <li><strong>שילוב עם השאלון לא הוסיף מעבר לתמונה</strong> על המטופלים האלה. השארנו אותו כגיבוי, למקרה של תמונה גרועה או תשובה חסרה.</li>
+        <li><strong>רוב הפער בין צילום מרפאה לצילום טלפון היה בכלל קרטוזיס אקטינית,</strong> סוג נגע שהמודל לא הכיר מספיק, ולא איכות המצלמה.</li>
+        <li><strong>שני דברים פתוחים:</strong> מקרי סרטן קשקשי שמסווגים כקרטוזיס, ושאלת סימוני העט הכירורגי.</li>
+      </ul>
+      <div class="figs">
+        <div class="fig"><b>0.956</b><span>AUC ברמת מטופל, המודל הסופי</span></div>
+        <div class="fig"><b>60%</b><span>מחולי הסרטן ברשימה היומית, 10 מקומות</span></div>
+        <div class="fig"><b><bdi>+0.089</bdi></b><span>יתרון ב־AUC על השאלון, מובהק</span></div>
+        <div class="fig"><b>0</b><span>תמונות מסט הבדיקה שנטענו</span></div>
+      </div>
+    </div>
+
+    <section id="job">
+      <h2><span class="n">1</span>מה המוצר צריך מהמודל</h2>
+      <p>המשתמש הוא רופא עור בקופה עם תור עמוס. בזמן ההמתנה המטופל מצלם את הנגע וממלא שאלון קצר. כל בוקר המערכת מדרגת את כל רשימת ההמתנה ומציגה לרופא את המקרים החשודים ביותר, כדי שיחליט למי להקדים תור.</p>
+      <p><strong>לכן המודל לא מחליט "חולה" או "בריא". הוא ממיין.</strong> כל מטופל מקבל ציון, ממיינים מהגבוה לנמוך, והראשונים נכנסים למקומות הפנויים. מודל טוב הוא מודל שמעלה את חולי הסרטן לראש הרשימה. מי שלא נבחר שומר על התור הרגיל שלו, כמו היום.</p>
+      <p>המדד הראשי: <strong>מתוך חולי הסרטן בתור, כמה נכנסו לרשימה היומית.</strong> נמדד בתרחיש של 100 פונים ביום ו־10% ממאירים, בדיוק כמו במחברת 02 של תמי.</p>
+    </section>
+
+    <section id="data">
+      <h2><span class="n">2</span>הדאטה</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>מקור</th><th>סוג צילום</th><th>תפקיד</th></tr></thead>
+        <tbody>
+          <tr><td><strong>ISIC</strong>, בעיקר MILK10k</td><td>צילום קליני מקרוב, במרפאות עור</td><td>אימון ראשון: 4,325 תמונות, ולידציה: 763</td></tr>
+          <tr><td><strong>PAD-UFES-20</strong></td><td>טלפון חכם, ברזיל</td><td>כיוונון: 878 מטופלים · ולידציה: 220 · בדיקה: 275, סגור</td></tr>
+          <tr><td><strong>סלואן קטרינג</strong> (בתוך ISIC)</td><td>קליני</td><td>מחוץ לאימון: 1,234 מתוך 1,241 שפירים, מ־73 מטופלים בלבד</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>ששת סוגי הנגעים שהמודל מזהה</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>סוג</th><th>מה זה</th><th>במדד הצ'רטר</th></tr></thead>
+        <tbody>
+          <tr><td>מלנומה</td><td>סרטן של תאי הפיגמנט. הנדיר והקטלני מבין הנפוצים</td><td><span class="chip u">סרטן</span></td></tr>
+          <tr><td>סרטן קשקשי</td><td>סרטן של תאי השכבה החיצונית. כולל קרטואקנתומה ושלב מוקדם</td><td><span class="chip u">סרטן</span></td></tr>
+          <tr><td>סרטן תאי בסיס</td><td>הסרטן הנפוץ ביותר. גדל מקומית, כמעט לא שולח גרורות</td><td><span class="chip u">סרטן</span></td></tr>
+          <tr><td>קרטוזיס אקטינית</td><td>כתם מחוספס מנזק שמש. טרום־סרטני</td><td><span class="chip r">לא סרטן</span></td></tr>
+          <tr><td>שומה</td><td>נקודת חן רגילה</td><td><span class="chip g">לא סרטן</span></td></tr>
+          <tr><td>קרטוזיס שפירה</td><td>גידולים שפירים שמופיעים עם הגיל</td><td><span class="chip g">לא סרטן</span></td></tr>
+        </tbody>
+      </table></div>
+      <p>ציון הסרטן הוא סכום ההסתברויות של שלושת הסרטנים, כפי שהגדיר הצ'רטר. התוויות של ISIC נלקחו מהתיוג המפורט של הארכיון, כי בקובץ של תחרות MILK10k הקטגוריה AKIEC מערבבת קרטוזיס אקטינית עם סרטן קשקשי מוקדם.</p>
+
+      <h3>ההתפלגות מתהפכת בין המאגרים</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>סוג</th><th>אימון ISIC</th><th>אימון PAD</th></tr></thead>
+        <tbody><tr><td>מלנומה</td><td class='num'>397 <span class='ci'>(9%)</span></td><td class='num'>35 <span class='ci'>(2%)</span></td></tr><tr><td>סרטן קשקשי</td><td class='num'>564 <span class='ci'>(13%)</span></td><td class='num'>125 <span class='ci'>(9%)</span></td></tr><tr><td>סרטן תאי בסיס</td><td class='num'>2,151 <span class='ci'>(50%)</span></td><td class='num'>515 <span class='ci'>(36%)</span></td></tr><tr><td>קרטוזיס אקטינית</td><td class='num'>106 <span class='ci'>(2%)</span></td><td class='num'>473 <span class='ci'>(33%)</span></td></tr><tr><td>שומה</td><td class='num'>641 <span class='ci'>(15%)</span></td><td class='num'>136 <span class='ci'>(9%)</span></td></tr><tr><td>קרטוזיס שפירה</td><td class='num'>466 <span class='ci'>(11%)</span></td><td class='num'>156 <span class='ci'>(11%)</span></td></tr></tbody>
+      </table></div>
+      <p>קרטוזיס אקטינית קופצת מ־2% לשליש מהתמונות, ומלנומה יורדת מ־9% ל־2%. אוכלוסייה מבוגרת וחשופת שמש בברזיל, לעומת מרפאות עור באירופה. זה חצי מהסיפור של התוצאות.</p>
+    </section>
+
+    <section id="train">
+      <h2><span class="n">3</span>האימון</h2>
+      <p>לקחנו את <strong>ConvNeXt-Tiny</strong>: רשת עם 28 מיליון פרמטרים, שכבר אומנה על 14 מיליון תמונות כלליות. היא יודעת לראות, אבל לא מכירה נגעי עור. החלפנו את שכבת היציאה שלה בשכבה של 6 סוגי נגעים, ואימנו בשלושה שלבים:</p>
+      <ol class="steps">
+        <li><span class="t">חימום הראש · ISIC · 2 אפוקים</span><span class="d">רק השכבה החדשה לומדת, כל השאר קפוא. <span class="k">הראש מתחיל אקראי. אם מאמנים הכל מיד, השגיאות הגדולות שלו בהתחלה מקלקלות את מה שהרשת כבר יודעת.</span></span></li>
+        <li><span class="t">אימון מלא · ISIC · עד 15 אפוקים</span><span class="d">כל השכבות לומדות, המוקדמות לאט יותר. בוחרים את האפוק הטוב לפי ולידציה, ועוצרים כשאין שיפור. <span class="k">כ־24 שניות לאפוק.</span></span></li>
+        <li><span class="t">כיוונון לצילומי טלפון · PAD · עד 10 אפוקים</span><span class="d">רק השכבות המאוחרות לומדות, בקצב נמוך פי 10. משקל כפול לסרטן קשקשי. בוחרים את האפוק לפי 220 מטופלי הוולידציה. <span class="k">כ־7 שניות לאפוק. 1,430 תמונות זה מעט, ובלי הקפאה הרשת תשנן אותן.</span></span></li>
+      </ol>
+      <div class="layers" role="img" aria-label="אילו שכבות מתאמנות בכל שלב">
+        <div class="lg">
+          <div></div><div class="h">גבעול</div><div class="h">שלב 1<br>קווים</div><div class="h">שלב 2<br>מרקמים</div><div class="h">שלב 3<br>צורות</div><div class="h">שלב 4<br>מבנים</div><div class="h">ראש<br>6 יציאות</div>
+          <div class="rl">חימום</div><div class="c off">קפוא</div><div class="c off">קפוא</div><div class="c off">קפוא</div><div class="c off">קפוא</div><div class="c off">קפוא</div><div class="c on">לומד</div>
+          <div class="rl">אימון מלא</div><div class="c on">לאט</div><div class="c on">לאט</div><div class="c on">בינוני</div><div class="c on">מהר</div><div class="c on">מהר</div><div class="c on">מהר</div>
+          <div class="rl">כיוונון PAD</div><div class="c off">קפוא</div><div class="c off">קפוא</div><div class="c off">קפוא</div><div class="c on">לומד</div><div class="c on">לומד</div><div class="c on">לומד</div>
+        </div>
+      </div>
+      <p style="font-size:.9rem;color:var(--muted)">משותף לכל השלבים: תמונות 448 פיקסלים. העשרה אקראית בכל אפוק — סיבוב, היפוך, חיתוך, שינוי קל בבהירות וטשטוש — בלי לשנות גוון, כי הצבע הוא סימן אבחנתי. משקל לכל סוג לפי אחד חלקי שורש התדירות, כדי שסוגים נדירים לא יוזנחו.</p>
+    </section>
+
+    <section id="rules">
+      <h2><span class="n">4</span>החלטות שנקבעו לפני הריצות</h2>
+      <p>כדי לא לבחור את המספר הנוח אחרי שרואים תוצאות, ארבעה כללים נכתבו מראש, וכל גרסה אומנה שלוש פעמים עם זרעים אקראיים שונים.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>כלל</th><th>מה יצא</th></tr></thead>
+        <tbody>
+          <tr><td><strong>משקל כפול לסרטן קשקשי</strong> מאומץ רק אם, בממוצע של שלוש ריצות, פחות מקרים מסווגים כקרטוזיס, וה־AUC לא יורד ביותר מ־0.01</td><td><span class="chip g">אומץ</span> מקרים שסווגו כקרטוזיס: 7.3 ← 5.7. רגישות לסרטן קשקשי: 41% ← 52%. AUC: 0.953 ← 0.950</td></tr>
+          <tr><td><strong>המודל הסופי הוא ריצה 42,</strong> לא הריצה הטובה ביותר</td><td>טווח ה־AUC בין שלוש הריצות: 0.950–0.959 בלי התיקון, 0.947–0.956 איתו</td></tr>
+          <tr><td><strong>ממוצע של שלושה מודלים</strong> מאומץ רק אם השיפור מובהק</td><td><span class="chip r">לא אומץ</span> שיפור של <bdi>+0.0006</bdi>, טווח ביטחון <bdi>-0.007</bdi> עד <bdi>+0.008</bdi></td></tr>
+          <tr><td><strong>שילוב עם השאלון</strong> במשקל קבוע: 60% תמונה, 40% שאלון</td><td>ראו בסעיף התוצאות</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note warn"><b>מחיר שהכלל לא כלל:</b> עם המשקל הכפול, בממוצע של שלוש ריצות, נכנסו לרשימה פחות מטופלי מלנומה: 2.7 ← 2.0 מתוך 6. במודל הסופי נכנסו 3 מתוך 6. עם 6 מטופלים זה בגבולות הרעש, אבל הצוות צריך לדעת.</div>
+    </section>
+
+    <section id="results">
+      <h2><span class="n">5</span>התוצאות</h2>
+      <p>כל השורות נמדדו על אותם 220 מטופלים. הרגישות והדיוק נמדדו בתרחיש הראשי: 10 מקומות ל־100 פונים, 10% ממאירים.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>מודל</th><th>AUC ברמת מטופל</th><th>חולים ברשימה</th><th>דיוק הרשימה</th><th>הערה</th></tr></thead>
+        <tbody><tr><td>סדר הגעה (המצב היום)</td><td class='num'>0.500</td><td class='num'>10%</td><td class='num'>10%</td><td>בחירה אקראית</td></tr><tr><td>שאלון בלבד</td><td class='num'>0.867 <span class='ci'>(0.815–0.913)</span></td><td class='num'>52%</td><td class='num'>53%</td><td>רגרסיה לוגיסטית של תמי, שוחזרה בדיוק</td></tr><tr><td>DINOv2 קפוא + רגרסיה</td><td class='num'>0.880 <span class='ci'>(0.835–0.923)</span></td><td class='num'>49%</td><td class='num'>51%</td><td>בלי לאמן אף משקל ברשת</td></tr><tr><td>ConvNeXt, צילומי מרפאה בלבד</td><td class='num'>0.778 <span class='ci'>(0.719–0.836)</span></td><td class='num'>30%</td><td class='num'>30%</td><td>לא ראה צילום טלפון</td></tr><tr class="best-row"><td>ConvNeXt + כיוונון על PAD</td><td class='num'>0.956 <span class='ci'>(0.930–0.977)</span></td><td class='num'>60%</td><td class='num'>61%</td><td><b>המודל הסופי</b></td></tr><tr><td>תמונה 60% + שאלון 40%</td><td class='num'>0.954 <span class='ci'>(0.928–0.978)</span></td><td class='num'>61%</td><td class='num'>61%</td><td>שילוב לפי מקומות בתור</td></tr></tbody>
+      </table></div>
+      <p>הפרשים מזווגים, על אותם מטופלים: <strong>תמונה פחות שאלון <bdi>+0.089</bdi></strong> (טווח <bdi>+0.047</bdi> עד <bdi>+0.132</bdi>). <strong>שילוב פחות תמונה <bdi>-0.001</bdi></strong> (טווח <bdi>-0.014</bdi> עד <bdi>+0.011</bdi>), כלומר אין הבדל.</p>
+
+      <h3>כמה חולים נכנסים לרשימה, לפי מספר המקומות</h3>
+      <div class="chart" dir="ltr"><svg viewBox="0 0 660 340" role="img" aria-label="שיעור חולי הסרטן שנכנסים לרשימה לפי מספר המקומות הדחופים">
+<line x1="56" x2="644" y1="292.0" y2="292.0" class="g"/><text x="48" y="296.0" class="ax" text-anchor="end">0%</text><line x1="56" x2="644" y1="237.2" y2="237.2" class="g"/><text x="48" y="241.2" class="ax" text-anchor="end">20%</text><line x1="56" x2="644" y1="182.4" y2="182.4" class="g"/><text x="48" y="186.4" class="ax" text-anchor="end">40%</text><line x1="56" x2="644" y1="127.6" y2="127.6" class="g"/><text x="48" y="131.6" class="ax" text-anchor="end">60%</text><line x1="56" x2="644" y1="72.8" y2="72.8" class="g"/><text x="48" y="76.8" class="ax" text-anchor="end">80%</text><line x1="56" x2="644" y1="18.0" y2="18.0" class="g"/><text x="48" y="22.0" class="ax" text-anchor="end">100%</text><text x="56.0" y="310" class="ax" text-anchor="middle">1</text><text x="137.1" y="310" class="ax" text-anchor="middle">5</text><text x="238.5" y="310" class="ax" text-anchor="middle">10</text><text x="339.9" y="310" class="ax" text-anchor="middle">15</text><text x="441.2" y="310" class="ax" text-anchor="middle">20</text><text x="542.6" y="310" class="ax" text-anchor="middle">25</text><text x="644.0" y="310" class="ax" text-anchor="middle">30</text>
+<line x1="238.5" x2="238.5" y1="18" y2="292" class="mark"/>
+<text x="244.5" y="286" class="axh">התרחיש הראשי</text>
+<path d="M56.0,264.6 L76.3,237.2 L96.6,209.8 L116.8,182.4 L137.1,155.0 L157.4,127.6 L177.7,100.2 L197.9,72.8 L218.2,45.4 L238.5,18.0 L258.8,18.0 L279.0,18.0 L299.3,18.0 L319.6,18.0 L339.9,18.0 L360.1,18.0 L380.4,18.0 L400.7,18.0 L421.0,18.0 L441.2,18.0 L461.5,18.0 L481.8,18.0 L502.1,18.0 L522.3,18.0 L542.6,18.0 L562.9,18.0 L583.2,18.0 L603.4,18.0 L623.7,18.0 L644.0,18.0" class="ln best"/>
+<path d="M56.0,284.0 L76.3,273.4 L96.6,270.7 L116.8,262.7 L137.1,249.4 L157.4,244.1 L177.7,241.4 L197.9,228.2 L218.2,217.5 L238.5,209.5 L258.8,198.9 L279.0,196.2 L299.3,180.3 L319.6,180.3 L339.9,177.6 L360.1,177.6 L380.4,174.9 L400.7,174.9 L421.0,172.3 L441.2,167.0 L461.5,140.4 L481.8,132.4 L502.1,127.1 L522.3,121.7 L542.6,116.4 L562.9,116.4 L583.2,111.1 L603.4,103.1 L623.7,95.2 L644.0,92.5" class="ln isic"/><path d="M56.0,265.4 L76.3,238.8 L96.6,212.2 L116.8,204.2 L137.1,180.3 L157.4,177.6 L177.7,164.3 L197.9,153.7 L218.2,151.0 L238.5,148.3 L258.8,140.4 L279.0,135.1 L299.3,135.1 L319.6,132.4 L339.9,113.8 L360.1,113.8 L380.4,111.1 L400.7,111.1 L421.0,111.1 L441.2,103.1 L461.5,95.2 L481.8,92.5 L502.1,87.2 L522.3,87.2 L542.6,87.2 L562.9,84.5 L583.2,81.8 L603.4,81.8 L623.7,68.6 L644.0,65.9" class="ln q"/><path d="M56.0,265.4 L76.3,238.8 L96.6,212.2 L116.8,188.3 L137.1,177.6 L157.4,172.3 L177.7,153.7 L197.9,148.3 L218.2,140.4 L238.5,124.4 L258.8,119.1 L279.0,89.8 L299.3,79.2 L319.6,71.2 L339.9,68.6 L360.1,65.9 L380.4,60.6 L400.7,55.2 L421.0,52.6 L441.2,44.6 L461.5,41.9 L481.8,34.0 L502.1,34.0 L522.3,31.3 L542.6,28.6 L562.9,26.0 L583.2,26.0 L603.4,26.0 L623.7,26.0 L644.0,26.0" class="ln fused"/><path d="M56.0,265.4 L76.3,238.8 L96.6,212.2 L116.8,182.9 L137.1,159.0 L157.4,159.0 L177.7,151.0 L197.9,148.3 L218.2,135.1 L238.5,127.1 L258.8,127.1 L279.0,111.1 L299.3,97.8 L319.6,79.2 L339.9,71.2 L360.1,44.6 L380.4,44.6 L400.7,44.6 L421.0,41.9 L441.2,41.9 L461.5,36.6 L481.8,36.6 L502.1,36.6 L522.3,36.6 L542.6,34.0 L562.9,34.0 L583.2,34.0 L603.4,31.3 L623.7,26.0 L644.0,26.0" class="ln img"/><circle cx="238.5" cy="209.5" r="4" class="pt isic"/><circle cx="238.5" cy="148.3" r="4" class="pt q"/><circle cx="238.5" cy="124.4" r="4" class="pt fused"/><circle cx="238.5" cy="127.1" r="4" class="pt img"/>
+<text x="350.0" y="332" class="axh" text-anchor="middle">מקומות דחופים ל־100 פונים ביום</text>
+</svg></div>
+      <div class="legend">
+        <span><i style="background:var(--c-img)"></i>תמונה, אחרי כיוונון</span>
+        <span><i style="background:var(--c-fused)"></i>תמונה 60% + שאלון 40%</span>
+        <span><i style="background:var(--c-q)"></i>שאלון בלבד</span>
+        <span><i style="background:var(--c-isic)"></i>תמונה, בלי צילומי טלפון</span>
+        <span><i style="background:var(--c-best)"></i>הכי טוב שאפשר</span>
+      </div>
+      <p>בראש הרשימה המודל כמעט מושלם: ב־5 מקומות הוא מגיע ל־49% מתוך 50% אפשריים, ודיוק הרשימה 100%. המאבק הוא סביב הקו. בין 10 ל־15 מקומות התפיסה קופצת מ־60% ל־81%, וזו החלטת מוצר שכדאי להציג לצוות כעקומה ולא כנקודה אחת.</p>
+
+      <h3>משקל התמונה בשילוב</h3>
+      <div class="tbl" style="max-width:420px"><table>
+        <thead><tr><th>משקל לתמונה</th><th>AUC</th><th>חולים ברשימה</th></tr></thead>
+        <tbody><tr><td class='num'>0%</td><td class='num'>0.867</td><td class='num'>52%</td></tr><tr><td class='num'>40%</td><td class='num'>0.936</td><td class='num'>61%</td></tr><tr><td class='num'>50%</td><td class='num'>0.947</td><td class='num'>61%</td></tr><tr><td class='num'>60%</td><td class='num'>0.954</td><td class='num'>61%</td></tr><tr><td class='num'>70%</td><td class='num'>0.957</td><td class='num'>56%</td></tr><tr><td class='num'>100%</td><td class='num'>0.956</td><td class='num'>60%</td></tr></tbody>
+      </table></div>
+      <p>בין 50% ל־70% כמעט אין הבדל, ו־60% בתוך הטווח. הטבלה מוצגת במלואה כדי שיראו שהמשקל לא נבחר כי יצא הכי טוב.</p>
+    </section>
+
+    <section id="trust">
+      <h2><span class="n">6</span>למה אפשר להאמין לתוצאה</h2>
+      <p>קפיצה מ־0.778 ל־0.956 נראתה טובה מדי, אז חיפשנו במה המודל עלול "לרמות":</p>
+      <ul class="plain">
+        <li><strong>מאיפה השיפור:</strong> כשבודקים רק את 139 המטופלים שאין להם קרטוזיס אקטינית, המודל שלא ראה צילומי טלפון כבר מגיע ל־0.899. כלומר רוב הפער היה סוג נגע אחד שהמודל סיווג כסרטן, והכיוונון לימד אותו שהוא לא.</li>
+        <li><strong>לא תלוי בשיטת החישוב:</strong> 0.956 כשלוקחים את התמונה החשודה ביותר של המטופל, 0.937 בממוצע התמונות, 0.928 ברמת התמונה הבודדת.</li>
+        <li><strong>אין מטופל ואין קובץ זהה</strong> בשני חלקים של החלוקה. זה נבדק אוטומטית בכל בנייה של האינדקס.</li>
+        <li><strong>תמונות כמעט־זהות:</strong> 95 זוגות חשודים בבדיקה הגסה, 0 אושרו בהשוואת פיקסלים. בזוג הדומה ביותר נבדק גם בעין: שתי תמונות שונות.</li>
+        <li><strong>החלוקה והשאלון של תמי שוחזרו בדיוק:</strong> כל 18 המספרים של החלוקה, וה־AUC של השאלון עד הספרה השלישית. ההשוואה הוגנת.</li>
+        <li><strong>שורת הבסיס הזולה</strong>, DINOv2 קפוא עם רגרסיה, מגיעה ל־0.880, בערך כמו השאלון. הכיוונון המלא מוסיף מעליה, ולא רק מנצח את המצב היום.</li>
+      </ul>
+    </section>
+
+    <section id="errors">
+      <h2><span class="n">7</span>איפה המודל טועה</h2>
+      <p>מטריצת הבלבול של המודל הסופי על תמונות הוולידציה. שורה = הסוג האמיתי, עמודה = מה שהמודל אמר. ככל שהתא כהה יותר, חלק גדול יותר מהשורה.</p>
+      <div class="tbl mono-tbl"><table>
+        <thead><tr><th>אמיתי \ נחזה</th><th>מלנומה</th><th>סרטן קשקשי</th><th>סרטן תאי בסיס</th><th>קרטוזיס אקטינית</th><th>שומה</th><th>קרטוזיס שפירה</th><th>סה"כ</th></tr></thead>
+        <tbody><tr><th>מלנומה</th><td class="cm diag" style="--a:38%">3</td><td class="cm" style="--a:0%">0</td><td class="cm" style="--a:25%">2</td><td class="cm" style="--a:0%">0</td><td class="cm" style="--a:25%">2</td><td class="cm" style="--a:12%">1</td><td class='num'>8</td></tr><tr><th>סרטן קשקשי</th><td class="cm" style="--a:3%">1</td><td class="cm diag" style="--a:44%">15</td><td class="cm" style="--a:26%">9</td><td class="cm" style="--a:24%">8</td><td class="cm" style="--a:0%">0</td><td class="cm" style="--a:3%">1</td><td class='num'>34</td></tr><tr><th>סרטן תאי בסיס</th><td class="cm" style="--a:1%">1</td><td class="cm" style="--a:7%">10</td><td class="cm diag" style="--a:79%">106</td><td class="cm" style="--a:12%">16</td><td class="cm" style="--a:1%">1</td><td class="cm" style="--a:0%">0</td><td class='num'>134</td></tr><tr><th>קרטוזיס אקטינית</th><td class="cm" style="--a:2%">2</td><td class="cm" style="--a:7%">7</td><td class="cm" style="--a:12%">12</td><td class="cm diag" style="--a:75%">77</td><td class="cm" style="--a:0%">0</td><td class="cm" style="--a:4%">4</td><td class='num'>102</td></tr><tr><th>שומה</th><td class="cm" style="--a:9%">4</td><td class="cm" style="--a:2%">1</td><td class="cm" style="--a:4%">2</td><td class="cm" style="--a:2%">1</td><td class="cm diag" style="--a:74%">35</td><td class="cm" style="--a:9%">4</td><td class='num'>47</td></tr><tr><th>קרטוזיס שפירה</th><td class="cm" style="--a:0%">0</td><td class="cm" style="--a:3%">1</td><td class="cm" style="--a:3%">1</td><td class="cm" style="--a:0%">0</td><td class="cm" style="--a:7%">2</td><td class="cm diag" style="--a:87%">26</td><td class='num'>30</td></tr></tbody>
+      </table></div>
+      <div class="note fix"><b>הבעיה המרכזית: סרטן קשקשי שמסווג כקרטוזיס.</b> 8 מתוך 34 תמונות של סרטן קשקשי סווגו כקרטוזיס אקטינית, כלומר כ"לא סרטן". זה הכיוון המסוכן, וגם הגבול הקשה ביותר קלינית, כי קרטוזיס יכולה להתפתח לסרטן קשקשי. המשקל הכפול עזר אבל לא פתר.</div>
+      <p>שאר הבלבולים פחות מטרידים: סרטן קשקשי שסווג כסרטן תאי בסיס נשאר "סרטן" (אבל יורד בדחיפות), ושומות שסווגו כמלנומה הן אזעקות שווא, שהרופא מסנן.</p>
+    </section>
+
+    <section id="risks">
+      <h2><span class="n">8</span>סיכונים ומגבלות</h2>
+      <ul class="plain">
+        <li><strong>סימוני עט כירורגי.</strong> בחלק מתמונות PAD יש סימון סגול ליד הנגע, שנעשה לפני ביופסיה. זה קיצור דרך ידוע בספרות: המודל עלול ללמוד "יש דיו, אז זה סרטן". גלאי אוטומטי נכשל בבדיקה, אז ההשפעה <strong>לא נמדדה</strong>. גיליון תיוג של 200 תמונות מוכן, כ־20 דקות עבודה.</li>
+        <li><strong>לחולי סרטן ב־PAD יש יותר תמונות:</strong> 1.93 מול 1.33 בממוצע. מספר התמונות לבדו מגיע ל־AUC של 0.663, וכלל "התמונה החשודה ביותר" הופך את זה ליתרון. באפליקציה תהיה תמונה אחת לנגע, אז המספרים כאן אופטימיים מעט.</li>
+        <li><strong>ולידציה קטנה:</strong> 220 מטופלים, מתוכם 6 עם מלנומה, והאפוק נבחר לפיה. התוצאה על סט הבדיקה צפויה להיות נמוכה קצת יותר.</li>
+        <li><strong>תוכנית אחת, צלמים מיומנים:</strong> את PAD צילמו סטודנטים לרפואה. מטופלים שמצלמים את עצמם יפיקו תמונות גרועות יותר. גם השאלון ייחלש: במחברת של תמי, היפוך של 10% מהתשובות מוריד אותו ל־0.82.</li>
+        <li><strong>עור כהה:</strong> ב־PAD יש 11 תמונות בגוון V עד VI בלבד. ביצועים על עור כהה לא נבדקו.</li>
+      </ul>
+    </section>
+
+    <section id="next">
+      <h2><span class="n">9</span>מה נשאר, ומה צריך מהצוות</h2>
+      <h3>החלטות שהענף לקח באופן זמני</h3>
+      <ul class="plain">
+        <li><strong>6 קטגוריות,</strong> שמהן נגזר הציון הבינארי של הצ'רטר. המדד M2 לא משתנה.</li>
+        <li><strong>123 תמונות הקרטוזיס האקטינית מ־ISIC נשארו</strong> באימון. הצ'רטר זורק אותן.</li>
+        <li><strong>תמונות סלואן קטרינג מחוץ לאימון,</strong> בגלל הסיכון שהמודל יזהה את בית החולים. הצ'רטר משאיר אותן.</li>
+        <li><strong>בלי אימון מקדים על HAM10000.</strong> הוא לא הורד.</li>
+      </ul>
+      <h3>לפני פתיחת סט הבדיקה</h3>
+      <ol class="steps">
+        <li><span class="t">לסגור את ארבע ההחלטות למעלה</span><span class="d">כל שינוי בהן הוא אימון מחדש של כ־15 דקות.</span></li>
+        <li><span class="t">לתייג את 200 התמונות לסימוני דיו</span><span class="d">ואז להריץ <code>python -m src.ink_effect</code>.</span></li>
+        <li><span class="t">להקפיא הכל ולהריץ פעם אחת על סט הבדיקה</span><span class="d">הגיוני אחרי מפגש הליווי ב־4.11 ולפני ההגשה ב־12.11. לדווח את התוצאה כמו שהיא.</span></li>
+      </ol>
+    </section>
+
+    <section id="repo">
+      <h2><span class="n">10</span>מה בענף ואיך מריצים</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>איפה</th><th>מה</th></tr></thead>
+        <tbody>
+          <tr><td><code>src/</code></td><td>כל הקוד: אינדקס וחלוקה, אימון, כיוונון, הערכה, שילוב, בדיקות דליפה, וממשק לסוכן</td></tr>
+          <tr><td><code>src/predict.py</code></td><td>הכלי <code>predict_visual_risk</code> לסוכן: מקבל תמונות של מטופל, מחזיר ציונים</td></tr>
+          <tr><td><code>data/splits/image_index.csv</code></td><td>שורה לכל אחת מ־8,837 התמונות: תוויות, מפתחות, חלוקה</td></tr>
+          <tr><td><code>notebooks/04_image_model.ipynb</code></td><td>מחברת התוצאות, ממשיכה את המספור של תמי</td></tr>
+          <tr><td><code>reports/</code></td><td>הדוח הזה, דוח טקסט, קובץ התוצאות המלא, גרפים ויומני אימון</td></tr>
+          <tr><td><code>evaluation/</code></td><td>גיליון התיוג לסימוני דיו, עם הוראות</td></tr>
+        </tbody>
+      </table></div>
+<pre>python -m src.build_index --resize-pad
+python -m src.train --seed 42
+python -m src.finetune_pad --seed 42 --scc-boost 2
+python -m src.baseline_dinov2
+python -m src.evaluate</pre>
+      <p>משקלות המודלים לא נמצאים בגיט, כ־110 מגה כל אחד. הם יישלחו בנפרד. ההוראות המלאות נמצאות ב־<code>src/README.md</code>.</p>
+    </section>
+  </main>
+</div>

@@ -1,7 +1,18 @@
-pandas
+# Python 3.12. The RTX 50-series (Blackwell) needs PyTorch >= 2.7 built for CUDA 12.8:
+#   pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cu128
+#   pip install -r requirements.txt
+torch==2.11.0
+torchvision==0.26.0
+timm==1.0.30
+pandas==3.1.0
 numpy
+scikit-learn==1.9.1
+pillow
 matplotlib
 seaborn
-scikit-learn
 requests
 opencv-python
+scipy
+nbformat
+nbconvert
+ipykernel

@@ -1,0 +1,5 @@
+{
+ "checkpoints": [
+  "convnext_pad_s42_scc2.pt"
+ ]
+}

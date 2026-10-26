@@ -1,0 +1,106 @@
+{
+ "config": {
+  "head_epochs": 2,
+  "epochs": 15,
+  "patience": 4,
+  "lr": 0.0002,
+  "layer_decay": 0.85,
+  "seed": 1,
+  "backbone": "convnext_tiny.fb_in22k_ft_in1k",
+  "img_size": 448,
+  "n_train": 4325,
+  "n_val": 763,
+  "class_weights": {
+   "MEL": 1.0149999856948853,
+   "SCC": 0.8510000109672546,
+   "BCC": 0.4359999895095825,
+   "AK": 1.9630000591278076,
+   "NEV": 0.7979999780654907,
+   "BKL": 0.9359999895095825
+  }
+ },
+ "epochs": [
+  {
+   "phase": "head",
+   "epoch": 1,
+   "train_loss": 1.6268,
+   "seconds": 92,
+   "val_cancer_auc": 0.7932,
+   "val_balanced_acc": 0.4651,
+   "val_accuracy": 0.5963
+  },
+  {
+   "phase": "head",
+   "epoch": 2,
+   "train_loss": 1.4953,
+   "seconds": 16,
+   "val_cancer_auc": 0.8016,
+   "val_balanced_acc": 0.4639,
+   "val_accuracy": 0.6658
+  },
+  {
+   "phase": "full",
+   "epoch": 1,
+   "train_loss": 1.4096,
+   "seconds": 26,
+   "val_cancer_auc": 0.8338,
+   "val_balanced_acc": 0.4945,
+   "val_accuracy": 0.6828
+  },
+  {
+   "phase": "full",
+   "epoch": 2,
+   "train_loss": 1.3178,
+   "seconds": 24,
+   "val_cancer_auc": 0.8779,
+   "val_balanced_acc": 0.5416,
+   "val_accuracy": 0.713
+  },
+  {
+   "phase": "full",
+   "epoch": 3,
+   "train_loss": 1.2537,
+   "seconds": 24,
+   "val_cancer_auc": 0.8866,
+   "val_balanced_acc": 0.6119,
+   "val_accuracy": 0.7497
+  },
+  {
+   "phase": "full",
+   "epoch": 4,
+   "train_loss": 1.1798,
+   "seconds": 24,
+   "val_cancer_auc": 0.8842,
+   "val_balanced_acc": 0.5772,
+   "val_accuracy": 0.7457
+  },
+  {
+   "phase": "full",
+   "epoch": 5,
+   "train_loss": 1.1181,
+   "seconds": 23,
+   "val_cancer_auc": 0.8811,
+   "val_balanced_acc": 0.6134,
+   "val_accuracy": 0.751
+  },
+  {
+   "phase": "full",
+   "epoch": 6,
+   "train_loss": 1.0563,
+   "seconds": 22,
+   "val_cancer_auc": 0.883,
+   "val_balanced_acc": 0.5852,
+   "val_accuracy": 0.7444
+  },
+  {
+   "phase": "full",
+   "epoch": 7,
+   "train_loss": 0.9917,
+   "seconds": 22,
+   "val_cancer_auc": 0.88,
+   "val_balanced_acc": 0.6105,
+   "val_accuracy": 0.7339
+  }
+ ],
+ "best_full_epoch": 3
+}
