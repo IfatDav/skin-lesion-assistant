@@ -11,6 +11,7 @@ import pandas as pd
 from PIL import Image
 
 from src import config as C
+from src.data import original_path
 from src.pad_split import patient_split
 
 
@@ -19,11 +20,11 @@ def md5(path: Path) -> str:
 
 
 def isic_rows() -> pd.DataFrame:
-    m = pd.read_csv(C.META_DIR / "isic_clinical_metadata.csv", dtype=str).fillna("")
+    m = pd.read_csv(C.ISIC_META_CSV, dtype=str).fillna("")
     src = m["attribution"].map(lambda a: "milk" if a == "MILK study team" else "msk" if a == C.MSK_ATTRIBUTION else "isic_other")
     df = pd.DataFrame({
         "image_id": m["isic_id"],
-        "image_path": [str((C.ISIC_DIR / f"{i}.jpg").relative_to(C.DATA_ROOT)) for i in m["isic_id"]],
+        "image_path": m["isic_id"] + ".jpg",
         "source": src,
         "patient_id": m["patient_id"],
         "lesion_key": m["lesion_id"].where(m["lesion_id"] != "", m["isic_id"]),
@@ -38,10 +39,11 @@ def isic_rows() -> pd.DataFrame:
 
 def pad_rows() -> pd.DataFrame:
     m = pd.read_csv(C.META_DIR / "PAD_UFES_20_metadata.csv", dtype=str).fillna("")
-    where = {p.name: p for d in C.PAD_DIRS for p in d.iterdir()}
+    found = {p.name for d in C.PAD_DIRS for p in d.iterdir()}
+    assert set(m["img_id"]) <= found, f"PAD images missing under {C.PAD_DIRS}"
     df = pd.DataFrame({
         "image_id": m["img_id"],
-        "image_path": [str(where[i].relative_to(C.DATA_ROOT)) for i in m["img_id"]],
+        "image_path": m["img_id"],
         "source": "pad",
         "patient_id": m["patient_id"],
         # Raw PAD lesion ids are reused across patients (250 of 1,641), so the key needs both.
@@ -97,11 +99,11 @@ def assign_splits(df: pd.DataFrame) -> pd.DataFrame:
 
 def resize_pad(df: pd.DataFrame) -> None:
     C.PAD_RESIZED_DIR.mkdir(parents=True, exist_ok=True)
-    for rel in df.loc[df["source"] == "pad", "image_path"]:
-        out = C.PAD_RESIZED_DIR / (Path(rel).stem + ".jpg")
+    for _, row in df[df["source"] == "pad"].iterrows():
+        out = C.PAD_RESIZED_DIR / (Path(row["image_path"]).stem + ".jpg")
         if out.exists():
             continue
-        im = Image.open(C.DATA_ROOT / rel).convert("RGB")
+        im = Image.open(original_path(row)).convert("RGB")
         im.thumbnail((512, 512), Image.LANCZOS)
         im.save(out, quality=95)
 
@@ -112,7 +114,7 @@ def main():
     args = ap.parse_args()
 
     df = pd.concat([isic_rows(), pad_rows()], ignore_index=True)
-    df["md5"] = [md5(C.DATA_ROOT / p) for p in df["image_path"]]
+    df["md5"] = [md5(original_path(r)) for _, r in df.iterrows()]
     df["cancer"] = df.apply(cancer_label, axis=1)
     df["tier"] = df["label6"].map(C.TIER).fillna("")
     df = assign_splits(df)

@@ -1,4 +1,5 @@
 """Image dataset, transforms and loaders built on data/splits/image_index.csv."""
+from functools import lru_cache
 from pathlib import Path
 
 import pandas as pd
@@ -37,12 +38,22 @@ def load_index(splits=None, skip_duplicates: bool = True) -> pd.DataFrame:
     return df.reset_index(drop=True)
 
 
+@lru_cache(maxsize=1)
+def _pad_originals() -> dict:
+    return {p.name: p for d in C.PAD_DIRS for p in d.iterdir()}
+
+
+def original_path(row) -> Path:
+    """The index stores file names only; PAD is spread over two download folders, everything else is ISIC."""
+    return _pad_originals()[row["image_path"]] if row["source"] == "pad" else C.ISIC_DIR / row["image_path"]
+
+
 def resolve_path(row) -> Path:
     if row["source"] == "pad":
         cached = C.PAD_RESIZED_DIR / (Path(row["image_path"]).stem + ".jpg")
         if cached.exists():
             return cached
-    return C.DATA_ROOT / row["image_path"]
+    return original_path(row)
 
 
 class LesionImages(Dataset):

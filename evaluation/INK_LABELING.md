@@ -5,11 +5,12 @@ biopsy, and every cancer in PAD was biopsied, so a model can learn "ink = cancer
 lesion. This is a known failure of dermatology models (Winkler et al., *JAMA Dermatology* 2019). An automatic
 colour detector was tried and failed (it missed the photo where ink was seen), so the check needs human eyes.
 
-**The sample.** `ink_labeling_sample.csv` holds 200 PAD development photos (train + validation patients,
-never test), 100 cancer and 100 non-cancer, in random order. The diagnosis is deliberately not in the file, so
-the labeller is not influenced by it.
+**The sheet.** `ink_labeling_test.csv` is written by the single test run (`python -m src.evaluate_test
+--frozen`): every PAD test photo, in random order, with no diagnosis and no score, so the labeller is not
+influenced by them. Labelling happens after the test run, as decided in `reports/decisions.md`; it does not
+change the model, so it does not touch the test result.
 
-## How to label (about 20 minutes)
+## How to label (about 500 photos, under an hour)
 
 1. Open each photo from the `photo` column (paths are relative to the repo root; run
    `python -m src.build_index --resize-pad` first if `data/processed/pad_512/` is missing).

@@ -433,7 +433,7 @@ cancer_score = probs[:, [0, 1, 2]].sum(1)    # MEL + SCC + BCC</pre>
       <ol class="steps">
         <li><span class="t">הצוות מאשר את קובץ ההחלטות</span><span class="d">אחרי הריצה על סט הבדיקה אי אפשר לשנות אותו.</span></li>
         <li><span class="t">ריצה אחת על סט הבדיקה</span><span class="d"><code>python -m src.evaluate_test --frozen</code>. הסקריפט נכתב מראש, מסרב לרוץ בלי הדגל ומסרב לרוץ פעמיים. מדווחים את התוצאה כמו שהיא.</span></li>
-        <li><span class="t">תיוג סימוני עט על תמונות הבדיקה</span><span class="d">הסקריפט כותב גיליון בלי אבחנה ובלי ציון. אחר כך: <code>python -m src.ink_effect evaluation/ink_labeling_test.csv</code>.</span></li>
+        <li><span class="t">תיוג סימוני עט על תמונות הבדיקה</span><span class="d">הסקריפט כותב גיליון בלי אבחנה ובלי ציון. אחר כך: <code>python -m src.ink_effect</code>.</span></li>
       </ol>
     </section>
 
@@ -450,7 +450,7 @@ cancer_score = probs[:, [0, 1, 2]].sum(1)    # MEL + SCC + BCC</pre>
           <tr><td><code>data/splits/image_index.csv</code></td><td>שורה לכל אחת מ־8,837 התמונות: תוויות, מפתחות, חלוקה</td></tr>
           <tr><td><code>notebooks/04_image_model.ipynb</code></td><td>מחברת התוצאות, ממשיכה את המספור של תמי</td></tr>
           <tr><td><code>reports/</code></td><td>הדוח הזה, דוח טקסט, קובץ התוצאות המלא, גרפים ויומני אימון</td></tr>
-          <tr><td><code>evaluation/</code></td><td>גיליון התיוג לסימוני דיו, עם הוראות</td></tr>
+          <tr><td><code>evaluation/</code></td><td>הוראות לתיוג סימוני הדיו על תמונות הבדיקה</td></tr>
         </tbody>
       </table></div>
 <pre>python -m src.build_index --resize-pad

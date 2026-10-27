@@ -4,6 +4,18 @@ Code for the image (CV) part of the triage pipeline. Images are not in the repo:
 `../DATA` next to the repo, or from the folder in the `SKIN_DATA_ROOT` environment variable. Results:
 `reports/results_image_model.md` and `notebooks/04_image_model.ipynb`.
 
+## Data layout
+
+```
+DATA/                                  # next to the repo, or set SKIN_DATA_ROOT
+  metadata/PAD_UFES_20_metadata.csv
+  isic_512*/isic_512/ISIC_*.jpg        # the Drive download; the timestamp in the folder name does not matter
+  pad_original*/pad_original/PAT_*.png # PAD may come in two download parts
+```
+
+The index stores file names only, so it works on any machine with this layout. The ISIC labels
+(`data/metadata/isic_clinical_metadata.csv`, pulled from the ISIC API) are in the repo.
+
 ## Setup
 
 ```bash

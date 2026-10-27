@@ -25,7 +25,7 @@ changes; anything learned afterwards goes into the report as a finding, not into
 
 - **Surgical-marker ink is not measured yet.** After the test run, the test photos are labelled for ink
   without seeing diagnosis or score (`evaluation/ink_labeling_test.csv`, written by the test script), and
-  `python -m src.ink_effect evaluation/ink_labeling_test.csv` checks whether **benign** inked photos score
+  `python -m src.ink_effect` checks whether **benign** inked photos score
   higher than benign photos without ink. Removing inked photos from training was rejected: it would need all
   1,440 training photos labelled, would remove mostly biopsied (cancer) photos, and would need retraining.
 - **Unbiopsied lesions are easy cases.** In PAD every cancer was biopsied; the 566 development lesions without
@@ -41,4 +41,4 @@ changes; anything learned afterwards goes into the report as a finding, not into
 
 1. Team approves this file.
 2. `python -m src.evaluate_test --frozen` — once.
-3. Ink labelling of the test photos, then `python -m src.ink_effect evaluation/ink_labeling_test.csv`.
+3. Ink labelling of the test photos (`evaluation/INK_LABELING.md`), then `python -m src.ink_effect`.

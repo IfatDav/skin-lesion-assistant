@@ -89,4 +89,4 @@ Over three seeds the plain recipe gives AUC 0.950–0.959 and the SCC×2 recipe 
 ## Not yet done
 
 Decisions are frozen in `decisions.md`. In order: the team approves it, `python -m src.evaluate_test --frozen`
-runs once, then the test photos are labelled for ink and `python -m src.ink_effect evaluation/ink_labeling_test.csv`.
+runs once, then the test photos are labelled for ink and `python -m src.ink_effect`.

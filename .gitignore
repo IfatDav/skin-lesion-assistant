@@ -9,8 +9,9 @@ data/processed/
 *.JPG
 .ipynb_checkpoints/
 
-# Small files that must be shared: frozen splits, the ink labelling sheet, report figures
+# Small files that must be shared: ISIC labels, frozen splits, the ink labelling sheet, report figures
 !data/splits/*.csv
+!data/metadata/*.csv
 !evaluation/*.csv
 !reports/figures/*.png
 

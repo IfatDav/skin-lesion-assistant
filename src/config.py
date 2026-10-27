@@ -5,11 +5,13 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 DATA_ROOT = Path(os.environ.get("SKIN_DATA_ROOT", REPO_ROOT.parent / "DATA")).resolve()
 META_DIR = DATA_ROOT / "metadata"
-ISIC_DIR = DATA_ROOT / "isic_512-20261018T095351Z-1-001" / "isic_512"
-PAD_DIRS = [DATA_ROOT / "pad_original-20261018T095353Z-1-001" / "pad_original",
-            DATA_ROOT / "pad_original-20261018T095353Z-1-002" / "pad_original"]
+# Google Drive adds a download timestamp to the folder names (isic_512-2026...-1-001/isic_512), so search for them.
+ISIC_DIR = next(iter(sorted(DATA_ROOT.glob("isic_512*/isic_512"))), DATA_ROOT / "isic_512")
+PAD_DIRS = sorted(DATA_ROOT.glob("pad_original*/pad_original")) or [DATA_ROOT / "pad_original"]
 PAD_RESIZED_DIR = REPO_ROOT / "data" / "processed" / "pad_512"
 
+# Labels for the ISIC images, pulled from the ISIC API (not part of the Drive download), kept in the repo.
+ISIC_META_CSV = REPO_ROOT / "data" / "metadata" / "isic_clinical_metadata.csv"
 SPLITS_DIR = REPO_ROOT / "data" / "splits"
 INDEX_CSV = SPLITS_DIR / "image_index.csv"
 MODELS_DIR = REPO_ROOT / "models"
