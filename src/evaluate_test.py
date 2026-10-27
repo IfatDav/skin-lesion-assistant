@@ -20,10 +20,11 @@ import pandas as pd
 
 from src import config as C
 from src.data import load_index, make_loader, resolve_path
-from src.evaluate import probs_for
 from src.fusion import fuse
 from src.metrics import cancer_score
+from src.model import predict
 from src.operating_point import paired_auc_diff, primary, report, to_patients
+from src.predict import load_final_models
 from src.questionnaire import patient_scores
 
 OUT = C.REPORTS_DIR / "test_results.json"
@@ -41,7 +42,8 @@ def main():
     manifest = json.loads((C.MODELS_DIR / "final_model.json").read_text())
     w = manifest["fusion"]["w_image"]
     test = load_index("pad_test")
-    p = probs_for(manifest["checkpoints"], make_loader(test, train=False))
+    loader = make_loader(test, train=False)
+    p = np.mean([predict(m.cuda(), loader).numpy() for m in load_final_models()], axis=0)
     assert not np.isnan(p).any()
     img = to_patients(test["patient_id"].to_numpy(), (test["cancer"] == "1").astype(int).to_numpy(), cancer_score(p))
     quest = patient_scores("test")

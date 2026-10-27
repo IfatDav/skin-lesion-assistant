@@ -457,8 +457,9 @@ cancer_score = probs[:, [0, 1, 2]].sum(1)    # MEL + SCC + BCC</pre>
 python -m src.train --seed 42
 python -m src.finetune_pad --seed 42 --scc-boost 2
 python -m src.baseline_dinov2
-python -m src.evaluate</pre>
-      <p>משקלות המודלים לא נמצאים בגיט, כ־110 מגה כל אחד. הם יישלחו בנפרד. ההוראות המלאות נמצאות ב־<code>src/README.md</code>.</p>
+python -m src.evaluate
+python -m src.export_model</pre>
+      <p>משקלות רשת התמונה (111 מגה) גדולים מדי לגיט. הם מצורפים ל־Release בשם <code>image-model-v1</code> במאגר, והקוד מוריד אותם לבד בהרצה הראשונה ובודק שהקובץ תקין. מודל השאלון שמור בגיט כקובץ joblib קטן. ההוראות המלאות נמצאות ב־<code>src/README.md</code>.</p>
     </section>
 
     <section id="gloss">

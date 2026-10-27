@@ -2,6 +2,7 @@
 on the same validation patients. Uses only the app's mandatory fields; missing answers are imputed inside the
 pipeline and no missingness indicator is given to the model.
 """
+import joblib
 import numpy as np
 import pandas as pd
 from sklearn.compose import make_column_transformer
@@ -16,6 +17,7 @@ from src.pad_split import patient_split
 
 SYMPTOMS = ["itch", "grew", "hurt", "changed", "bleed", "elevation"]
 NUM, CAT = ["age"], ["region"] + SYMPTOMS
+MODEL_FILE = C.MODELS_DIR / "questionnaire.joblib"  # written by src.export_model
 
 
 def _prep(df):
@@ -46,6 +48,11 @@ def fit_model():
     return model.fit(_prep(tr), tr["is_malignant"])
 
 
+def load_model():
+    """The saved pipeline (needs the scikit-learn version in requirements.txt); refits if the file is missing."""
+    return joblib.load(MODEL_FILE) if MODEL_FILE.exists() else fit_model()
+
+
 def score(model, df: pd.DataFrame) -> np.ndarray:
     return model.predict_proba(_prep(df))[:, 1]
 
@@ -54,7 +61,7 @@ def patient_scores(split: str = "val") -> pd.DataFrame:
     """Patient-level questionnaire scores (max over lesions) for one PAD split. 'test' only after the freeze."""
     lesions = _lesions()
     part = lesions[lesions["split"] == split]
-    return to_patients(part["patient_id"].to_numpy(), part["is_malignant"].to_numpy(), score(fit_model(), part))
+    return to_patients(part["patient_id"].to_numpy(), part["is_malignant"].to_numpy(), score(load_model(), part))
 
 
 def val_patient_scores() -> pd.DataFrame:

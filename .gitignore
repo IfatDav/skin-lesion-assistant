@@ -19,3 +19,4 @@ data/processed/
 .venv/
 __pycache__/
 models/*.pt
+models/*.safetensors

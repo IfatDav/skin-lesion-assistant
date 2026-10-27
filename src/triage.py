@@ -25,7 +25,7 @@ class Triage:
         self.w_image = cfg["fusion"]["w_image"]
         self.slots_per_100 = cfg["operating_point"]["slots_per_100"]
         self.image = VisualRiskModel()
-        self.quest = questionnaire.fit_model()
+        self.quest = questionnaire.load_model()
 
     def rank(self, queue: list[dict]) -> pd.DataFrame:
         df = pd.DataFrame(queue).set_index("patient_id")

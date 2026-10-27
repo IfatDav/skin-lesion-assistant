@@ -33,6 +33,7 @@ python -m src.train --seed 42                     # ISIC training -> models/conv
 python -m src.finetune_pad --seed 42 --scc-boost 2   # PAD fine-tune -> models/convnext_pad_s42_scc2.pt ~1 min
 python -m src.baseline_dinov2                     # cheapest image baseline                        ~1 min
 python -m src.evaluate                            # decisions, final model, figures                ~5 min
+python -m src.export_model                        # safetensors weights + questionnaire.joblib     <1 min
 python -m src.near_duplicates                     # leakage audit across PAD splits                <1 min
 ```
 
@@ -61,8 +62,12 @@ Triage().rank([{"patient_id": "a", "photos": ["a1.jpg"], "age": 61, "region": "F
 # -> the queue sorted by score, with the top 10 per 100 marked urgent
 ```
 
-Scores rank patients; they are not calibrated probabilities. Model weights are not in git (about 110 MB each);
-they are shared separately.
+Scores rank patients; they are not calibrated probabilities.
+
+**Weights.** The image weights (111 MB, `.safetensors`) are too big for git. They are attached to the GitHub
+release `image-model-v1`, and `src.predict` downloads them into `models/` on first use and checks their sha256
+against `models/final_model.json`. The questionnaire model is in git as `models/questionnaire.joblib`; it needs
+the scikit-learn version pinned in `requirements.txt`.
 
 ## Files
 
@@ -84,7 +89,8 @@ they are shared separately.
 | `evaluate_test.py` | the single run on PAD test patients, written before it runs |
 | `near_duplicates.py` | near-identical photos across PAD splits |
 | `ink_effect.py` | analyses the manual ink labels in `evaluation/` |
-| `predict.py` | inference entry point for the agent |
+| `export_model.py` | packs the final model: `.safetensors` weights for the release, `questionnaire.joblib` |
+| `predict.py` | inference entry point for the agent; downloads the weights on first use |
 
 ## Index splits
 
