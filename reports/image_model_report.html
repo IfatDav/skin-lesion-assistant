@@ -125,6 +125,7 @@ ul.plain{padding-inline-start:1.1em;display:grid;gap:8px;margin:10px 0 16px}
       <li><a href="#job">מה המוצר צריך</a></li>
       <li><a href="#data">הדאטה</a></li>
       <li><a href="#train">האימון</a></li>
+      <li><a href="#tech">מתחת למכסה</a></li>
       <li><a href="#rules">החלטות מראש</a></li>
       <li><a href="#results">התוצאות</a></li>
       <li><a href="#trust">למה להאמין</a></li>
@@ -132,6 +133,7 @@ ul.plain{padding-inline-start:1.1em;display:grid;gap:8px;margin:10px 0 16px}
       <li><a href="#risks">סיכונים</a></li>
       <li><a href="#next">מה נשאר</a></li>
       <li><a href="#repo">מה בענף</a></li>
+      <li><a href="#gloss">מילון מונחים</a></li>
     </ol>
   </nav>
 
@@ -212,8 +214,120 @@ ul.plain{padding-inline-start:1.1em;display:grid;gap:8px;margin:10px 0 16px}
       <p style="font-size:.9rem;color:var(--muted)">משותף לכל השלבים: תמונות 448 פיקסלים. העשרה אקראית בכל אפוק — סיבוב, היפוך, חיתוך, שינוי קל בבהירות וטשטוש — בלי לשנות גוון, כי הצבע הוא סימן אבחנתי. משקל לכל סוג לפי אחד חלקי שורש התדירות, כדי שסוגים נדירים לא יוזנחו.</p>
     </section>
 
+
+    <section id="tech">
+      <h2><span class="n">4</span>מתחת למכסה: הפרטים הטכניים</h2>
+      <p>הפרק הזה למי שרוצה להבין מה קורה בפועל בתוך המודל ובאימון. אפשר לדלג עליו בלי לאבד את הסיפור.</p>
+
+      <h3>איך תמונה עוברת דרך הרשת</h3>
+      <p>הרשת היא סדרה של שלבים. בכל שלב התמונה קטנה במימדים, אבל כל נקודה בה מתארת יותר מאפיינים, שנקראים ערוצים. בסוף כל תמונה הופכת לווקטור של 768 מספרים, ומהם הראש מחשב 6 הסתברויות.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>חלק</th><th>גודל המפה</th><th>ערוצים</th><th>בלוקים</th><th>פרמטרים</th></tr></thead>
+        <tbody>
+          <tr><td>קלט: תמונת צבע</td><td class="num">448×448</td><td class="num">3</td><td>—</td><td>—</td></tr>
+          <tr><td>גבעול: קונבולוציה 4×4 בצעדים של 4 פיקסלים</td><td class="num">112×112</td><td class="num">96</td><td>—</td><td class="num">4,896</td></tr>
+          <tr><td>שלב 1: קווים וקצוות</td><td class="num">112×112</td><td class="num">96</td><td class="num">3</td><td class="num">237,888</td></tr>
+          <tr><td>שלב 2: מרקמים</td><td class="num">56×56</td><td class="num">192</td><td class="num">3</td><td class="num">992,256</td></tr>
+          <tr><td>שלב 3: צורות</td><td class="num">28×28</td><td class="num">384</td><td class="num">9</td><td class="num">11,112,960</td></tr>
+          <tr><td>שלב 4: מבנים</td><td class="num">14×14</td><td class="num">768</td><td class="num">3</td><td class="num">15,470,592</td></tr>
+          <tr><td>ראש: ממוצע על כל המפה, נרמול, שכבה לינארית</td><td class="num">1</td><td class="num">768 ← 6</td><td>—</td><td class="num">6,150</td></tr>
+          <tr><td><b>סה"כ</b></td><td></td><td></td><td></td><td class="num"><b>27,824,742</b></td></tr>
+        </tbody>
+      </table></div>
+      <p><strong>מה יש בתוך בלוק:</strong> כל ערוץ מסתכל על שכנות של 7×7 נקודות סביבו, בנפרד משאר הערוצים. אחר כך נרמול, הרחבה של מספר הערוצים פי 4, פונקציית הפעלה לא לינארית, וכיווץ חזרה. בסוף מוסיפים לתוצאה את הקלט המקורי של הבלוק. החיבור הזה מאפשר לבנות רשת עמוקה בלי שהלמידה תיתקע.</p>
+      <p><strong>מה זה אומר על הרזולוציה:</strong> בסוף שלב 4 כל נקודה במפה של 14×14 מייצגת ריבוע של 32×32 פיקסלים מהתמונה, יחד עם ההקשר שסביבו. ב־224 פיקסלים כל נקודה הייתה מכסה חלק גדול פי ארבעה מהנגע, ופרטים עדינים כמו גבול משונן היו נבלעים.</p>
+
+      <h3>מי לומד בכל שלב, במספרים</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>שלב האימון</th><th>פרמטרים שלומדים</th><th>קצב למידה</th><th>האפוק שנבחר</th></tr></thead>
+        <tbody>
+          <tr><td>חימום הראש</td><td class="num">6,150 <span class="ci">(0.02%)</span></td><td class="num">1e-3</td><td>שני אפוקים קבועים</td></tr>
+          <tr><td>אימון מלא על ISIC</td><td class="num">27.8M <span class="ci">(100%)</span></td><td>מ־9e-6 בגבעול ועד 2e-4 בראש</td><td>6</td></tr>
+          <tr><td>כיוונון על PAD</td><td class="num">26.6M <span class="ci">(95.6%)</span></td><td>3e-5, ובראש 3e-4</td><td>6</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note"><b>פרט שמפתיע:</b> "להקפיא את השכבות המוקדמות" נשמע דרמטי, אבל בפועל זה מקפיא רק 4.4% מהפרמטרים, כי רוב המשקלות יושבים בשלבים 3 ו־4. ההקפאה שומרת על גלאי הקווים והמרקמים הבסיסיים. מה שבאמת מגן מפני שינון של 1,430 התמונות הוא קצב הלמידה הנמוך פי 10, יחד עם העצירה המוקדמת.</div>
+
+      <h3>הקלט וההעשרה</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>פעולה</th><th>פרמטרים</th><th>למה</th></tr></thead>
+        <tbody>
+          <tr><td>חיתוך אקראי ושינוי גודל</td><td>70% עד 100% מהשטח, ל־448×448</td><td>שהמודל לא יסתמך על מיקום הנגע בתמונה</td></tr>
+          <tr><td>היפוך אופקי ואנכי, סיבוב</td><td>כל זווית</td><td>לנגע אין "למעלה"</td></tr>
+          <tr><td>בהירות, ניגודיות, רוויה</td><td>עד 20%, 20%, 15%</td><td>מחקה תאורה של טלפון</td></tr>
+          <tr><td>גוון</td><td>עד 2% בלבד</td><td>הצבע הוא סימן אבחנתי, אסור לעוות אותו</td></tr>
+          <tr><td>טשטוש</td><td>ב־20% מהתמונות, בעוצמה משתנה</td><td>מחקה צילום לא מפוקס</td></tr>
+          <tr><td>נרמול צבעים</td><td>ממוצע וסטיית תקן של ImageNet</td><td>אותו קלט שהרשת התרגלה אליו באימון המקורי</td></tr>
+        </tbody>
+      </table></div>
+      <p>בהערכה אין העשרה: מקטינים את הצלע הקצרה ל־448 וחותכים ריבוע מהמרכז. את תמונות PAD הקטנו מראש ל־512 פעם אחת, כי פענוח תמונה מקורית לוקח 16 מילישניות לעומת 3 ב־ISIC, ובלי זה המעבד הופך לצוואר הבקבוק.</p>
+
+      <h3>פונקציית ההפסד</h3>
+      <p>הרשת מוציאה 6 מספרים, ופונקציית softmax הופכת אותם להסתברויות שמסתכמות ל־1. ההפסד, cross-entropy, מודד עד כמה ההסתברות שהמודל נתן לסוג הנכון רחוקה מ־1. נוספו לו שני תיקונים:</p>
+      <p><strong>משקל לכל סוג:</strong> אחד חלקי שורש מספר התמונות שלו, מנורמל לממוצע 1. טעות על סוג נדיר "עולה" יותר. שורש ולא יחס ישיר, כי פער של פי 20 בין סוגים היה גורם למודל להתמקד בכמה עשרות תמונות ולשנן אותן.</p>
+      <div class="tbl" style="max-width:480px"><table>
+        <thead><tr><th>סוג</th><th>משקל ב־ISIC</th><th>משקל ב־PAD, עם סרטן קשקשי ×2</th></tr></thead>
+        <tbody><tr><td>מלנומה</td><td class='num'>1.01</td><td class='num'>1.68</td></tr><tr><td>סרטן קשקשי</td><td class='num'>0.85</td><td class='num'>1.78</td></tr><tr><td>סרטן תאי בסיס</td><td class='num'>0.44</td><td class='num'>0.44</td></tr><tr><td>קרטוזיס אקטינית</td><td class='num'>1.96</td><td class='num'>0.46</td></tr><tr><td>שומה</td><td class='num'>0.80</td><td class='num'>0.85</td></tr><tr><td>קרטוזיס שפירה</td><td class='num'>0.94</td><td class='num'>0.80</td></tr></tbody>
+      </table></div>
+      <p><strong>ריכוך תוויות של 0.1:</strong> במקום לדרוש 100% לסוג הנכון, היעד הוא 91.7%, ו־1.7% לכל אחד מהאחרים. זה מונע מהמודל להיות בטוח מדי, וזה חשוב כשהתוויות עצמן לא מושלמות: רוב הנגעים השפירים ב־PAD אובחנו בלי ביופסיה.</p>
+
+      <h3>האופטימיזציה</h3>
+      <ul class="plain">
+        <li><strong>האופטימייזר AdamW,</strong> עם weight decay של 0.05: מעדכן כל משקל לפי ההיסטוריה של השינויים שלו, ומושך משקלות לכיוון אפס כדי לבלום התאמת יתר.</li>
+        <li><strong>לוח קצב הלמידה:</strong> באפוק הראשון הקצב עולה בהדרגה מאפס, ואחר כך יורד בצורת קוסינוס עד אפס. ההתחלה העדינה מונעת קפיצה חדה במשקלות המאומנים, והירידה בסוף מייצבת.</li>
+        <li><strong>קצב שונה לכל שכבה:</strong> כל בלוק מקבל 85% מהקצב של הבלוק שאחריו. עם כ־20 בלוקים, הגבעול לומד בכ־5% מהקצב של הראש.</li>
+        <li><strong>חצי דיוק (bfloat16):</strong> החישובים נעשים במספרים של 16 ביט במקום 32. זה חוסך זיכרון ומאיץ, כמעט בלי השפעה על הדיוק. ב־batch של 32 הכרטיס מעבד כ־175 תמונות בשנייה ותופס 8 מתוך 16 גיגה.</li>
+        <li><strong>עצירה מוקדמת:</strong> אחרי כל אפוק בודקים את הוולידציה ושומרים את הגרסה הטובה ביותר. עוצרים אחרי 4 אפוקים בלי שיפור ב־ISIC, ואחרי 3 ב־PAD.</li>
+      </ul>
+
+      <h3>מתמונה לדירוג</h3>
+      <ol class="steps">
+        <li><span class="t">ציון סרטן לכל תמונה</span><span class="d">סכום ההסתברויות של מלנומה, סרטן קשקשי וסרטן תאי בסיס.</span></li>
+        <li><span class="t">ציון למטופל</span><span class="d">הציון הגבוה מבין התמונות שלו, כלומר המטופל מדורג לפי הנגע החשוד ביותר. זה הכלל הקפוא מהמחברת של תמי.</span></li>
+        <li><span class="t">שילוב עם השאלון</span><span class="d">כל ציון הופך למקום בתור באחוזונים, ומחשבים 60% מהמקום לפי התמונה ועוד 40% לפי השאלון. אין כאן אימון, ולכן אין גם דליפה.</span></li>
+        <li><span class="t">דירוג</span><span class="d">ממיינים את התור מהגבוה לנמוך, והראשונים נכנסים למקומות הדחופים.</span></li>
+      </ol>
+
+      <h3>איך מודדים</h3>
+      <ul class="plain">
+        <li><strong>AUC:</strong> הסיכוי שמטופל חולה יקבל ציון גבוה יותר ממטופל בריא, כשמגרילים אחד מכל קבוצה. לא תלוי בסף.</li>
+        <li><strong>רגישות בנקודת עבודה:</strong> משקללים את המטופלים כך ששיעור הממאירים בתור יהיה 5%, 10% או 20%, ובודקים כמה חולים נכנסים לרשימה בגודל נתון. אותו קוד בדיוק כמו במחברת 02.</li>
+        <li><strong>טווח ביטחון של 95%:</strong> מגרילים מחדש את המטופלים 1,000 פעמים, עם החזרה ובנפרד לחולים ולבריאים, ומחשבים את המדד בכל פעם. הטווח הוא בין האחוזון ה־2.5 ל־97.5 של התוצאות.</li>
+        <li><strong>השוואה מזווגת:</strong> בכל הגרלה מחשבים את ההפרש בין שני מודלים על אותם מטופלים. כך רעש שמשותף לשניהם מתבטל, וההשוואה רגישה בהרבה מהשוואה בין שני טווחים נפרדים.</li>
+      </ul>
+
+      <h3>שתי מלכודות טכניות שנמצאו בדרך</h3>
+      <ul class="plain">
+        <li><strong>timm מתעלמת בשקט מהקצב השונה לכל שכבה.</strong> הפרמטר <code>layer_decay</code> רק שומר מקדם בצד, ורק המתזמנים של timm עצמה מפעילים אותו. עם מתזמן רגיל של PyTorch כל השכבות מתאמנות באותו קצב, בלי שגיאה ובלי אזהרה. בקוד יש שורה שמפעילה את המקדם ידנית.</li>
+        <li><strong>בווינדוס, תהליכי הטעינה המקבילים צריכים לייבא את הקוד.</strong> סקריפט שמורץ מקלט ישיר, או מחלקת Dataset שמוגדרת בתוך תא של מחברת, פשוט נתקע. לכן כל הקוד יושב בתיקייה <code>src/</code> ומורץ כמודול.</li>
+      </ul>
+
+      <h3>הליבה בקוד</h3>
+<pre>model = timm.create_model("convnext_tiny.fb_in22k_ft_in1k", pretrained=True, num_classes=6)
+
+# step 1: only the new head learns
+for name, p in model.named_parameters():
+    p.requires_grad = name.startswith("head")
+opt = torch.optim.AdamW(model.head.parameters(), lr=1e-3, weight_decay=0.05)
+
+# step 2: everything learns, earlier layers slower
+opt = create_optimizer_v2(model, opt="adamw", lr=2e-4, weight_decay=0.05, layer_decay=0.85)
+for g in opt.param_groups:
+    g["lr"] *= g["lr_scale"]          # timm applies lr_scale only inside its own schedulers
+
+# step 3 (PAD): stem and the first two stages frozen, 10x lower learning rate
+for name, p in model.named_parameters():
+    p.requires_grad = not name.startswith(("stem", "stages.0", "stages.1"))
+
+crit = torch.nn.CrossEntropyLoss(weight=class_weights, label_smoothing=0.1)
+with torch.autocast("cuda", dtype=torch.bfloat16):
+    loss = crit(model(images), labels)
+
+cancer_score = probs[:, [0, 1, 2]].sum(1)    # MEL + SCC + BCC</pre>
+    </section>
+
     <section id="rules">
-      <h2><span class="n">4</span>החלטות שנקבעו לפני הריצות</h2>
+      <h2><span class="n">5</span>החלטות שנקבעו לפני הריצות</h2>
       <p>כדי לא לבחור את המספר הנוח אחרי שרואים תוצאות, ארבעה כללים נכתבו מראש, וכל גרסה אומנה שלוש פעמים עם זרעים אקראיים שונים.</p>
       <div class="tbl"><table>
         <thead><tr><th>כלל</th><th>מה יצא</th></tr></thead>
@@ -228,7 +342,7 @@ ul.plain{padding-inline-start:1.1em;display:grid;gap:8px;margin:10px 0 16px}
     </section>
 
     <section id="results">
-      <h2><span class="n">5</span>התוצאות</h2>
+      <h2><span class="n">6</span>התוצאות</h2>
       <p>כל השורות נמדדו על אותם 220 מטופלים. הרגישות והדיוק נמדדו בתרחיש הראשי: 10 מקומות ל־100 פונים, 10% ממאירים.</p>
       <div class="tbl"><table>
         <thead><tr><th>מודל</th><th>AUC ברמת מטופל</th><th>חולים ברשימה</th><th>דיוק הרשימה</th><th>הערה</th></tr></thead>
@@ -263,7 +377,7 @@ ul.plain{padding-inline-start:1.1em;display:grid;gap:8px;margin:10px 0 16px}
     </section>
 
     <section id="trust">
-      <h2><span class="n">6</span>למה אפשר להאמין לתוצאה</h2>
+      <h2><span class="n">7</span>למה אפשר להאמין לתוצאה</h2>
       <p>קפיצה מ־0.778 ל־0.956 נראתה טובה מדי, אז חיפשנו במה המודל עלול "לרמות":</p>
       <ul class="plain">
         <li><strong>מאיפה השיפור:</strong> כשבודקים רק את 139 המטופלים שאין להם קרטוזיס אקטינית, המודל שלא ראה צילומי טלפון כבר מגיע ל־0.899. כלומר רוב הפער היה סוג נגע אחד שהמודל סיווג כסרטן, והכיוונון לימד אותו שהוא לא.</li>
@@ -276,7 +390,7 @@ ul.plain{padding-inline-start:1.1em;display:grid;gap:8px;margin:10px 0 16px}
     </section>
 
     <section id="errors">
-      <h2><span class="n">7</span>איפה המודל טועה</h2>
+      <h2><span class="n">8</span>איפה המודל טועה</h2>
       <p>מטריצת הבלבול של המודל הסופי על תמונות הוולידציה. שורה = הסוג האמיתי, עמודה = מה שהמודל אמר. ככל שהתא כהה יותר, חלק גדול יותר מהשורה.</p>
       <div class="tbl mono-tbl"><table>
         <thead><tr><th>אמיתי \ נחזה</th><th>מלנומה</th><th>סרטן קשקשי</th><th>סרטן תאי בסיס</th><th>קרטוזיס אקטינית</th><th>שומה</th><th>קרטוזיס שפירה</th><th>סה"כ</th></tr></thead>
@@ -287,7 +401,7 @@ ul.plain{padding-inline-start:1.1em;display:grid;gap:8px;margin:10px 0 16px}
     </section>
 
     <section id="risks">
-      <h2><span class="n">8</span>סיכונים ומגבלות</h2>
+      <h2><span class="n">9</span>סיכונים ומגבלות</h2>
       <ul class="plain">
         <li><strong>סימוני עט כירורגי.</strong> בחלק מתמונות PAD יש סימון סגול ליד הנגע, שנעשה לפני ביופסיה. זה קיצור דרך ידוע בספרות: המודל עלול ללמוד "יש דיו, אז זה סרטן". גלאי אוטומטי נכשל בבדיקה, אז ההשפעה <strong>לא נמדדה</strong>. גיליון תיוג של 200 תמונות מוכן, כ־20 דקות עבודה.</li>
         <li><strong>לחולי סרטן ב־PAD יש יותר תמונות:</strong> 1.93 מול 1.33 בממוצע. מספר התמונות לבדו מגיע ל־AUC של 0.663, וכלל "התמונה החשודה ביותר" הופך את זה ליתרון. באפליקציה תהיה תמונה אחת לנגע, אז המספרים כאן אופטימיים מעט.</li>
@@ -298,7 +412,7 @@ ul.plain{padding-inline-start:1.1em;display:grid;gap:8px;margin:10px 0 16px}
     </section>
 
     <section id="next">
-      <h2><span class="n">9</span>מה נשאר, ומה צריך מהצוות</h2>
+      <h2><span class="n">10</span>מה נשאר, ומה צריך מהצוות</h2>
       <h3>החלטות שהענף לקח באופן זמני</h3>
       <ul class="plain">
         <li><strong>6 קטגוריות,</strong> שמהן נגזר הציון הבינארי של הצ'רטר. המדד M2 לא משתנה.</li>
@@ -315,7 +429,7 @@ ul.plain{padding-inline-start:1.1em;display:grid;gap:8px;margin:10px 0 16px}
     </section>
 
     <section id="repo">
-      <h2><span class="n">10</span>מה בענף ואיך מריצים</h2>
+      <h2><span class="n">11</span>מה בענף ואיך מריצים</h2>
       <div class="tbl"><table>
         <thead><tr><th>איפה</th><th>מה</th></tr></thead>
         <tbody>
@@ -333,6 +447,28 @@ python -m src.finetune_pad --seed 42 --scc-boost 2
 python -m src.baseline_dinov2
 python -m src.evaluate</pre>
       <p>משקלות המודלים לא נמצאים בגיט, כ־110 מגה כל אחד. הם יישלחו בנפרד. ההוראות המלאות נמצאות ב־<code>src/README.md</code>.</p>
+    </section>
+
+    <section id="gloss">
+      <h2>מילון מונחים</h2>
+      <div class="tbl"><table>
+        <tbody>
+          <tr><td><b>אפוק</b></td><td>מעבר אחד של המודל על כל תמונות האימון</td></tr>
+          <tr><td><b>batch</b></td><td>קבוצת תמונות שהמודל רואה יחד לפני עדכון משקלות אחד</td></tr>
+          <tr><td><b>קצב למידה</b></td><td>גודל צעד העדכון. גבוה מדי: האימון קופץ. נמוך מדי: לא זז</td></tr>
+          <tr><td><b>ראש</b></td><td>החלק האחרון ברשת, שהופך את מה שהיא ראתה להסתברות לכל סוג</td></tr>
+          <tr><td><b>הקפאה</b></td><td>שכבה שהמשקלות שלה לא מתעדכנים באימון</td></tr>
+          <tr><td><b>למידת העברה</b></td><td>שימוש ברשת שאומנה על משימה אחת כנקודת פתיחה למשימה אחרת</td></tr>
+          <tr><td><b>כיוונון</b></td><td>המשך אימון של רשת מאומנת על דאטה חדש, בקצב נמוך</td></tr>
+          <tr><td><b>העשרת נתונים</b></td><td>שינויים אקראיים בתמונות בזמן האימון, כדי שהמודל לא ישנן</td></tr>
+          <tr><td><b>שינון</b></td><td>המודל זוכר את תמונות האימון במקום ללמוד כללים. רואים את זה כשהשגיאה באימון יורדת והוולידציה מפסיקה להשתפר</td></tr>
+          <tr><td><b>זרע אקראי</b></td><td>מספר שקובע את כל ההגרלות באימון. זרע אחר נותן ריצה קצת אחרת</td></tr>
+          <tr><td><b>דליפה</b></td><td>מידע מסט הבדיקה שמגיע לאימון בטעות, למשל אותו מטופל בשני הצדדים, ומנפח את התוצאה</td></tr>
+          <tr><td><b>AUC</b></td><td>עד כמה המודל מדרג חולים מעל בריאים. 0.5 זה ניחוש, 1 זה מושלם</td></tr>
+          <tr><td><b>רגישות</b></td><td>מתוך כל החולים, כמה נתפסו</td></tr>
+          <tr><td><b>דיוק הרשימה</b></td><td>מתוך מי שנכנס לרשימה, כמה באמת חולים (PPV)</td></tr>
+        </tbody>
+      </table></div>
     </section>
   </main>
 </div>
