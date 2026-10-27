@@ -1,6 +1,6 @@
 {
  "pad_val_patients": 220,
- "rules": "Final evaluation on PAD validation patients. PAD test patients are never loaded.\n\nApplies the decision rules written down before the runs:\n  1. SCC weight x2 is adopted only if, averaged over the 3 seeds, fewer SCC photos are called AK and the\n     patient AUC drops by no more than 0.01.\n  2. The final model is the seed-42 run of the adopted variant, not the best seed.\n  3. Averaging the 3 seeds is adopted only if its paired AUC gain over the single model excludes zero.\n  4. Fusion with the questionnaire uses fixed weights, 60% image / 40% questionnaire.",
+ "rules": "Final evaluation on PAD validation patients. PAD test patients are never loaded.\n\nApplies the decision rules written down before the runs:\n  1. SCC weight x2 is adopted only if, averaged over the 3 seeds, fewer SCC photos are called AK and the\n     patient AUC drops by no more than 0.01.\n  2. The final model is the seed-42 run of the adopted variant, not the best seed.\n  3. Averaging the 3 seeds is adopted only if its paired AUC gain over the single model excludes zero.\n  4. Fusion with the questionnaire uses fixed weights, 60% image / 40% questionnaire.\nAfter these results the team chose the 60/40 fusion as the final model (reports/decisions.md); the manifest\nrecords it. Validation numbers are slightly optimistic: epochs and the rules above were chosen on them.",
  "runs": {
   "plain_s42": {
    "auc": 0.9586756285785412,
@@ -894,6 +894,20 @@
   "images_per_patient_auc": 0.6627250850551821,
   "mean_images_cancer": 1.9320388349514563,
   "mean_images_non_cancer": 1.3333333333333333
+ },
+ "biopsied_only": {
+  "n_patients": 116,
+  "n_malignant": 93,
+  "auc_image": 0.8859280037400654,
+  "auc_questionnaire": 0.8457223001402524,
+  "auc_fused": 0.8903693314633007,
+  "fused_minus_image": {
+   "mean": 0.00453401122019635,
+   "ci": [
+    -0.02384291725105181,
+    0.033432678821879454
+   ]
+  }
  },
  "msk_false_alarms": {
   "cutoff": 0.8333661556243896,

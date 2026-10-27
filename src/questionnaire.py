@@ -25,19 +25,37 @@ def _prep(df):
     return X
 
 
-def val_patient_scores() -> pd.DataFrame:
+def _lesions() -> pd.DataFrame:
     pad = pd.read_csv(C.META_DIR / "PAD_UFES_20_metadata.csv").replace({"UNK": np.nan, "": np.nan})
     pad["split"] = pad["patient_id"].map(patient_split(pad.astype({"diagnostic": str})))
     pad["is_malignant"] = pad["diagnostic"].isin(["MEL", "BCC", "SCC"]).astype(int)
     pad["lesion_key"] = pad["patient_id"].astype(str) + "::" + pad["lesion_id"].astype(str)
-    lesions = pad[pad["split"].isin(["train", "val"])].sort_values("img_id").drop_duplicates("lesion_key")
-    tr, va = lesions[lesions["split"] == "train"], lesions[lesions["split"] == "val"]
+    return pad.sort_values("img_id").drop_duplicates("lesion_key")
+
+
+def fit_model():
+    """Variant D fitted on PAD train lesions only. Input: a frame with age, region and the 6 symptom columns."""
+    lesions = _lesions()
+    tr = lesions[lesions["split"] == "train"]
     model = make_pipeline(
         make_column_transformer(
             (make_pipeline(SimpleImputer(strategy="median"), StandardScaler()), NUM),
             (make_pipeline(SimpleImputer(strategy="most_frequent"),
                            OneHotEncoder(handle_unknown="ignore", min_frequency=10)), CAT)),
         LogisticRegression(max_iter=2000, class_weight="balanced"))
-    model.fit(_prep(tr), tr["is_malignant"])
-    return to_patients(va["patient_id"].to_numpy(), va["is_malignant"].to_numpy(),
-                       model.predict_proba(_prep(va))[:, 1])
+    return model.fit(_prep(tr), tr["is_malignant"])
+
+
+def score(model, df: pd.DataFrame) -> np.ndarray:
+    return model.predict_proba(_prep(df))[:, 1]
+
+
+def patient_scores(split: str = "val") -> pd.DataFrame:
+    """Patient-level questionnaire scores (max over lesions) for one PAD split. 'test' only after the freeze."""
+    lesions = _lesions()
+    part = lesions[lesions["split"] == split]
+    return to_patients(part["patient_id"].to_numpy(), part["is_malignant"].to_numpy(), score(fit_model(), part))
+
+
+def val_patient_scores() -> pd.DataFrame:
+    return patient_scores("val")

@@ -2,9 +2,11 @@
 
 A shortcut shows up as inked photos getting higher cancer scores than un-inked photos of the same diagnosis.
 
-Run:  python -m src.ink_effect
+Run:  python -m src.ink_effect                                        # development sample
+      python -m src.ink_effect evaluation/ink_labeling_test.csv      # test photos, after the frozen test run
 """
 import json
+import sys
 
 import pandas as pd
 from scipy.stats import mannwhitneyu
@@ -16,12 +18,13 @@ from src.predict import VisualRiskModel
 SAMPLE = C.REPO_ROOT / "evaluation" / "ink_labeling_sample.csv"
 
 
-def main():
-    lab = pd.read_csv(SAMPLE, dtype=str).fillna("")
+def main(sample=SAMPLE):
+    sample = C.REPO_ROOT / sample
+    lab = pd.read_csv(sample, dtype=str).fillna("")
     lab = lab[lab["has_ink"].isin(["0", "1"])]
     if lab.empty:
-        raise SystemExit(f"No labels yet: fill the has_ink column in {SAMPLE.relative_to(C.REPO_ROOT)}")
-    idx = load_index(["pad_train", "pad_val"]).set_index("image_id")
+        raise SystemExit(f"No labels yet: fill the has_ink column in {sample.relative_to(C.REPO_ROOT)}")
+    idx = load_index(sorted(set(lab["split"]))).set_index("image_id")
     lab = lab.join(idx[["label6", "cancer", "source", "image_path"]], on="image_id")
 
     vrm = VisualRiskModel()
@@ -37,9 +40,9 @@ def main():
             out["within_class"][c] = {"n_ink": int(len(a)), "n_no_ink": int(len(b)),
                                       "median_score_ink": float(a.median()), "median_score_no_ink": float(b.median()),
                                       "mannwhitney_p": float(mannwhitneyu(a, b).pvalue)}
-    (C.REPORTS_DIR / "ink_effect.json").write_text(json.dumps(out, indent=1))
+    (C.REPORTS_DIR / f"ink_effect{'_test' if 'pad_test' in set(lab['split']) else ''}.json").write_text(json.dumps(out, indent=1))
     print(json.dumps(out, indent=1))
 
 
 if __name__ == "__main__":
-    main()
+    main(*sys.argv[1:])

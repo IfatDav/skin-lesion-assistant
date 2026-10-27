@@ -38,8 +38,8 @@ Sensitivity and PPV at the primary operating point: 10 urgent slots per 100 arri
 | Questionnaire only | 0.867 (0.815–0.913) | 0.52 | 0.53 |
 | DINOv2 frozen + logistic regression | 0.880 (0.835–0.923) | 0.49 | 0.51 |
 | ConvNeXt, ISIC only | 0.778 (0.719–0.836) | 0.30 | 0.30 |
-| **ConvNeXt + PAD fine-tuning (final)** | **0.956 (0.930–0.977)** | **0.60** | **0.61** |
-| Final image 60% + questionnaire 40% | 0.954 (0.928–0.978) | 0.61 | 0.61 |
+| ConvNeXt + PAD fine-tuning (image part of the final model) | 0.956 (0.930–0.977) | 0.60 | 0.61 |
+| **Final model: image 60% + questionnaire 40%** | **0.954 (0.928–0.978)** | **0.61** | **0.61** |
 
 Paired AUC differences: image − questionnaire **+0.089** (+0.047 to +0.132); fused − questionnaire +0.087
 (+0.054 to +0.124); fused − image −0.001 (−0.014 to +0.011).
@@ -51,8 +51,11 @@ Over three seeds the plain recipe gives AUC 0.950–0.959 and the SCC×2 recipe 
 
 1. **The image model ranks phone-photo patients better than the questionnaire**, by 9 AUC points, a paired and
    significant difference. At the primary point it puts 60% of cancer patients on the daily list (questionnaire 52%).
-2. **Fusion adds nothing measurable on top of the image** on these patients. It is kept for robustness (a poor
-   photo or a missing answer), since both inputs will be noisier in the app than in PAD.
+2. **The final model is the 60/40 fusion** (team decision, `decisions.md`). It ties the image model on these
+   patients and keeps the answers in the score for poor photos. The weights were fixed before any result.
+   **Unbiopsied lesions are easy cases:** in PAD they are all benign. On the 116 patients whose lesions were all
+   biopsied (93 with cancer) the AUCs are 0.890 (final), 0.886 (image) and 0.846 (questionnaire); fused − image
+   +0.005 (−0.024 to +0.033).
 3. **Most of the clinic-to-phone gap was actinic keratosis.** Without the 81 patients who have an AK, the
    ISIC-only model already reaches 0.899. ISIC has 123 AK photos and PAD 730; the ISIC-only model calls AK cancer.
 4. **The cheapest image baseline is already as good as the questionnaire** (0.880 vs 0.867) without training a
@@ -75,7 +78,8 @@ Over three seeds the plain recipe gives AUC 0.950–0.959 and the SCC×2 recipe 
 - **The SCC weight cost some melanoma on average:** melanoma patients on the list 2.7 → 2.0 of 6 over three
   seeds (the final model has 3 of 6). With 6 patients this is within noise, but the team should know.
 - **Surgical-marker ink** is visible on some PAD photos and is a known shortcut. Unmeasured: an automatic detector
-  failed validation. A labelling sheet is ready in `evaluation/` (about 20 minutes of work).
+  failed validation. Decided: after the test run, test photos are labelled blind and benign inked photos are
+  compared with benign photos without ink.
 - **More photos for cancer patients in PAD** (1.93 vs 1.33 on average); the photo count alone reaches AUC 0.663,
   and the max rule turns it into extra chances. Patient-level numbers are therefore slightly optimistic.
 - **Small validation set** (220 patients, 6 with melanoma), used to choose the epoch: expect the test score to be
@@ -84,7 +88,5 @@ Over three seeds the plain recipe gives AUC 0.950–0.959 and the SCC×2 recipe 
 
 ## Not yet done
 
-- PAD test evaluation: once the team has frozen every choice above, run it once and report it as it comes out.
-- Ink labelling (`evaluation/INK_LABELING.md`, then `python -m src.ink_effect`).
-- Team decisions this branch made provisionally: 6 classes, keeping the 123 ISIC AK photos, MSK out of training,
-  no HAM10000 pretraining.
+Decisions are frozen in `decisions.md`. In order: the team approves it, `python -m src.evaluate_test --frozen`
+runs once, then the test photos are labelled for ink and `python -m src.ink_effect evaluation/ink_labeling_test.csv`.

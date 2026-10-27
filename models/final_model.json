@@ -1,5 +1,14 @@
 {
  "checkpoints": [
   "convnext_pad_s42_scc2.pt"
- ]
+ ],
+ "ranking_score": "P(MEL)+P(SCC)+P(BCC), max over photos",
+ "fusion": {
+  "w_image": 0.6,
+  "questionnaire": "notebook 02 variant D, fitted on PAD train"
+ },
+ "operating_point": {
+  "slots_per_100": 10,
+  "prevalence": 0.1
+ }
 }

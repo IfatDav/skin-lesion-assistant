@@ -6,6 +6,8 @@ Applies the decision rules written down before the runs:
   2. The final model is the seed-42 run of the adopted variant, not the best seed.
   3. Averaging the 3 seeds is adopted only if its paired AUC gain over the single model excludes zero.
   4. Fusion with the questionnaire uses fixed weights, 60% image / 40% questionnaire.
+After these results the team chose the 60/40 fusion as the final model (reports/decisions.md); the manifest
+records it. Validation numbers are slightly optimistic: epochs and the rules above were chosen on them.
 
 Writes reports/final_results.json, reports/figures/*.png and models/final_model.json.
 
@@ -111,7 +113,10 @@ def main():
     res["decision_ensemble"] = {"adopted": bool(adopt_ens), "auc_gain_mean": d, "auc_gain_ci": ci,
                                 "ensemble_auc": ens_rep["auc"], "single_auc": single_rep["auc"]}
     final_ckpts = [f"convnext_pad_s{s}{VARIANTS[variant]}.pt" for s in (SEEDS if adopt_ens else [42])]
-    (C.MODELS_DIR / "final_model.json").write_text(json.dumps({"checkpoints": final_ckpts}, indent=1))
+    manifest = {"checkpoints": final_ckpts, "ranking_score": "P(MEL)+P(SCC)+P(BCC), max over photos",
+                "fusion": {"w_image": FUSION_W_IMAGE, "questionnaire": "notebook 02 variant D, fitted on PAD train"},
+                "operating_point": {"slots_per_100": PRIMARY[0], "prevalence": PRIMARY[1]}}
+    (C.MODELS_DIR / "final_model.json").write_text(json.dumps(manifest, indent=1))
     final_p = ens_p if adopt_ens else probs[(variant, 42)]
     final_rep, final_pat = (ens_rep, ens_pat) if adopt_ens else (single_rep, single_pat)
     final_rep["image_level_6class"] = summarize(final_p, y6)
@@ -157,6 +162,18 @@ def main():
         "mean_images_cancer": float(cnt[final_pat["y"] == 1].mean()),
         "mean_images_non_cancer": float(cnt[final_pat["y"] == 0].mean()),
     }
+
+    # --- PAD's unbiopsied lesions: all benign, diagnosed by eye, and never asked the history block -----------
+    meta = pd.read_csv(C.META_DIR / "PAD_UFES_20_metadata.csv")
+    all_biopsied = meta["biopsed"].astype(str).str.upper().eq("TRUE").groupby(meta["patient_id"]).all()
+    keep_b = common[all_biopsied.loc[common].to_numpy()]
+    yb = fused_pat["y"].loc[keep_b]
+    sub = {"image": final_pat["score"].loc[keep_b], "questionnaire": quest["score"].loc[keep_b]}
+    sub["fused"] = fuse(sub["image"], sub["questionnaire"], FUSION_W_IMAGE)
+    m, c = paired_auc_diff(yb, sub["fused"], sub["image"])
+    res["biopsied_only"] = {"n_patients": int(len(keep_b)), "n_malignant": int(yb.sum()),
+                            **{f"auc_{k}": float(roc_auc_score(yb, v)) for k, v in sub.items()},
+                            "fused_minus_image": {"mean": m, "ci": c}}
 
     # --- MSK false alarms, image model at its primary-point cutoff ----------------------------------------
     msk = load_index("msk_eval")
@@ -240,7 +257,8 @@ def print_summary(res):
         print(f"  {name:<38} {r['auc']:.3f} ({r['auc_ci'][0]:.3f}-{r['auc_ci'][1]:.3f}) | {p['sensitivity']:.2f} | {p['ppv']:.2f}")
     for k in ("image_minus_questionnaire", "fused_minus_questionnaire", "fused_minus_image"):
         print(f"  {k}: {res[k]['mean']:+.3f} ({res[k]['ci'][0]:+.3f} to {res[k]['ci'][1]:+.3f})")
-    print("\ndiagnostics:", {k: round(v, 3) if isinstance(v, float) else v for k, v in res["diagnostics"].items()})
+    print("\nbiopsied-only patients:", {k: (round(v, 3) if isinstance(v, float) else v) for k, v in res["biopsied_only"].items()})
+    print("diagnostics:", {k: round(v, 3) if isinstance(v, float) else v for k, v in res["diagnostics"].items()})
     print("MSK false alarms:", {k: round(v, 3) if isinstance(v, float) else v for k, v in res["msk_false_alarms"].items()})
 
 

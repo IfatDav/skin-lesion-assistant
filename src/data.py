@@ -63,5 +63,7 @@ class LesionImages(Dataset):
 
 def make_loader(df: pd.DataFrame, train: bool, batch_size: int = 32, workers: int = 8) -> DataLoader:
     ds = LesionImages(df, train_transform() if train else eval_transform())
+    # pin_memory stays off: on the project machine (RTX 5070 Ti, Windows, torch 2.11) pinned host->GPU copies
+    # corrupted ~1-2% of rows, which surfaced as NaN predictions. Unpinned copies are exact.
     return DataLoader(ds, batch_size=batch_size if train else 64, shuffle=train, drop_last=train,
-                      num_workers=workers, pin_memory=True, persistent_workers=workers > 0)
+                      num_workers=workers, pin_memory=False, persistent_workers=workers > 0)

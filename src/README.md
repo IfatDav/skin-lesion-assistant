@@ -25,7 +25,8 @@ python -m src.near_duplicates                     # leakage audit across PAD spl
 ```
 
 `src.evaluate` expects seeds 42, 1 and 2 of `train` and of `finetune_pad` with `--scc-boost 1` and `2`.
-**PAD test patients are never loaded by any of these scripts.**
+**PAD test patients are never loaded by any of these scripts.** The one script that does,
+`python -m src.evaluate_test --frozen`, runs once, after the team approves `reports/decisions.md`.
 
 On Windows, run scripts as modules (as above), not from stdin or from notebook cells that define the dataset:
 the data loader starts worker processes that must be able to import the code.
@@ -37,6 +38,15 @@ from src.predict import VisualRiskModel
 model = VisualRiskModel()                              # checkpoint(s) listed in models/final_model.json
 model.predict(["photo1.jpg", "photo2.jpg"])            # one patient, any number of photos
 # -> per-photo class probabilities, cancer_score, urgent_score, most_suspicious_photo, most_likely_class
+```
+
+The final model ranks a whole queue: 60% image rank + 40% questionnaire rank.
+
+```python
+from src.triage import Triage
+Triage().rank([{"patient_id": "a", "photos": ["a1.jpg"], "age": 61, "region": "FACE", "itch": True,
+                "grew": True, "hurt": False, "changed": False, "bleed": True, "elevation": True}, ...])
+# -> the queue sorted by score, with the top 10 per 100 marked urgent
 ```
 
 Scores rank patients; they are not calibrated probabilities. Model weights are not in git (about 110 MB each);
@@ -56,8 +66,10 @@ they are shared separately.
 | `metrics.py`, `operating_point.py` | cancer score, patient aggregation, the charter's slot × prevalence operating point |
 | `questionnaire.py` | the questionnaire baseline from notebook 02, reproduced for paired comparison |
 | `fusion.py` | 60/40 rank-average fusion |
+| `triage.py` | the final model: ranks a queue from photos and answers |
 | `baseline_dinov2.py` | frozen DINOv2 features + logistic regression |
 | `evaluate.py` | applies the pre-set decision rules, picks the final model, writes results and figures |
+| `evaluate_test.py` | the single run on PAD test patients, written before it runs |
 | `near_duplicates.py` | near-identical photos across PAD splits |
 | `ink_effect.py` | analyses the manual ink labels in `evaluation/` |
 | `predict.py` | inference entry point for the agent |
