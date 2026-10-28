@@ -1,0 +1,3 @@
+isic_id,reason,cluster,kept_instead,lesion_id,label
+ISIC_4303795,near_duplicate_phash,1,ISIC_0185358,IL_2734125,Malignant
+ISIC_3846189,near_duplicate_phash,4,ISIC_1599277,IL_2812139,Malignant
