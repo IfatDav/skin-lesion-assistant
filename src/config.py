@@ -11,7 +11,7 @@ PAD_DIRS = sorted(DATA_ROOT.glob("pad_original*/pad_original")) or [DATA_ROOT / 
 PAD_RESIZED_DIR = REPO_ROOT / "data" / "processed" / "pad_512"
 
 # Labels for the ISIC images, pulled from the ISIC API (not part of the Drive download), kept in the repo.
-ISIC_META_CSV = REPO_ROOT / "data" / "metadata" / "isic_clinical_metadata.csv"
+ISIC_META_CSV = REPO_ROOT / "data" / "metadata" / "isic_pool_api_metadata.csv"
 SPLITS_DIR = REPO_ROOT / "data" / "splits"
 INDEX_CSV = SPLITS_DIR / "image_index.csv"
 MODELS_DIR = REPO_ROOT / "models"
