@@ -1,7 +1,20 @@
-pandas
+# The pins describe the image-model training environment (local GPU, Python 3.12).
+# Notebooks 01-04 run on Colab's own stack and do not need them; the pins matter for
+# loading models/*.joblib and for reproducing the image model.
+# RTX 50-series needs PyTorch >= 2.7 built for CUDA 12.8:
+#   pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cu128
+torch==2.11.0
+torchvision==0.26.0
+timm==1.0.30
+pandas==3.1.0
 numpy
+scikit-learn==1.9.1
+pillow
 matplotlib
 seaborn
-scikit-learn
 requests
 opencv-python
+scipy
+nbformat
+nbconvert
+ipykernel
