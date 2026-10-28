@@ -1,5 +1,0 @@
-{
-  "image_to_lesion": "max",
-  "lesion_to_patient": "max",
-  "rationale": "Patient triage priority is determined by the most suspicious submitted image/lesion; averaging could dilute a high-risk lesion."
-}
