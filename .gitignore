@@ -1,10 +1,25 @@
-# Ignore raw data and heavy images across the entire project
+# Heavy data and images stay out of Git: the notebooks fetch them from the source.
 data/raw/
-data/processed/
-*.csv
+*.tar
 *.jpg
 *.jpeg
 *.png
 *.PNG
 *.JPG
+
+# Frozen manifests and decisions ARE the project: small, and the pipeline cannot be
+# reproduced without them. Ignore the directory's bulk, then name what must be shared.
+data/processed/*
+!data/processed/*.csv
+!data/processed/*.json
+!data/splits/*.csv
+!data/metadata/*.csv
+!evaluation/*.csv
+!reports/figures/*.png
+
+# Environments, caches and model weights
 .ipynb_checkpoints/
+.venv/
+__pycache__/
+models/*.pt
+models/*.safetensors
