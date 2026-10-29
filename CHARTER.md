@@ -136,9 +136,9 @@ The RAG explanation layer is evaluated separately under M3 and is not counted as
 
 | Hat | Owner | Responsibility |
 |---|---|---|
-| Data | Tami Khazma | Pipeline architecture, strict patient-level splitting, data cleaning, and leakage mitigation |
+| Data | Yuval Rubenchuk | Pipeline architecture, strict patient-level splitting, data cleaning, and leakage mitigation |
 | Model | Roi Budnitsky | Training baselines, model fine-tuning, threshold tuning, and multi-ethnic performance analysis |
-| Agent | Yuval Rubenchuk | Agent tool building, orchestration loops, safety guardrails, and M4 validation set execution |
+| Agent | Tami Khazma | Agent tool building, orchestration loops, safety guardrails, and M4 validation set execution |
 | Product | Ifat Davidson | Clinician workflow UX, patient-facing safety copy, README documentation, and final fund presentation deck |
 
 ---
