@@ -5,8 +5,8 @@ inside the health-fund app and answers six questions. Every morning the dermatol
 to ten patients whose lesions look most suspicious, moves them to an earlier appointment, and — where the
 evidence supports it — issues a biopsy referral before the visit.
 
-**BIU DS23 capstone.** Ifat Davidson (Product) · Tami Khazma (Data) · Roi Budnitsky (Model) ·
-Yuval Rubenchuk (Agent)
+**BIU DS23 capstone.** Ifat Davidson (Product) · Yuval Rubenchuk (Data) · Roi Budnitsky (Model) ·
+Tami Khazma (Agent)
 
 ---
 
