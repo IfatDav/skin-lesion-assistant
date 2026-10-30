@@ -196,7 +196,7 @@ The notebooks run in Google Colab and mount Drive; each one states what it needs
 naming the notebook that produces it. **Run order: 01 → 02 → 03 → 04 → 05.** Notebooks 01 and 03 both
 fetch the PAD photographs from the same mirror, so whichever runs first does the work.
 
-`src/` holds the runnable image-model pipeline, documented in [src/README_image model.md](src/README_image%20model.md). The evaluation scripts require a CUDA GPU and the image data in the configured external data directory.
+`src/` holds the runnable image-model pipeline, documented in [src/README.md](src/README.md). The evaluation scripts require a CUDA GPU and the image data in the configured external data directory.
 
 The decisions governing the single held-out test run were frozen in `reports/decisions.md`. The test was executed once on 30.10.2026, and its results are preserved in `reports/test_results.json` and summarized in `reports/results.md`. The held-out test set must not be reused for model selection or tuning.
 
