@@ -1,0 +1,81 @@
+{
+ "assumptions": {
+  "capacity_per_day": 100,
+  "arrivals_per_day": 100,
+  "prevalence": 0.1,
+  "fusion_w_image": 0.6,
+  "baseline_median_days": 24.5,
+  "target_days": 7,
+  "days_simulated": 400,
+  "burn_in_days": 120,
+  "seed": 42,
+  "patients": "the 220 PAD validation patients, resampled to the prevalence"
+ },
+ "scenarios": [
+  {
+   "scenario": "arrival order (today)",
+   "n_malignant_seen": 2796,
+   "median_days_malignant": 24.0,
+   "p75_days_malignant": 24.0,
+   "p90_days_malignant": 24.0,
+   "share_malignant_over_target": 1.0,
+   "share_malignant_in_urgent_slot": 0.0,
+   "median_days_benign": 25.0
+  },
+  {
+   "scenario": "5 urgent slots per 100",
+   "n_malignant_seen": 2801,
+   "median_days_malignant": 25.0,
+   "p75_days_malignant": 25.0,
+   "p90_days_malignant": 25.0,
+   "share_malignant_over_target": 0.602998928953945,
+   "share_malignant_in_urgent_slot": 0.408782577650839,
+   "median_days_benign": 26.0,
+   "urgent_slots": 5
+  },
+  {
+   "scenario": "10 urgent slots per 100",
+   "n_malignant_seen": 2779,
+   "median_days_malignant": 1.0,
+   "p75_days_malignant": 27.0,
+   "p90_days_malignant": 27.0,
+   "share_malignant_over_target": 0.4364879453040662,
+   "share_malignant_in_urgent_slot": 0.6120906801007556,
+   "median_days_benign": 27.0,
+   "urgent_slots": 10
+  },
+  {
+   "scenario": "15 urgent slots per 100",
+   "n_malignant_seen": 2796,
+   "median_days_malignant": 1.0,
+   "p75_days_malignant": 2.0,
+   "p90_days_malignant": 28.0,
+   "share_malignant_over_target": 0.20243204577968527,
+   "share_malignant_in_urgent_slot": 0.8140200286123033,
+   "median_days_benign": 28.0,
+   "urgent_slots": 15
+  },
+  {
+   "scenario": "20 urgent slots per 100",
+   "n_malignant_seen": 2813,
+   "median_days_malignant": 1.0,
+   "p75_days_malignant": 1.0,
+   "p90_days_malignant": 30.0,
+   "share_malignant_over_target": 0.13970849626733026,
+   "share_malignant_in_urgent_slot": 0.864912904372556,
+   "median_days_benign": 30.0,
+   "urgent_slots": 20
+  },
+  {
+   "scenario": "30 urgent slots per 100",
+   "n_malignant_seen": 2814,
+   "median_days_malignant": 1.0,
+   "p75_days_malignant": 1.0,
+   "p90_days_malignant": 1.0,
+   "share_malignant_over_target": 0.0472636815920398,
+   "share_malignant_in_urgent_slot": 0.9534470504619759,
+   "median_days_benign": 34.0,
+   "urgent_slots": 30
+  }
+ ]
+}
