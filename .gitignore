@@ -18,6 +18,7 @@ data/processed/*
 !data/processed/*.json
 !data/processed/rag/
 !data/processed/rag/*.json
+data/processed/rag/chroma_nci/
 !data/splits/*.csv
 !data/metadata/*.csv
 !evaluation/*.csv
