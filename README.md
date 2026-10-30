@@ -1,9 +1,10 @@
 # Skin Lesion Triage for Healthcare Providers
 
-**A dermatologist's waiting list, re-ordered by risk.** A patient photographs a mole with their phone
-inside the health-fund app and answers six questions. Every morning the dermatologist opens a list of up
-to ten patients whose lesions look most suspicious, moves them to an earlier appointment, and — where the
-evidence supports it — issues a biopsy referral before the visit.
+**A dermatologist's waiting list, re-ordered by risk.** A patient photographs a skin lesion with their phone
+inside the health-fund app and answers six questions. Every morning, the system ranks all patients currently
+on the dermatologist's waiting list and flags the highest-risk 10% for priority review. The dermatologist
+reviews these cases and decides whether an earlier appointment or further assessment is warranted.
+The system does not make clinical decisions autonomously.
 
 **BIU DS23 capstone.** Ifat Davidson (Product) · Yuval Rubenchuk (Data) · Roi Budnitsky (Model) ·
 Tami Khazma (Agent)
@@ -24,15 +25,17 @@ it hands the dermatologist the evidence for that ordering.
 
 | | Metric | Target |
 |---|---|---|
-| **M1** | Median simulated days to appointment for patients with a malignant lesion, under the fixed urgent-slot capacity | ≤ 7 days in the primary scenario, always reported against the arrival-order baseline |
-| **M2** | Patient-level sensitivity for skin cancer (MEL + BCC + SCC) among the patients the dashboard flags, on held-out PAD-UFES-20 patients | See the capacity note below |
+| **M1** | Median simulated days to appointment for patients with a malignant lesion, under the 10% waiting-list prioritization policy | ≤ 7 days in the primary scenario, reported against the arrival-order baseline (not yet evaluated) |
+| **M2** | Patient-level sensitivity for skin cancer (MEL + BCC + SCC) among patients flagged for priority review, evaluated on held-out PAD-UFES-20 patients | ≥ 0.90 (not met; held-out test sensitivity: 0.664 in the primary evaluation scenario) |
 | **M3** | Groundedness of the agent's guidance on a frozen set of 20 questions, 5 of them unanswerable | ≥ 0.9, and 5/5 refusals |
 
-**M2 and the capacity ceiling.** At a fixed number of urgent slots, sensitivity is a joint statement about
-the model *and* the slot budget: no ranking can exceed `budget ÷ prevalence`. At 10 slots per 100 arrivals
-and 10% prevalence the ceiling is 1.00. **On the held-out test patients the delivered model reaches 0.66
-there, and 0.82 at 15 slots** (validation: 0.61 and 0.82). The number of urgent slots required to reach
-0.90 is therefore reported as a product requirement rather than treated as a model failure.
+**Prioritization policy.** Every morning, the system ranks all patients currently on the dermatologist's waiting list by their combined risk score and flags the highest-risk **10% of the waiting list** for priority review. The number of flagged patients scales with the queue size (e.g., 5 out of 50, 10 out of 100, or 30 out of 300). The policy applies to the entire waiting list at the time of ranking, not only to new daily arrivals. Patients who are not flagged retain their existing appointments. The dermatologist makes all clinical and scheduling decisions.
+
+**M2 and the capacity ceiling.** The primary evaluation scenario assumes 10 priority-review slots per 100 arrivals and a 10% malignancy prevalence. This is a standardized, prevalence-weighted evaluation scenario representing 10% review capacity, rather than a full simulation of a changing waiting list.
+At this operating point, the theoretical sensitivity ceiling is 1.00. The final model achieved **0.664 sensitivity (95% CI: 0.570–0.750)** on held-out test patients, compared with 0.612 on validation. The pre-specified M2 target of ≥ 0.90 was therefore **not met**.
+Sensitivity depends on both ranking performance and prioritization capacity. Since the theoretical ceiling at the primary operating point is 1.00, the gap cannot be attributed to capacity alone.
+Increasing capacity to 15 slots per 100 arrivals raised test sensitivity to 0.820. On validation, sensitivity reached 0.903 at 20 slots per 100 arrivals; this latter result was not confirmed on the held-out test set.
+The product's prioritization policy remains unchanged at **10% of the current waiting list**. Increasing this percentage would require a separate product decision and additional evaluation.
 
 ## 3 · Data
 
@@ -56,12 +59,7 @@ either direction.**
 ## 4 · What the pipeline does
 
 ```
-phone photo ─┐
-             ├─→ image model (ConvNeXt-Tiny, 448 px) ──┐
-symptom form ┘                                         ├─→ rank fusion (60/40) ─→ daily top-10
-             └─→ questionnaire model (logistic reg.) ──┘                              │
-                                                                                      ▼
-                                                        agent: evidence, citations, guardrails
+symptom form ┘                                         ├─→ rank fusion (60/40) ─→ top 10% of waiting list
 ```
 
 Scores are aggregated **image → lesion → patient by maximum**, frozen in
@@ -70,9 +68,8 @@ averaging would dilute it.
 
 ## 5 · The baseline table — "the cheapest thing that works"
 
-**The held-out result first.** 275 test patients, 128 with a malignant lesion, opened once on 30.10.2026
-on the decisions frozen in `reports/decisions.md`. Same aggregation rule, same operating point: 10 urgent
-slots per 100 arrivals at 10% prevalence.
+**The held-out result first.** The final evaluation was performed once, on 30.10.2026, using 275 held-out PAD patients, 128 of whom were labelled as having a malignant lesion. The evaluation followed the decisions frozen in `reports/decisions.md`.
+All models were compared using the same patient-level aggregation rule and the same primary evaluation scenario: 10 priority-review slots per 100 arrivals at an assumed 10% malignancy prevalence. This standardized scenario evaluates ranking performance under a defined review capacity; it does not simulate the complete dynamics of the real waiting list.
 
 | Model | Patient AUC (95% CI) | Sensitivity | PPV |
 |---|---|---|---|
@@ -188,9 +185,9 @@ The notebooks run in Google Colab and mount Drive; each one states what it needs
 naming the notebook that produces it. **Run order: 01 → 02 → 03 → 04 → 05.** Notebooks 01 and 03 both
 fetch the PAD photographs from the same mirror, so whichever runs first does the work.
 
-`src/` holds the runnable image-model pipeline, documented in `src/README.md`; it needs a CUDA GPU and the
-images in a folder next to the repo. The decisions governing the single held-out test run are frozen in
-`reports/decisions.md`, and the run itself — `python -m src.evaluate_test --frozen` — has not happened yet.
+`src/` holds the runnable image-model pipeline, documented in [src/README_image model.md](src/README_image%20model.md). The evaluation scripts require a CUDA GPU and the image data in the configured external data directory.
+
+The decisions governing the single held-out test run were frozen in `reports/decisions.md`. The test was executed once on 30.10.2026, and its results are preserved in `reports/test_results.json` and summarized in `reports/results.md`. The held-out test set must not be reused for model selection or tuning.
 
 Every notebook asserts the figures this README quotes. If an assertion fires, the archive has changed and
 the number is corrected here, not in the notebook.
