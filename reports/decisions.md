@@ -36,6 +36,13 @@ changes; anything learned afterwards goes into the report as a finding, not into
   The test run is the clean estimate.
 - The questionnaire model (variant D) uses age, region and six symptoms only, not the history block, so the
   block's missingness does not enter the score.
+  - **One test patient is scored benign because of an archive error.** PAD stores the same photograph under
+  two lesion ids with contradictory diagnoses in 12 of its 15 byte-identical pairs. One crosses the cancer
+  boundary: `PAT_759_1538_566.png` (BCC, nose, biopsied) is byte-identical to `PAT_759_1433_914.png`
+  (NEV, back, biopsied), and the de-duplication in `src/build_index.py` keeps the benign row. PAT_759
+  therefore counts as a negative, and the test set holds 128 malignant patients rather than the 129 in the
+  frozen split manifest. The error penalises the model — a correct high score on that photograph is counted
+  as a false alarm — so it cannot inflate the result, and the index is left untouched.
 
 ## Order
 
