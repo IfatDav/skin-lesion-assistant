@@ -47,5 +47,5 @@ changes; anything learned afterwards goes into the report as a finding, not into
 ## Order
 
 1. ~~Team approves this file.~~ **Approved 26.10.2026.**
-2. `python -m src.evaluate_test --frozen` — once.
+2. ~~`python -m src.evaluate_test --frozen` — once.~~ **Run 30.10.2026.** `reports/test_results.json`.
 3. Ink labelling of the test photos (`evaluation/INK_LABELING.md`), then `python -m src.ink_effect`.
