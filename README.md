@@ -198,7 +198,7 @@ fetch the PAD photographs from the same mirror, so whichever runs first does the
 
 `src/` holds the runnable image-model pipeline, documented in [src/README.md](src/README.md). The evaluation scripts require a CUDA GPU and the image data in the configured external data directory.
 
-The decisions governing the single held-out test run were frozen in `reports/decisions.md`. The test was executed once on 30.10.2026, and its results are preserved in `reports/test_results.json` and summarized in `reports/results.md`. The held-out test set must not be reused for model selection or tuning.
+The decisions governing the single held-out test run were frozen in `reports/decisions.md`. The test was executed once on 30.10.2026 in `notebooks/06_test_run.ipynb`, which keeps the run's own output, and its results are preserved in `reports/test_results.json` and summarized in `reports/results.md`.
 
 Every notebook asserts the figures this README quotes. If an assertion fires, the archive has changed and
 the number is corrected here, not in the notebook.
