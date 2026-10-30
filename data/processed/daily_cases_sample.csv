@@ -1,0 +1,11 @@
+patient_id,rank,risk_score,risk_band,image_risk_band,symptom_risk_band,age,body_site,itch,grew,hurt,changed,bleed,elevation,patient_note,image_path,image_quality,image_issues
+P-0193,1,0.935,very high,very high,high,64,back,no,yes,no,yes,yes,no,,p-0193.jpg,usable,
+P-0274,2,0.92,very high,very high,high,59,scalp,no,yes,no,yes,no,no,,p-0274.jpg,borderline,hair covers part of the lesion
+P-0457,3,0.905,high,high,moderate,71,face,yes,yes,no,no,no,no,,p-0457.jpg,borderline,too dark
+P-0530,4,0.89,high,very high,low,45,arm,no,no,no,no,no,no,"I have had this mole since I was a child, but this summer it got darker.",p-0530.jpg,usable,
+P-0812,5,0.875,high,high,high,16,arm,no,no,no,yes,no,no,,p-0812.jpg,usable,
+P-0745,6,0.86,high,high,high,67,behind the ear,no,yes,no,yes,no,no,,p-0745.jpg,borderline,hard to photograph: behind the ear
+P-0821,7,0.845,high,high,moderate,49,chin,no,yes,no,no,no,no,It bleeds a little when I shave over it.,p-0821.jpg,usable,
+P-0866,8,0.83,high,low,very high,61,back,no,yes,yes,yes,yes,no,,p-0866.jpg,usable,
+P-0903,9,0.815,high,high,high,42,arm,no,no,no,yes,no,no,My father had melanoma.,p-0903.jpg,usable,
+P-0988,10,0.8,high,high,moderate,38,leg,yes,no,no,no,no,no,השומה גדלה מאוד בחודש האחרון,p-0988.jpg,usable,
