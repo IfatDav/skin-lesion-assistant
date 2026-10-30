@@ -77,7 +77,7 @@ image of a lesion, so one row per photo would weight lesions by how often they w
 
 **Missing values are kept as `NaN` in the file.** `grew` and `changed` are unanswered for 20% of development lesions, 87–88% of them malignant, so a missingness indicator would leak the label. The models therefore impute inside the training pipeline (most frequent answer) and never receive an indicator. Imputing the usual answer, "no", makes these mostly malignant lesions look *less* suspicious, so the policy can only lower the baseline, never inflate it. The honest baseline is **AUC 0.860** (notebook 02, variant D).
 
-**Who filled the form:** senior medical students during the visit (Pacheco et al., 2020). App users will answer alone; flipping 10% of answers lowers the baseline's sensitivity at the primary operating point from 0.52 to 0.47 (notebook 02, Cell 8c).
+**Who filled the form:** senior medical students during the visit (Pacheco et al., 2020). App users will answer alone; flipping 10% of answers lowers the baseline's sensitivity at the primary operating point from 0.52 to 0.46, and patient AUC from 0.867 to 0.823 (notebook 02, Cell 8c).
 
 ## `aggregation_policy.json`
 
@@ -95,3 +95,12 @@ The frozen rule for turning image scores into the patient score that triage is e
 - PAD images are stored at their original size under `data/raw/images/pad_original/`.
 - All splits use `random_state=42`, are created once and loaded on every later run.
 - PAD missing values arrive as `UNK` or an empty string, and are normalised to `NaN` on load.
+
+- ## Model files in `models/`
+
+| File | What it is | Used by |
+|---|---|---|
+| `questionnaire.joblib` | Variant D: logistic regression on age, region and the six symptoms, imputed inside the pipeline, fitted on PAD **train** lesions only. **This is the baseline** — patient AUC 0.867 on validation | `src/questionnaire.py`, the fusion, `models/final_model.json` |
+| `symptom_model.joblib` | Notebook 04's gradient boosting with sigmoid calibration, patient AUC 0.890. It was *selected* on the same validation patients, so it is a study and not a bar | Notebook 04 only. The pipeline never loads it |
+| `convnext_pad_s42_scc2.safetensors` | The image model, 111 MB, too large for git. Attached to the GitHub release `image-model-v1`; `src/predict.py` downloads it on first use and checks its sha256 against `models/final_model.json` | `src/predict.py`, `src/triage.py`, `src/evaluate_test.py` |
+
