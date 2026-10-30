@@ -27,7 +27,13 @@ it hands the dermatologist the evidence for that ordering.
 |---|---|---|
 | **M1** | Median simulated days to appointment for patients with a malignant lesion, under the 10% waiting-list prioritization policy | ≤ 7 days in the primary scenario, reported against the arrival-order baseline (not yet evaluated) |
 | **M2** | Patient-level sensitivity for skin cancer (MEL + BCC + SCC) among patients flagged for priority review, evaluated on held-out PAD-UFES-20 patients | ≥ 0.90 (not met; held-out test sensitivity: 0.664 in the primary evaluation scenario) |
-| **M3** | Groundedness of the agent's guidance on a frozen set of 20 questions, 5 of them unanswerable | ≥ 0.9, and 5/5 refusals |
+| **M3** | Groundedness of the agent's guidance on a frozen set of 20 questions, 5 of them unanswerable | ≥ 0.9, and 5/5 refusals — **met**: 0.933 after re-ranking, 5/5 refusals, and every number in an answer traced to its cited chunk (`notebooks/07_rag_nci_m3.ipynb`) |
+| **M4** | Agent decisions on a frozen set of 15 complex workflow cases, measured against an if-else script on the same cases | ≥ 13/15 correct and above the baseline, with no patient suppressed, downgraded or removed. **Not met on accuracy**: agent 9/15, system after guardrails 11/15, if-else 12/15. **Met on safety**: no patient removed, no score or rank changed, no reassuring wording (`notebooks/08_agent_m4_vs_ifelse.ipynb`) |
+
+Two of the four are met, and the two that are not are reported with the number they reached. M2 is a
+capacity statement as much as a ranking one — see the note below. M4 is the more interesting failure: the
+agent does not beat a rule script on decisions, which is a finding about where an agent belongs, not a bug
+to be tuned away. `reports/results.md` and `notebooks/08_agent_m4_vs_ifelse.ipynb` carry the diagnosis.
 
 **Prioritization policy.** Every morning, the system ranks all patients currently on the dermatologist's waiting list by their combined risk score and flags the highest-risk **10% of the waiting list** for priority review. The number of flagged patients scales with the queue size (e.g., 5 out of 50, 10 out of 100, or 30 out of 300). The policy applies to the entire waiting list at the time of ranking, not only to new daily arrivals. Patients who are not flagged retain their existing appointments. The dermatologist makes all clinical and scheduling decisions.
 
