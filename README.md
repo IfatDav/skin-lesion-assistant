@@ -59,7 +59,18 @@ either direction.**
 ## 4 · What the pipeline does
 
 ```
-symptom form ┘                                         ├─→ rank fusion (60/40) ─→ top 10% of waiting list
+Phone photo ──→ Image model ───────────────┐
+                                          ├──→ Rank fusion (60/40)
+Symptom form ─→ Questionnaire model ───────┘             │
+                                                        ▼
+                                           Top 10% of waiting list
+                                                        │
+                                                        ▼
+                                          Agent (planned): evidence
+                                               and citations
+                                                        │
+                                                        ▼
+                                         Dermatologist: clinical review
 ```
 
 Scores are aggregated **image → lesion → patient by maximum**, frozen in
