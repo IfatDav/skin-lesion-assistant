@@ -30,9 +30,8 @@ it hands the dermatologist the evidence for that ordering.
 
 **M2 and the capacity ceiling.** At a fixed number of urgent slots, sensitivity is a joint statement about
 the model *and* the slot budget: no ranking can exceed `budget ÷ prevalence`. At 10 slots per 100 arrivals
-and 10% prevalence the ceiling is 1.00. The delivered model reaches **0.60** there and **0.81** at 15 slots
+and 10% prevalence the ceiling is 1.00. The delivered model reaches **0.61** there and **0.82** at 15 slots
 on validation patients. The number of slots required to reach 0.90 is therefore reported as a product
-requirement rather than treated as a model failure.
 
 ## 3 · Data
 
@@ -143,14 +142,16 @@ used, and returns a single decision with a structured JSON contract.
 │  ├─ 03_preprocessing.ipynb frozen manifests and the modelling hand-off
 │  ├─ 04_symptom_model.ipynb the questionnaire model
 │  └─ 05_image_model.ipynb   the image model and the fusion
-├─ src/                      reusable code for the image model
-├─ agents/                   tools, prompts, the loop, guardrails
+├─ src/                      the runnable image-model pipeline (see src/README.md)
+├─ agents/                   tools, prompts, the loop, guardrails          
 ├─ evaluation/               eval sets, groundedness, error analysis
 ├─ models/                   model artefacts
 ├─ reports/
 │  ├─ figures/
-│  └─ results.md             the baseline table and the key results
-└─ presentation/
+│  ├─ decisions.md           the frozen decisions for the single test run
+│  ├─ results.md             the baseline table and the key results
+│  └─ results_image_model.md the image model's own report
+└─ presentation/                                                           
 ```
 
 ## 9 · Running it
@@ -162,6 +163,10 @@ pip install -r requirements.txt
 The notebooks run in Google Colab and mount Drive; each one states what it needs and fails with a message
 naming the notebook that produces it. **Run order: 01 → 02 → 03 → 04 → 05.** Notebooks 01 and 03 both
 fetch the PAD photographs from the same mirror, so whichever runs first does the work.
+
+`src/` holds the runnable image-model pipeline, documented in `src/README.md`; it needs a CUDA GPU and the
+images in a folder next to the repo. The decisions governing the single held-out test run are frozen in
+`reports/decisions.md`, and the run itself — `python -m src.evaluate_test --frozen` — has not happened yet.
 
 Every notebook asserts the figures this README quotes. If an assertion fires, the archive has changed and
 the number is corrected here, not in the notebook.
