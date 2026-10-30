@@ -3,7 +3,7 @@
 Run on 26.10.2026, RTX 5070 Ti. **PAD test patients were never loaded.** All numbers are on the 220 PAD
 validation patients (103 malignant) of the frozen split from notebook 02, at the charter's operating point, with
 the same code as the questionnaire baseline, so every comparison is paired. Raw numbers: `final_results.json`;
-figures: `figures/`; notebook: `notebooks/04_image_model.ipynb`.
+figures: `figures/`; notebook: `notebooks/05_image_model.ipynb`.
 
 ## Pipeline
 
@@ -67,7 +67,8 @@ Over three seeds the plain recipe gives AUC 0.950–0.959 and the SCC×2 recipe 
 
 - No patient and no byte-identical image shared between PAD train, validation and test (asserted in `build_index`).
 - Near-identical photos across PAD splits: 95 hash candidates, 0 confirmed by pixel correlation.
-- PAD split reproduced from notebook 02's code and checked against its 18 published counts; questionnaire baseline
+- PAD split reproduced from notebook 02's code and checked against its 12 published counts — images, patients,
+  malignant patients and melanoma patients, for each of the three splits; questionnaire baseline
   reproduced exactly (AUC 0.867, sensitivity 0.524, PPV 0.532).
 
 ## Risks and limitations
