@@ -1,6 +1,7 @@
 # The pins describe the image-model training environment (local GPU, Python 3.12).
-# Notebooks 01-04 run on Colab's own stack and do not need them; the pins matter for
+# Notebooks 01-05 run on Colab's own stack and do not need them; the pins matter for
 # loading models/*.joblib and for reproducing the image model.
+# scikit-learn's pin is load-bearing: models/questionnaire.joblib was written with it.
 # RTX 50-series needs PyTorch >= 2.7 built for CUDA 12.8:
 #   pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytorch.org/whl/cu128
 torch==2.11.0
