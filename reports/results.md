@@ -123,9 +123,19 @@ Both columns are the final model: image 60% + questionnaire 40%. At 15 slots the
 
 `Delivered` is the final model throughout: image 60% + questionnaire 40%.
 
-The charter's target of ≥ 0.90 is not reached at 10 slots on either set. The constraint is capacity, not ranking:
-**reaching 0.90 requires more urgent slots than the primary scenario allows**, and that number is reported
-as a product requirement rather than recorded as a model failure.
+The pre-specified M2 target of ≥ 0.90 sensitivity was not met at the primary operating point.
+
+At 10 priority-review slots per 100 arrivals and 10% assumed malignancy prevalence,
+the final model achieved 0.664 sensitivity on the held-out test set. The theoretical
+sensitivity ceiling under this scenario is 1.00.
+
+Therefore, the gap cannot be attributed to review capacity alone. The observed
+performance reflects both the model's ranking quality and the prioritization capacity.
+
+Increasing the capacity to 15 slots per 100 arrivals improved test sensitivity to 0.820.
+However, the product's operational policy remains prioritization of the highest-risk
+10% of patients currently on the waiting list. Any increase in this percentage would
+require a separate product decision and further evaluation.
 
 ---
 
@@ -261,7 +271,6 @@ augmentation has to attack.
 
 ## 9 · Not yet measured
 
-- **The held-out test set.** One run, on the decisions frozen in `reports/decisions.md`.
 - **Surgical-marker ink**, a known shortcut visible on some PAD photographs. An automatic detector failed
   validation. After the test run the test photographs are labelled for ink *blind* to diagnosis and score,
   and benign inked photographs are compared with benign photographs without ink.
