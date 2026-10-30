@@ -38,6 +38,9 @@ patients on the daily list instead of 52% — a paired, significant difference o
 chosen in advance, before any result, because it keeps the answers in the score when a photograph is poor.
 That is a robustness argument, not a performance one, and it is stated as such.
 
+A weight sweep was run afterwards and is kept in `final_results.json`: w = 0.7 reaches 0.957 against 0.954
+at the pre-registered 0.6. It was not used to choose anything; the pre-registered weight stands.
+
 **At 15 slots** the share of cancer patients reaching the list is 0.65 for the questionnaire, 0.81 for the
 image model and 0.82 for the fusion.
 
@@ -69,10 +72,12 @@ can exceed `budget ÷ prevalence`.
 
 | Slots per 100 | Prevalence | Ceiling | Delivered |
 |---|---|---|---|
-| 5 | 10% | 0.50 | 0.35 |
+| 5 | 10% | 0.50 | 0.42 |
 | **10** | **10%** | **1.00** | **0.61** |
 | 15 | 10% | 1.00 | 0.82 |
-| 10 | 20% | 0.50 | 0.39 |
+| 10 | 20% | 0.50 | 0.43 |
+
+`Delivered` is the final model throughout: image 60% + questionnaire 40%.
 
 The charter's target of ≥ 0.90 is not reached at 10 slots. The constraint is capacity, not ranking:
 **reaching 0.90 requires more urgent slots than the primary scenario allows**, and that number is reported
@@ -104,7 +109,8 @@ is the first requirement for any pilot.
 than printed reports. A naive image-level split would put **29.3%** of PAD test images in training through
 their own lesion, and 1.0% of ISIC.
 
-**Duplicate photographs.** MD5 over the 6,539 original downloads found nothing. A perceptual hash over all
+**Duplicate photographs.** MD5 over the 6,539 original downloads found nothing; MD5 over the 512-px copies
+and a perceptual hash over all pairs both found the same two pairs. The perceptual hash over all
 pairs found four groups covering 13 images; two of them are pairs with an *identical* hash, both
 basal-cell carcinoma, each filed under two different `lesion_id` values — the same photograph stored twice
 under different compression, which is exactly what a byte comparison cannot see. Both are excluded. The
@@ -170,6 +176,11 @@ phone photos is largely learning that boundary.
 weight was adopted on its stated criterion (SCC photos called AK fell from 7.3 to 5.7, SCC recall rose
 from 0.41 to 0.52, AUC fell 0.953 → 0.950, within the 0.01 allowance). Averaging three seeds was
 **rejected**: the paired gain was +0.0006, CI −0.007 to +0.008.
+
+**The SCC decision cost melanoma on average, and that was accepted knowingly.** Over the three seeds the
+number of melanoma patients reaching the list fell from 2.7 to 2.0 of 6 when the SCC weight was doubled;
+the chosen seed-42 model flags 3 of 6. With six melanoma patients the difference is inside the noise, but
+it is the cost of the decision and it is recorded rather than left in the log.
 
 **Where it is still wrong.** Eight of 34 SCC photographs are called actinic keratosis, which the charter
 counts as non-cancer. AK can progress to SCC, so this is the hardest and most consequential boundary the
