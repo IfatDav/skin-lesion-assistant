@@ -36,7 +36,7 @@ For each case, the dermatologist decides whether to move the patient to an earli
 | M3 | Groundedness on a frozen set of 20 guidance questions (5 unanswerable), plus a check that each number appears in its cited source | ≥ 0.9, and 5/5 refusals | **Met** · **0.933** after re-ranking, 5/5 refusals, 15/15 numbers traced to their cited chunk |
 | M4 | Agent scenario set of 15 complex workflow cases | ≥ 13/15 correct; zero cases in which the agent suppresses, downgrades or removes a patient who was flagged by the validated deterministic triage policy. | **Split** · accuracy **not met**: agent 9/15, agent behind the code guardrails 11/15, against **12/15 for a plain if-else script**. Safety **met**: no patient removed, no score or rank changed |
 
-**The operating point, locked. [amended 30.10 — this paragraph is new.]** The charter originally gave the
+**The operating point, locked. [amended 26.10 — this paragraph is new.]** The charter originally gave the
 metrics without a shared operating point, so M2 could have been reached by flagging almost everyone and M1
 depended on an unstated arrival rate. Both are now pinned to one scenario and every number in this project
 is reported at it:
@@ -67,8 +67,8 @@ Because the real-world prevalence is unknown, queue-level metrics are interprete
 |---|---|---|---|---|
 | **ISIC Archive**, clinical (non-dermoscopic) images, incl. MILK10k | **Main training data** |6,539 images, 470 melanomas, 761 nevi, 56.6% malignant (after removing PAD and the unlabelled benchmark; a further 124 Indeterminate rows — 123 actinic keratoses and one atypical melanocytic neoplasm — are dropped at preprocessing) | The largest pool of non-dermoscopic images with enough melanomas; the closest public proxy for a phone photo | CC-BY-NC / CC-BY (per image) |
 | **PAD-UFES-20** | **Test set** of real phone photos; the only source with symptoms; training only from patients outside the test split |2,298 images, 1,891 lesions, 1,373 patients, **52 melanomas**, 47.4% malignant | The only source actually shot on smartphones, and the only one with the symptom answers our app collects. Too small to train on alone | CC BY 4.0 |
-| ~~**HAM10000**~~ | ~~Pretraining only~~ **[amended 26.10: dropped]** | 10,015 images, 1,113 melanomas | **Rejected.** It overlaps ISIC, so pretraining on it risks the same lesion appearing in training and in evaluation, and it is dermoscopic: no image in it is a phone photo, so it cannot narrow the domain gap that actually matters. The final model is trained on ISIC clinical images and fine-tuned on PAD, with no HAM10000 stage. `reports/decisions.md` #8 | CC BY-NC 4.0 |
-| **NCI PDQ** summaries | Guidance corpus for the RAG | 7 documents · 224 sections · 724 chunks **[amended 26.10: Health Professional versions, not patient summaries — see §8 CP1]** | Official, citable text for the reasons shown to the dermatologist | Free of copyright; credit NCI |
+| ~~**HAM10000**~~ | ~~Pretraining only~~ **[amended 16.10: dropped]** | 10,015 images, 1,113 melanomas | **Rejected.** It overlaps ISIC, so pretraining on it risks the same lesion appearing in training and in evaluation, and it is dermoscopic: no image in it is a phone photo, so it cannot narrow the domain gap that actually matters. The final model is trained on ISIC clinical images and fine-tuned on PAD, with no HAM10000 stage. `reports/decisions.md` #8 | CC BY-NC 4.0 |
+| **NCI PDQ** summaries | Guidance corpus for the RAG | 7 documents · 224 sections · 724 chunks **[amended 16.10: Health Professional versions, not patient summaries — see §8 CP1]** | Official, citable text for the reasons shown to the dermatologist | Free of copyright; credit NCI |
 
 **Label policy (frozen).** The target is binary: MEL + BCC + SCC are malignant, everything else is not.
 Actinic keratosis is pre-cancerous and is treated differently by the two sources, so the policy is stated
@@ -88,7 +88,7 @@ the false-alarm rate on that class separately rather than hide it inside the ove
 - `marmal88/skin_cancer`: a re-upload whose 13,354 rows hold only 10,015 unique images. **79.8% of its test images are also in train.**
 - `Fitzpatrick 17k`: atlas photos, mostly non-cancerous conditions, with no age, sex or body site. Only **10 of 40 sampled image links still work**. Its advantage, diverse skin tones, does not survive the dead links.
 - **Generative phone-to-dermoscopic conversion**: a generator would invent subsurface structures that the phone never captured. Unsafe for a medical product.
-- **HAM10000** **[amended 26.10]**, for the reasons in the table above.
+- **HAM10000** **[amended 16.10]**, for the reasons in the table above.
 
 ## 4 · Architecture
 
@@ -222,10 +222,10 @@ the line is built.]
 
 | Hat | Owner | Responsibility |
 |---|---|---|
-| Data | Yuval Rubenchuk | Pipeline architecture, strict patient-level splitting, data cleaning, and leakage mitigation |
+| Data | Ifat Davidson | Pipeline architecture, strict patient-level splitting, data cleaning, and leakage mitigation |
 | Model | Roi Budnitsky | Training baselines, model fine-tuning, threshold tuning, and multi-ethnic performance analysis |
 | Agent | Tami Khazma | Agent tool building, orchestration loops, safety guardrails, and M4 validation set execution |
-| Product | Ifat Davidson | Clinician workflow UX, patient-facing safety copy, README documentation, and final fund presentation deck |
+| Product | Yuval Rubenchuk | Clinician workflow UX, patient-facing safety copy, README documentation, and final fund presentation deck |
 
 ## 8 · Checkpoint updates
 
