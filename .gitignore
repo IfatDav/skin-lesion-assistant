@@ -1,5 +1,7 @@
 # Heavy data and images stay out of Git: the notebooks fetch them from the source.
-data/raw/
+# Narrowed to images only: data/raw/isic_clinical_metadata.csv is tracked, and a
+# directory-level ignore cannot be undone with a later "!" rule.
+data/raw/images/
 *.tar
 *.jpg
 *.jpeg
