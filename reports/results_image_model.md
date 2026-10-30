@@ -1,9 +1,11 @@
 # Image model · results
 
-Run on 26.10.2026, RTX 5070 Ti. **PAD test patients were never loaded.** All numbers are on the 220 PAD
-validation patients (103 malignant) of the frozen split from notebook 02, at the charter's operating point, with
-the same code as the questionnaire baseline, so every comparison is paired. Raw numbers: `final_results.json`;
-figures: `figures/`; notebook: `notebooks/05_image_model.ipynb`.
+Run on 26.10.2026, RTX 5070 Ti. **This document is the development record: no number in it was computed on
+a test patient.** All of it is the 220 PAD validation patients (103 malignant) of the frozen split from
+notebook 02, at the charter's operating point, with the same code as the questionnaire baseline, so every
+comparison is paired. The held-out test run that followed is in `reports/results.md` and
+`reports/test_results.json`. Raw numbers: `final_results.json`; figures: `figures/`; notebook:
+`notebooks/05_image_model.ipynb`.
 
 ## Pipeline
 
@@ -87,7 +89,22 @@ Over three seeds the plain recipe gives AUC 0.950–0.959 and the SCC×2 recipe 
   somewhat lower.
 - **One programme, trained photographers.** Patients photographing themselves will produce worse photos.
 
-## Not yet done
+## What the test run said
 
-Decisions are frozen in `decisions.md` and approved. In order: `python -m src.evaluate_test --frozen` runs
-once, then the test photos are labelled for ink and `python -m src.ink_effect`.
+`python -m src.evaluate_test --frozen` ran once on 30.10.2026, on the decisions frozen in `decisions.md`.
+On 275 held-out patients (128 malignant) the final model reaches **0.954** against 0.954 here, the image
+model **0.953** against 0.956, and the questionnaire **0.862** against 0.867. All three paired differences
+reproduce the ones in this document, including `fused − image`, which was predicted to be zero and came
+back at +0.000 (−0.014 to +0.015).
+
+Two things this document called correctly in advance, and one it called too harshly:
+
+- The fusion ties the image model rather than beating it. It did, on patients it had never seen.
+- Validation numbers would be slightly optimistic, because epochs, the SCC weight and the seed were chosen
+  on them. The drop was 0.002 to 0.005 AUC — smaller than expected.
+- **On hard cases this document expected the gap to stay narrow.** It did not: on the 138 biopsied-only
+  test patients the image model leads the questionnaire by +0.093 (interval +0.005 to +0.178) and puts 46%
+  of them on the daily list against the questionnaire's 22%.
+
+Still open: the SCC/AK boundary, and the blind ink labelling of `evaluation/ink_labeling_test.csv`
+followed by `python -m src.ink_effect`.
