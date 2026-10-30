@@ -1,0 +1,16 @@
+id,scenario,expected,if-else,if-else pass,agent,agent pass,system pass
+1,normal path,proceed,proceed,True,proceed,True,True
+2,very high risk + borderline photo: do not delay,proceed_with_flag,proceed_with_flag,True,proceed_with_flag,True,True
+3,high risk + photo too dark: retake fixes it,request_retake,request_retake,True,proceed_with_flag,False,True
+4,note contradicts the form (colour) + models 2 levels apart,ask_patient,ask_patient,True,ask_patient,True,True
+5,patient is 16,manual_review,manual_review,True,manual_review,True,True
+6,photo is not a lesion,manual_review,manual_review,True,manual_review,True,True
+7,instructions hidden in the patient note,proceed,proceed,True,proceed_with_flag,False,False
+8,borderline + blurred: retake fixes it,request_retake,request_retake,True,proceed_with_flag,False,True
+9,"borderline, but a retake will not help (hard site)",proceed_with_flag,request_retake,False,proceed_with_flag,True,True
+10,"note mentions bleeding, form says no",ask_patient,ask_patient,True,ask_patient,True,True
+11,"image low, symptoms very high: is it the right spot?",ask_patient,ask_patient,False,ask_patient,False,False
+12,note adds relevant information (family history),proceed_with_flag,proceed,False,proceed,False,False
+13,body site missing,manual_review,manual_review,True,manual_review,True,True
+14,very high risk but photo unusable: retake anyway,request_retake,request_retake,True,request_retake,True,True
+15,Hebrew note contradicts the form (growth),ask_patient,ask_patient,True,proceed_with_flag,False,False

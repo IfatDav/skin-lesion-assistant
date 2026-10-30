@@ -1,0 +1,335 @@
+[
+ {
+  "id":1,
+  "patient_id":"P-0193",
+  "decision":"proceed",
+  "decision_reason":"The photo is usable, information is consistent, nothing is missing, and the case can proceed directly to the dermatologist.",
+  "why_on_list":"The patient is on the list due to a very high risk band and reporting symptoms of bleeding, change, and growth on the back.",
+  "evidence_summary":"The patient form reports a lesion on the back with bleeding, change, and growth, with no patient note provided. The photo status is usable, and both the visual and symptom risk assessments indicate high to very high risk levels. \"Early signs in a nevus that would suggest a malignant change include: Darker or variable discoloration. An increase in size or the development of satellite lesions. Ulceration or bleeding (later signs). A common acronym used by medical professionals and the lay public to identify the suspicious features of pigmented lesions that may reflect malignant change is ABCDE:[ 5 ] A symmetry of the lesion. E volution or change in the lesion.\" [pdq:melanoma_tx:s05:c00]",
+  "follow_up_question":null,
+  "retake_instruction":null,
+  "citations":[
+   {
+    "id":"pdq:melanoma_tx:s05:c00",
+    "quote":"Early signs in a nevus that would suggest a malignant change include: Darker or variable discoloration. An increase in size or the development of satellite lesions. Ulceration or bleeding (later signs). A common acronym used by medical professionals and the lay public to identify the suspicious features of pigmented lesions that may reflect malignant change is ABCDE:[ 5 ] A symmetry of the lesion. E volution or change in the lesion.",
+    "source":"Melanoma Treatment (PDQ) - HP",
+    "section":"Clinical Features",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/melanoma-treatment-pdq"
+   }
+  ],
+  "flags":[
+
+  ]
+ },
+ {
+  "id":2,
+  "patient_id":"P-0274",
+  "decision":"proceed_with_flag",
+  "decision_reason":"The photo status is borderline due to hair covering part of the lesion, but since the combined risk band is very high, the case should proceed without delay.",
+  "why_on_list":"The patient is on the urgent list due to a very high risk band and symptoms of changed and grew.",
+  "evidence_summary":"The form reports a scalp lesion that has changed and grew, with no bleeding, elevation, pain, or itching reported. The photo status is borderline because hair covers part of the lesion. According to guidance, \"Early signs in a nevus that would suggest a malignant change include: Darker or variable discoloration. An increase in size or the development of satellite lesions. Ulceration or bleeding (later signs).\"",
+  "follow_up_question":null,
+  "retake_instruction":null,
+  "citations":[
+   {
+    "id":"pdq:melanoma_tx:s05:c00",
+    "quote":"Early signs in a nevus that would suggest a malignant change include: Darker or variable discoloration. An increase in size or the development of satellite lesions. Ulceration or bleeding (later signs).",
+    "source":"Melanoma Treatment (PDQ) - HP",
+    "section":"Clinical Features",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/melanoma-treatment-pdq"
+   }
+  ],
+  "flags":[
+   "borderline photo quality: hair covers part of the lesion"
+  ]
+ },
+ {
+  "id":3,
+  "patient_id":"P-0457",
+  "decision":"request_retake",
+  "decision_reason":"The decision is proceed_with_flag because the photo status is borderline due to being too dark, but the combined risk band is high, so the case should not be delayed by a retake.",
+  "why_on_list":"The patient is on the urgent list with a high risk band and symptoms answered yes for grew and itch.",
+  "evidence_summary":"Combined risk band high (score 0.92); image model high, symptom model moderate. Symptoms answered yes: itch, grew. Photo quality: borderline (too dark). Guidance: “Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.” [pdq:screening:s06:c00].",
+  "follow_up_question":null,
+  "retake_instruction":"צלמו שוב באור יום, ליד חלון, בלי פלאש.",
+  "citations":[
+   {
+    "id":"pdq:screening:s06:c00",
+    "quote":"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.",
+    "source":"Skin Cancer Screening (PDQ) - HP",
+    "section":"Accuracy of Making a Clinical Diagnosis of Melanoma",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/skin-screening-pdq"
+   }
+  ],
+  "flags":[
+   "borderline photo: too dark",
+   "guardrail: evidence summary had unsourced quotes or numbers; replaced with model evidence",
+   "guardrail: photo issue a retake can fix (too dark); decision set to request_retake"
+  ]
+ },
+ {
+  "id":4,
+  "patient_id":"P-0530",
+  "decision":"ask_patient",
+  "decision_reason":"The image risk band (very high) and symptom risk band (low) are two levels apart, requiring clarification from the patient.",
+  "why_on_list":"The patient is on the urgent list due to a combined high risk score of 0.91 with no specific symptoms answered yes on the form, but a patient note mentioning darkening.",
+  "evidence_summary":"The patient form reports no symptoms like bleeding, growth, or itching on the arm, but the patient note states that the mole got darker this summer. The photo quality status is usable. \"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.\" [pdq:screening:s06:c00]",
+  "follow_up_question":"האם הבחנת בשינויים נוספים בצבע, בצורה או בגודל של הנגע?",
+  "retake_instruction":null,
+  "citations":[
+   {
+    "id":"pdq:screening:s06:c00",
+    "quote":"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.",
+    "source":"Skin Cancer Screening (PDQ) - HP",
+    "section":"Accuracy of Making a Clinical Diagnosis of Melanoma",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/skin-screening-pdq"
+   }
+  ],
+  "flags":[
+
+  ]
+ },
+ {
+  "id":5,
+  "patient_id":"P-0812",
+  "decision":"manual_review",
+  "decision_reason":"The patient is under 18 years of age, requiring manual review according to the clinical triage rules.",
+  "why_on_list":"The patient is on the urgent list due to a high risk band and a reported symptom of change in the lesion.",
+  "evidence_summary":"The patient is 16 years old with a lesion located on the arm, presenting with a high risk band and a reported change in the lesion. The photo quality status is usable with no issues reported, and the image and symptom risk bands are consistent. \"Melanoma occurs predominantly in adults, and more than 50% of the cases arise in apparently normal areas of the skin.\" [pdq:melanoma_tx:s05:c00]",
+  "follow_up_question":null,
+  "retake_instruction":null,
+  "citations":[
+   {
+    "id":"pdq:melanoma_tx:s05:c00",
+    "quote":"Melanoma occurs predominantly in adults, and more than 50% of the cases arise in apparently normal areas of the skin.",
+    "source":"Melanoma Treatment (PDQ) - HP",
+    "section":"Clinical Features",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/melanoma-treatment-pdq"
+   }
+  ],
+  "flags":[
+   "patient under 18"
+  ]
+ },
+ {
+  "id":6,
+  "patient_id":"P-0390",
+  "decision":"manual_review",
+  "decision_reason":"Manual review is required because the photo quality status is not_a_lesion.",
+  "why_on_list":"Patient P-0390 is on the urgent list due to a high risk score and band (0.89, high), with reported symptoms of elevation and itching on the chest.",
+  "evidence_summary":"The patient is a 33-year-old presenting with a lesion on the chest, reporting elevation and itching on the symptom form with no additional patient note. The photo quality check returned 'not_a_lesion' with issues noted as 'looks like a rash covering a large area'. As noted in the verified guidance, \"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.\" [pdq:screening:s06:c00]",
+  "follow_up_question":null,
+  "retake_instruction":null,
+  "citations":[
+   {
+    "id":"pdq:screening:s06:c00",
+    "quote":"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.",
+    "source":"Skin Cancer Screening (PDQ) - HP",
+    "section":"Accuracy of Making a Clinical Diagnosis of Melanoma",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/skin-screening-pdq"
+   }
+  ],
+  "flags":[
+   "photo status not_a_lesion"
+  ]
+ },
+ {
+  "id":7,
+  "patient_id":"P-0611",
+  "decision":"proceed_with_flag",
+  "decision_reason":"The photo is usable, information is consistent, and the patient note contains instructions that must be flagged.",
+  "why_on_list":"The patient is on the list due to a high risk score and band, with reported symptoms of change and growth.",
+  "evidence_summary":"The form reports a lesion on the leg that has changed and grown, and the patient note includes instructions. The photo quality is usable, and both the image and symptom risk bands are high. \"Early signs in a nevus that would suggest a malignant change include: Darker or variable discoloration. An increase in size or the development of satellite lesions. Ulceration or bleeding (later signs). A common acronym used by medical professionals and the lay public to identify the suspicious features of pigmented lesions that may reflect malignant change is ABCDE:[ 5 ] A symmetry of the lesion. E volution or change in the lesion.\" [pdq:melanoma_tx:s05:c00]",
+  "follow_up_question":null,
+  "retake_instruction":null,
+  "citations":[
+   {
+    "id":"pdq:melanoma_tx:s05:c00",
+    "quote":"Early signs in a nevus that would suggest a malignant change include: Darker or variable discoloration. An increase in size or the development of satellite lesions. Ulceration or bleeding (later signs). A common acronym used by medical professionals and the lay public to identify the suspicious features of pigmented lesions that may reflect malignant change is ABCDE:[ 5 ] A symmetry of the lesion. E volution or change in the lesion.",
+    "source":"Melanoma Treatment (PDQ) - HP",
+    "section":"Clinical Features",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/melanoma-treatment-pdq"
+   }
+  ],
+  "flags":[
+   "instructions in patient text ignored"
+  ]
+ },
+ {
+  "id":8,
+  "patient_id":"P-0702",
+  "decision":"request_retake",
+  "decision_reason":"The photo status is borderline due to blurriness, but since the risk band is high, we proceed with a flag rather than requesting a retake.",
+  "why_on_list":"The patient is on the urgent list due to a high risk score and a positive symptom answer indicating that the lesion grew.",
+  "evidence_summary":"The patient reports growth on the shoulder, and the image quality is borderline due to blurriness. The visual risk band is high and the symptom risk band is moderate. \"High-risk individuals, including first- and second-degree family members in melanoma-prone families, should be educated about sun safety and warning signs of melanoma.[ 67 ]\" [pdq:genetics:s71:c00]",
+  "follow_up_question":null,
+  "retake_instruction":"החזיקו את הטלפון יציב וצלמו רק כשהתמונה חדה.",
+  "citations":[
+   {
+    "id":"pdq:genetics:s71:c00",
+    "quote":"High-risk individuals, including first- and second-degree family members in melanoma-prone families, should be educated about sun safety and warning signs of melanoma.[ 67 ]",
+    "source":"Genetics of Skin Cancer (PDQ) - HP",
+    "section":"High-risk population",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/skin-genetics-pdq"
+   }
+  ],
+  "flags":[
+   "borderline photo quality",
+   "guardrail: photo issue a retake can fix (blurred); decision set to request_retake"
+  ]
+ },
+ {
+  "id":9,
+  "patient_id":"P-0745",
+  "decision":"proceed_with_flag",
+  "decision_reason":"The photo status is borderline due to the anatomical body site behind the ear, but since the risk band is high and a retake would not fix the difficulty of photographing this site, the case proceeds with a flag.",
+  "why_on_list":"The patient is on the list with a high risk band (score 0.86) and reported symptoms of the lesion changing and growing.",
+  "evidence_summary":"The patient is 67 years old with a lesion located behind the ear, reporting that the lesion has changed and grown. The image quality status is borderline due to being hard to photograph behind the ear, and both the image risk band and symptom risk band are high. \"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.\" [pdq:screening:s06:c00]",
+  "follow_up_question":null,
+  "retake_instruction":null,
+  "citations":[
+   {
+    "id":"pdq:screening:s06:c00",
+    "quote":"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.",
+    "source":"Skin Cancer Screening (PDQ) - HP",
+    "section":"Accuracy of Making a Clinical Diagnosis of Melanoma",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/skin-screening-pdq"
+   }
+  ],
+  "flags":[
+   "borderline photo quality due to body site"
+  ]
+ },
+ {
+  "id":10,
+  "patient_id":"P-0821",
+  "decision":"ask_patient",
+  "decision_reason":"The patient note reports bleeding when shaving, which contradicts the symptom form where 'bleed' is answered as 'no', requiring clarification.",
+  "why_on_list":"The patient is on the urgent list due to a high risk band and a risk score of 0.85, with the symptom of growth reported.",
+  "evidence_summary":"The patient form and symptom check report that the lesion on the chin grew, while the patient note states it bleeds a little when shaving over it, contradicting the 'bleed: no' form response. The photo quality status is usable. Guidance on evaluation states: \"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.\" [pdq:screening:s06:c00]",
+  "follow_up_question":"האם הנגע מדמם לפעמים בזמן גלחיץ או מעצמו?",
+  "retake_instruction":null,
+  "citations":[
+   {
+    "id":"pdq:screening:s06:c00",
+    "quote":"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.",
+    "source":"Skin Cancer Screening (PDQ) - HP",
+    "section":"Accuracy of Making a Clinical Diagnosis of Melanoma",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/skin-screening-pdq"
+   }
+  ],
+  "flags":[
+
+  ]
+ },
+ {
+  "id":11,
+  "patient_id":"P-0866",
+  "decision":"ask_patient",
+  "decision_reason":"Image risk band and symptom risk band are two levels apart, requiring a follow-up question to resolve the gap.",
+  "why_on_list":"Patient is on the urgent list with a high combined risk score of 0.84 and a high risk band, with symptoms including bleeding, changes, growth, and pain on the back.",
+  "evidence_summary":"The form reports bleeding, changes, growth, and pain on the back, while the image risk band is low and the symptom risk band is very high, presenting a significant discrepancy. The photo quality is usable with no reported issues. \"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.\" [pdq:screening:s06:c00]",
+  "follow_up_question":"האםתוכללספרליותרעלשינוייםשהבחינתבנגעבגב,והאםהואמדמםאוכואבכרגע?",
+  "retake_instruction":null,
+  "citations":[
+   {
+    "id":"pdq:screening:s06:c00",
+    "quote":"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.",
+    "source":"Skin Cancer Screening (PDQ) - HP",
+    "section":"Accuracy of Making a Clinical Diagnosis of Melanoma",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/skin-screening-pdq"
+   }
+  ],
+  "flags":[
+
+  ]
+ },
+ {
+  "id":12,
+  "patient_id":"P-0903",
+  "decision":"proceed",
+  "decision_reason":"The photo is usable, the information is consistent between symptoms and image risk bands, and nothing is missing.",
+  "why_on_list":"Patient is on the list due to a high risk band with reported lesion change.",
+  "evidence_summary":"The patient reports a lesion on the arm that has changed, with a family history of melanoma noted. The photo quality status is usable and both image and symptom risk bands are high. \"Early signs in a nevus that would suggest a malignant change include: Darker or variable discoloration.\" [pdq:melanoma_tx:s05:c00]",
+  "follow_up_question":null,
+  "retake_instruction":null,
+  "citations":[
+   {
+    "id":"pdq:melanoma_tx:s05:c00",
+    "quote":"Early signs in a nevus that would suggest a malignant change include: Darker or variable discoloration.",
+    "source":"Melanoma Treatment (PDQ) - HP",
+    "section":"Clinical Features",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/melanoma-treatment-pdq"
+   }
+  ],
+  "flags":[
+
+  ]
+ },
+ {
+  "id":13,
+  "patient_id":"P-0950",
+  "decision":"manual_review",
+  "decision_reason":"The body site is missing from the case data, which requires manual review under the rules.",
+  "why_on_list":"The patient is on the urgent list due to a high risk band and reporting that the lesion grew.",
+  "evidence_summary":"The patient is 55 years old with a missing body site, a high risk score, and a high risk band across both image and symptom models, reporting growth of the lesion with a usable photo. \"High-risk individuals, including first- and second-degree family members in melanoma-prone families, should be educated about sun safety and warning signs of melanoma.[ 67 ]\" [pdq:genetics:s71:c00]",
+  "follow_up_question":null,
+  "retake_instruction":null,
+  "citations":[
+   {
+    "id":"pdq:genetics:s71:c00",
+    "quote":"High-risk individuals, including first- and second-degree family members in melanoma-prone families, should be educated about sun safety and warning signs of melanoma.[ 67 ]",
+    "source":"Genetics of Skin Cancer (PDQ) - HP",
+    "section":"High-risk population",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/skin-genetics-pdq"
+   }
+  ],
+  "flags":[
+   "body_site missing"
+  ]
+ },
+ {
+  "id":14,
+  "patient_id":"P-0977",
+  "decision":"request_retake",
+  "decision_reason":"The photo status is unusable due to being too far and blurred, and a retake is required before review.",
+  "why_on_list":"The patient is on the list with a very high combined risk score and reports that the lesion grew and bled.",
+  "evidence_summary":"The patient reports a lesion on the neck that grew and bled, with no additional patient note provided. The photo quality check returned an unusable status due to being too far and blurred. \"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.\" [pdq:screening:s06:c00]",
+  "follow_up_question":null,
+  "retake_instruction":"נא לצלם מחדש את הנגגע בצוואר מקרוב ופחות מטושטש.",
+  "citations":[
+   {
+    "id":"pdq:screening:s06:c00",
+    "quote":"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.",
+    "source":"Skin Cancer Screening (PDQ) - HP",
+    "section":"Accuracy of Making a Clinical Diagnosis of Melanoma",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/skin-screening-pdq"
+   }
+  ],
+  "flags":[
+
+  ]
+ },
+ {
+  "id":15,
+  "patient_id":"P-0988",
+  "decision":"proceed_with_flag",
+  "decision_reason":"The photo quality is usable and information is consistent, but the patient note reports growth which directly contradicts the symptom form where grew is answered no.",
+  "why_on_list":"The patient is on the list due to a high risk band with itching reported on the leg.",
+  "evidence_summary":"The patient note reports that the mole grew significantly in the last month, while the symptom form indicates itching but no growth. The photo status is usable. Guidance notes: \"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.\" [pdq:screening:s06:c00]",
+  "follow_up_question":null,
+  "retake_instruction":null,
+  "citations":[
+   {
+    "id":"pdq:screening:s06:c00",
+    "quote":"Observer variability among physicians has been noted in the evaluation of skin lesions and subsequent biopsy specimens.",
+    "source":"Skin Cancer Screening (PDQ) - HP",
+    "section":"Accuracy of Making a Clinical Diagnosis of Melanoma",
+    "url":"https:\/\/www.cancer.gov\/types\/skin\/hp\/skin-screening-pdq"
+   }
+  ],
+  "flags":[
+   "patient note contradicts symptom answers"
+  ]
+ }
+]

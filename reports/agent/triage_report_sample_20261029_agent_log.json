@@ -1,0 +1,62 @@
+[
+ {
+  "patient_id": "P-0193",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 23.3
+ },
+ {
+  "patient_id": "P-0274",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 20.0
+ },
+ {
+  "patient_id": "P-0457",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 30.7
+ },
+ {
+  "patient_id": "P-0530",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 26.3
+ },
+ {
+  "patient_id": "P-0812",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 93.8
+ },
+ {
+  "patient_id": "P-0745",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 112.2
+ },
+ {
+  "patient_id": "P-0821",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 20.5
+ },
+ {
+  "patient_id": "P-0866",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 26.2
+ },
+ {
+  "patient_id": "P-0903",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 24.7
+ },
+ {
+  "patient_id": "P-0988",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 21.5
+ }
+]
