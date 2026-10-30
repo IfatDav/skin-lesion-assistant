@@ -1,11 +1,40 @@
-# Results
+**The held-out test patients were opened once, on 30.10.2026, on the decisions frozen in
+`reports/decisions.md`.** The test result is below. Everything after it is the validation evidence those
+decisions were made on, left exactly as it stood.
 
-**Every number here is on validation data. The held-out PAD test patients have not been opened.**
-`reports/decisions.md` is approved and frozen; the test patients are opened once, on that basis, and the
-test figures will replace this sentence rather than these numbers.
-All model rows are on the same **220 PAD validation patients** (103 with a malignant lesion) from the
-frozen patient split created in notebook 02, aggregated image → lesion → patient by maximum, at the
-charter's primary operating point: **10 urgent slots per 100 daily arrivals, 10% malignant prevalence.**
+## The test result
+
+275 held-out PAD patients, 128 with a malignant lesion, aggregated image → lesion → patient by maximum,
+at the charter's primary operating point: **10 urgent slots per 100 daily arrivals, 10% prevalence.**
+
+| Model | Patient AUC (95% CI) | Sensitivity | PPV |
+|---|---|---|---|
+| Arrival order — today's practice | 0.500 | 0.10 | 0.10 |
+| Questionnaire only — the baseline | 0.862 (0.813–0.902) | 0.57 | 0.57 |
+| Image model | 0.953 (0.929–0.972) | 0.69 | 0.69 |
+| **Final: image 60% + questionnaire 40%** | **0.954** (0.928–0.975) | **0.66** | **0.68** |
+
+| Paired, same patients | ΔAUC | 95% CI |
+|---|---|---|
+| image − questionnaire | **+0.092** | +0.052 to +0.136 |
+| fused − questionnaire | +0.092 | +0.063 to +0.125 |
+| fused − image | +0.000 | −0.014 to +0.015 |
+
+**Nothing moved.** Fused 0.954 on patients it had never seen, against 0.954 on validation; image 0.953
+against 0.956; questionnaire 0.862 against 0.867. All three paired differences reproduce the validation
+result — including the one that was predicted in advance to be zero. Epochs, the SCC weight and the seed
+were chosen on the validation patients, and the test says that choice bought nothing that fails to carry.
+
+The run was executed on a Tesla T4 in float16, because cuDNN has no bfloat16 convolution kernel before
+Ampere. A rehearsal on the validation patients put the cost of that substitution at −0.002 patient AUC,
+well inside the bootstrap interval.
+
+---
+
+## The validation evidence
+
+All rows below are on the same **220 PAD validation patients** (103 with a malignant lesion) from the
+frozen patient split created in notebook 02, at the same operating point.
 
 ---
 
@@ -51,16 +80,30 @@ In PAD every cancer was biopsied, and the 566 development lesions that were *not
 — diagnosed by eye, and also the ones missing the history block of the questionnaire. They are easy cases
 and they inflate every row above.
 
-On the 116 validation patients whose lesions were **all** biopsied (93 of them with cancer):
+On the 116 validation patients whose lesions were all biopsied (93 with cancer), and on the **138 test
+patients** whose lesions were all biopsied (115 with cancer):
 
-| | Patient AUC |
-|---|---|
-| Final model | **0.890** |
-| Image model | 0.886 |
-| Questionnaire | 0.846 |
+| | Validation | **Test** (95% CI) |
+|---|---|---|
+| Final model | 0.890 | **0.851** (0.742–0.940) |
+| Image model | 0.886 | **0.859** (0.769–0.934) |
+| Questionnaire | 0.846 | **0.767** (0.653–0.880) |
 
-The nine-point gap becomes four, and it is no longer significant. **This is the number to quote when
-asked how the system performs on hard cases.**
+| Test, paired | ΔAUC | 95% CI |
+|---|---|---|
+| image − questionnaire | **+0.093** | **+0.005** to +0.178 |
+| fused − questionnaire | +0.085 | +0.027 to +0.143 |
+| fused − image | −0.008 | −0.045 to +0.026 |
+
+**Every model is worse on hard cases, as expected. But the gap did not close.** On validation the
+nine-point lead over the questionnaire shrank to four and lost significance, and this document said so
+before the test was opened. On the held-out patients it stayed at nine points and the interval clears
+zero — by 0.005, on 23 benign patients. The honest statement is the interval, not the word "significant".
+
+**At the operating point the difference is starker than the AUC.** On these patients the questionnaire
+puts **22%** of cancer patients on the daily list; the image model puts **46%**. On the patients a
+dermatologist could not settle by eye, the answers alone are close to useless and the photograph carries
+the decision. **This is the number to quote when asked how the system performs on hard cases.**
 
 ---
 
@@ -69,16 +112,18 @@ asked how the system performs on hard cases.**
 At a fixed number of slots, sensitivity is a joint statement about the model *and* the budget: no ranking
 can exceed `budget ÷ prevalence`.
 
-| Slots per 100 | Prevalence | Ceiling | Delivered |
-|---|---|---|---|
-| 5 | 10% | 0.50 | 0.42 |
-| **10** | **10%** | **1.00** | **0.61** |
-| 15 | 10% | 1.00 | 0.82 |
-| 10 | 20% | 0.50 | 0.43 |
+| Slots per 100 | Prevalence | Ceiling | Validation | **Test** |
+|---|---|---|---|---|
+| 5 | 10% | 0.50 | 0.42 | **0.39** |
+| **10** | **10%** | **1.00** | **0.61** | **0.66** |
+| 15 | 10% | 1.00 | 0.82 | **0.82** |
+| 10 | 20% | 0.50 | 0.43 | **0.45** |
+
+Both columns are the final model: image 60% + questionnaire 40%. At 15 slots the two sets agree exactly.
 
 `Delivered` is the final model throughout: image 60% + questionnaire 40%.
 
-The charter's target of ≥ 0.90 is not reached at 10 slots. The constraint is capacity, not ranking:
+The charter's target of ≥ 0.90 is not reached at 10 slots on either set. The constraint is capacity, not ranking:
 **reaching 0.90 requires more urgent slots than the primary scenario allows**, and that number is reported
 as a product requirement rather than recorded as a model failure.
 
