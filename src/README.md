@@ -40,8 +40,7 @@ python -m src.near_duplicates                     # leakage audit across PAD spl
 
 `src.evaluate` expects seeds 42, 1 and 2 of `train` and of `finetune_pad` with `--scc-boost 1` and `2`.
 **PAD test patients are never loaded by any of these scripts.** The one script that does,
-`python -m src.evaluate_test --frozen`, runs once, after the team approves `reports/decisions.md`.
-
+`python -m src.evaluate_test --frozen`, runs once, on the decisions frozen in `reports/decisions.md`.
 On Windows, run scripts as modules (as above), not from stdin or from notebook cells that define the dataset:
 the data loader starts worker processes that must be able to import the code.
 
