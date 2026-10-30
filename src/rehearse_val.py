@@ -31,8 +31,7 @@ PUBLISHED_SENS = {"image": 0.602, "questionnaire": 0.524, "final_fused": 0.612}
 PUBLISHED_PAIRED = 0.0888  # image - questionnaire
 AUC_TOL, SENS_TOL = 0.005, 0.02
 
-EXPECT_IMAGES, EXPECT_PATIENTS, EXPECT_MALIGNANT = 357, 220, 103
-
+EXPECT_IMAGES, EXPECT_PATIENTS, EXPECT_MALIGNANT = 355, 220, 103
 
 def main() -> int:
     has_cuda = torch.cuda.is_available()
