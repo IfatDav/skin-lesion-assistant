@@ -30,8 +30,9 @@ it hands the dermatologist the evidence for that ordering.
 
 **M2 and the capacity ceiling.** At a fixed number of urgent slots, sensitivity is a joint statement about
 the model *and* the slot budget: no ranking can exceed `budget ÷ prevalence`. At 10 slots per 100 arrivals
-and 10% prevalence the ceiling is 1.00. The delivered model reaches **0.61** there and **0.82** at 15 slots
-on validation patients. The number of slots required to reach 0.90 is therefore reported as a product
+and 10% prevalence the ceiling is 1.00. **On the held-out test patients the delivered model reaches 0.66
+there, and 0.82 at 15 slots** (validation: 0.61 and 0.82). The number of urgent slots required to reach
+0.90 is therefore reported as a product requirement rather than treated as a model failure.
 
 ## 3 · Data
 
@@ -69,8 +70,24 @@ averaging would dilute it.
 
 ## 5 · The baseline table — "the cheapest thing that works"
 
-All rows on the same **220 PAD validation patients** (103 malignant), the same aggregation rule, the same
-operating point: 10 urgent slots per 100 arrivals at 10% prevalence. Test patients have not been opened.
+**The held-out result first.** 275 test patients, 128 with a malignant lesion, opened once on 30.10.2026
+on the decisions frozen in `reports/decisions.md`. Same aggregation rule, same operating point: 10 urgent
+slots per 100 arrivals at 10% prevalence.
+
+| Model | Patient AUC (95% CI) | Sensitivity | PPV |
+|---|---|---|---|
+| Arrival order — today's practice | 0.500 | 0.10 | 0.10 |
+| **Questionnaire only — the baseline** | **0.862** (0.813–0.902) | **0.57** | **0.57** |
+| ConvNeXt + PAD fine-tuning | 0.953 (0.929–0.972) | 0.69 | 0.69 |
+| **Final: image 60% + questionnaire 40%** | **0.954** (0.928–0.975) | **0.66** | **0.68** |
+
+Paired on these patients: image − questionnaire **+0.092** (+0.052 to +0.136); fused − image **+0.000**
+(−0.014 to +0.015). Both reproduce the validation figures almost exactly — including the second, which was
+written down in advance as the one expected to be zero.
+
+**And the table that chose the model.** All rows below are on the 220 PAD validation patients (103
+malignant), at the same operating point. DINOv2 and the ISIC-only model were never run on the test
+patients: they are here to show what the expensive model had to beat.
 
 | Model | Patient AUC (95% CI) | Sensitivity | PPV | Cost to build |
 |---|---|---|---|---|
@@ -90,12 +107,19 @@ The questionnaire alone already reaches 0.867 and needs no photograph at all —
 specified before any model was fitted and never tuned on validation. A frozen DINOv2 with a logistic
 regression on top matches it without training a single weight. The expensive model earns its place by
 +0.089 AUC and by putting 60% of cancer patients on the daily list instead of 52%, and that gain is paired
-and significant.
+and significant. **On the held-out patients it held: +0.092, and 69% against 57%.**
 
-**And one thing it hides.** In PAD every cancer was biopsied, and the 566 development lesions that were
-not biopsied are all benign — easy cases that inflate every row. On the 116 validation patients whose
-lesions were all biopsied (93 with cancer) the AUCs are **0.890** (final), **0.886** (image) and
-**0.846** (questionnaire). The honest gap on hard cases is four points, not nine.
+**And one thing it hides.** In PAD every cancer was biopsied, and the lesions that were not biopsied are
+all benign — easy cases that inflate every row. On the **138 test patients** whose lesions were all
+biopsied (115 with cancer) the AUCs are **0.859** (image), **0.851** (final) and **0.767**
+(questionnaire); on the 116 validation patients they were 0.886, 0.890 and 0.846.
+
+On validation the nine-point lead over the questionnaire shrank to four and lost significance, and this
+README said so before the test was opened. On held-out data it did not shrink: **+0.093, interval +0.005
+to +0.178** — clearing zero by 0.005, on 23 benign patients. That is a real result and a fragile one, and
+it belongs in print with its lower bound rather than as "significant". At the operating point the
+difference is plainer: on these patients the questionnaire puts **22%** of cancer patients on the daily
+list and the image model puts **46%**.
 
 ## 6 · The agent
 
