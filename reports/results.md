@@ -1,9 +1,8 @@
 # Results
 
 **Every number here is on validation data. The held-out PAD test patients have not been opened.**
-They are opened once, after the team approves `reports/decisions.md`, and the test figures replace this
-sentence rather than these numbers.
-
+`reports/decisions.md` is approved and frozen; the test patients are opened once, on that basis, and the
+test figures will replace this sentence rather than these numbers.
 All model rows are on the same **220 PAD validation patients** (103 with a malignant lesion) from the
 frozen patient split created in notebook 02, aggregated image → lesion → patient by maximum, at the
 charter's primary operating point: **10 urgent slots per 100 daily arrivals, 10% malignant prevalence.**
@@ -217,7 +216,7 @@ augmentation has to attack.
 
 ## 9 · Not yet measured
 
-- **The held-out test set.** One run, after the team approves `reports/decisions.md`.
+- **The held-out test set.** One run, on the decisions frozen in `reports/decisions.md`.
 - **Surgical-marker ink**, a known shortcut visible on some PAD photographs. An automatic detector failed
   validation. After the test run the test photographs are labelled for ink *blind* to diagnosis and score,
   and benign inked photographs are compared with benign photographs without ink.
