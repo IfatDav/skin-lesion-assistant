@@ -12,8 +12,10 @@ change the model, so it does not touch the test result.
 
 ## How to label (about 500 photos, under an hour)
 
-1. Open each photo from the `photo` column (paths are relative to the repo root; run
-   `python -m src.build_index --resize-pad` first if `data/processed/pad_512/` is missing).
+1. Open each photo from the `photo` column. The paths are relative to the repo root and point *outside*
+   it, to the `DATA/` folder described in `src/README.md` — set `SKIN_DATA_ROOT` or place `DATA/` beside
+   the repo. Alternatively run `python -m src.build_index --resize-pad` to cache 512-px copies inside
+   `data/processed/pad_512/`.
 2. Fill `has_ink` with **1** if there is any marker ink on the skin: lines, dots, a circle around the lesion,
    arrows, written letters. Purple and blue are the usual colours.
 3. Fill **0** if there is none. Natural pigment, bruises, veins, hair and shadows are not ink.
