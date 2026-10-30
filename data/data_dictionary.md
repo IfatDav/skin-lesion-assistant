@@ -96,7 +96,7 @@ The frozen rule for turning image scores into the patient score that triage is e
 - All splits use `random_state=42`, are created once and loaded on every later run.
 - PAD missing values arrive as `UNK` or an empty string, and are normalised to `NaN` on load.
 
-- ## Model files in `models/`
+## Model files in `models/`
 
 | File | What it is | Used by |
 |---|---|---|
