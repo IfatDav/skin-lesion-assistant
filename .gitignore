@@ -11,9 +11,13 @@ data/raw/images/
 
 # Frozen manifests and decisions ARE the project: small, and the pipeline cannot be
 # reproduced without them. Ignore the directory's bulk, then name what must be shared.
+# A subdirectory must be un-ignored before anything inside it can be: git does not
+# descend into an ignored directory, so !data/processed/rag/*.json alone would not work.
 data/processed/*
 !data/processed/*.csv
 !data/processed/*.json
+!data/processed/rag/
+!data/processed/rag/*.json
 !data/splits/*.csv
 !data/metadata/*.csv
 !evaluation/*.csv
