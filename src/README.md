@@ -2,7 +2,7 @@
 
 Code for the image (CV) part of the triage pipeline. Images are not in the repo: the scripts read them from
 `../DATA` next to the repo, or from the folder in the `SKIN_DATA_ROOT` environment variable. Results:
-`reports/results_image_model.md` and `notebooks/04_image_model.ipynb`.
+`reports/results_image_model.md` and `notebooks/05_image_model.ipynb`.
 
 ## Data layout
 
@@ -14,7 +14,8 @@ DATA/                                  # next to the repo, or set SKIN_DATA_ROOT
 ```
 
 The index stores file names only, so it works on any machine with this layout. The ISIC labels
-(`data/metadata/isic_clinical_metadata.csv`, pulled from the ISIC API) are in the repo.
+(`data/metadata/isic_pool_api_metadata.csv`, pulled from the ISIC API) are in the repo. The notebooks'
+own ISIC table, with the derived exclusion columns, is a separate file: `data/raw/isic_clinical_metadata.csv`.
 
 ## Setup
 
@@ -92,6 +93,9 @@ the scikit-learn version pinned in `requirements.txt`.
 | `export_model.py` | packs the final model: `.safetensors` weights for the release, `questionnaire.joblib` |
 | `predict.py` | inference entry point for the agent; downloads the weights on first use |
 
+`reports/image_model_report.html` is a standalone HTML summary of the validation run, written by hand from
+`final_results.json`; nothing reads it.
+
 ## Index splits
 
 | split | images | use |
@@ -99,7 +103,7 @@ the scikit-learn version pinned in `requirements.txt`.
 | `milk_train` / `milk_val` | 4,325 / 763 | ISIC training and checkpoint selection; split by lesion |
 | `pad_train` / `pad_val` / `pad_test` | 1,440 / 357 / 501 | the team's frozen PAD patient split; if the original `pad_split.csv` is placed in `data/splits/`, it is used instead |
 | `msk_eval` | 1,241 | Memorial Sloan Kettering: 1,234 benign from 73 patients; kept out of training |
-| `excluded` | 210 | 129 rare classes, 79 without a fine label, 2 byte-identical duplicates |
+| `excluded` | 210 | 129 rare classes, 79 without a fine label, 2 duplicate photographs (byte-identical once resized to 512 px, and an identical perceptual hash; MD5 over the originals does not see them) |
 
 ## Notes
 
