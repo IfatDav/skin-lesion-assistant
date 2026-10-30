@@ -137,14 +137,56 @@ list and the image model puts **46%**.
 
 ## 6 · The agent
 
-> *To be completed by the Agent hat before the repo freeze.* `agents/` must contain the tool definitions,
-> the prompts, the decision loop and the guardrails, plus a paragraph answering the three questions the
-> charter requires: what the agent decides that a fixed script could not, which tools it may call, and what
-> happens when it fails. The system must work without it.
+`agent/` holds the whole layer — tools, prompts, decision loop and guardrails. Notebooks 07, 08 and 09
+build it, test it and run it, and every figure below comes from their saved output in `reports/agent/`.
 
-The current build is a CrewAI crew, *Clinician Seat triage evidence assistant*: for one patient on today's
-urgent list it assembles the evidence a dermatologist needs before the appointment, cites the guidance it
-used, and returns a single decision with a structured JSON contract.
+The build is a CrewAI crew, *Clinician Seat triage evidence assistant*. It takes one patient at a time from
+the list the model ranked, assembles the evidence a dermatologist needs before the appointment, cites the
+guidance it used, and returns one of five decisions through a structured JSON contract. The same role, goal
+and task text live in CrewAI Studio, where the prompt was designed; the code adds what Studio cannot do.
+
+**Which tools it may call.** Three, and nothing else:
+
+| Tool | Returns |
+|---|---|
+| the daily case | the ranked patient's record: score, risk bands, symptom answers, photo quality, free-text note |
+| `run_quality_check` | the photo's status — usable, borderline, unusable, not a lesion — and the specific issues |
+| `retrieve_guidance_context` | passages from the frozen NCI PDQ corpus, each with a chunk id, for citation |
+
+The retrieval query is built **by code** from the symptoms answered yes and the body site, not by the model:
+retrieval stays reproducible, and a photo word such as "too dark" cannot pull passages about dark skin.
+Patients 18 and over are never served the two childhood pages.
+
+**What happens when it fails.** `review_case` retries once on malformed output, never retries a call that
+has hung, and after 120 seconds falls back to `manual_review` with the fixed model-evidence summary and the
+patient's priority unchanged. Every outcome, attempt count and duration goes to the agent log. On the sample
+list all ten patients were handled by the agent on the first attempt with no fallback; earlier runs with an
+exhausted quota and with a missing API key fell back for every patient and still produced a complete report,
+and they are kept as the evidence that the path works.
+
+**The system works without it.** `USE_AGENT = False` produces the same report from the same ranking, with a
+fixed per-patient summary and the decision `model_evidence_only`. Both reports are in `reports/agent/`.
+
+**The agent cannot change a score or a rank** — not as an instruction, but because the `CaseReview` schema
+it answers in has no score field and no rank field. There is nothing for it to change. The model ranks; the
+agent explains and prepares the next step.
+
+**Guardrails are code, not prompt.** `enforce_guardrails` runs on every answer: reassuring words are
+rejected in English and Hebrew, with Hebrew final letters normalised and NCI quotes excluded so a clinical
+passage is not mistaken for reassurance; a patient under 18, a photo that may not show a lesion, or a
+missing critical field each force `manual_review`; a citation survives only if its chunk id was retrieved
+for that patient **and** its quote appears word for word in that chunk; every number in the summary must
+come from the case record or a surviving citation; and a message to a patient leaves the system only for
+`request_retake` and `ask_patient`, after all the checks have passed.
+
+**What the agent decides that a fixed script could not — the honest answer.** On decisions alone, nothing.
+On 15 frozen scenarios (M4) an if-else script on the same fields scored 12/15, the agent 9/15, and the agent
+behind the code guardrails 11/15; its decisions also vary between runs of the same case. Where it did add
+judgement was the one case the rules get wrong for a reason rules cannot encode: a lesion behind the ear,
+where a retake would not help, so it proceeded with a flag instead of demanding one. What it adds reliably
+is the patient-specific text — the question that targets the actual gap in the form, the retake instruction
+in Hebrew, the grounded citation. The conclusion this project draws is to let code make every rule-shaped
+decision and leave the agent the texts and the cases the rules do not cover.
 
 ## 7 · Evaluation
 
