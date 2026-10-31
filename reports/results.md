@@ -147,7 +147,7 @@ require a separate product decision and further evaluation.
 | ISIC after preprocessing | **6,404** images — minus 124 Indeterminate, 9 collision lesions and 2 duplicate photographs — 3,687 malignant (57.6%), 470 melanomas |
 | PAD-UFES-20 | 2,298 images · 1,891 lesions · 1,373 patients · 52 melanomas · 47.4% malignant |
 | Frozen PAD split | train 1,440 images / 878 patients · val 357 / 220 · **test 501 / 275** |
-| Melanoma in the test split | **9 images from 7 patients** — one miss moves sensitivity by 11 points |
+| Melanoma in the test split | **9 images from 7 patients**. One missed melanoma image changes image-level sensitivity by approximately 11 percentage points (1/9); one missed melanoma patient changes patient-level sensitivity by approximately 14 percentage points (1/7). |
 | Fitzpatrick V–VI in PAD | **11 images in total**, two of them in the test split |
 
 **Dark skin cannot be evaluated on this data.** ISIC holds 376 V–VI clinical close-ups, but all come from
