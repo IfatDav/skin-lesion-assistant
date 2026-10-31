@@ -237,6 +237,7 @@ decision and leave the agent the texts and the cases the rules do not cover.
 ├─ CHARTER.md                the plan, plus the checkpoint updates
 ├─ DATA_DECISIONS.md         every dataset considered, and why it was kept or rejected
 ├─ requirements.txt
+├─ build_daily_cases_from_val.py   validation-only model-to-agent demo
 ├─ data/
 │  └─ data_dictionary.md     every table and column the pipeline writes
 ├─ notebooks/
@@ -246,7 +247,7 @@ decision and leave the agent the texts and the cases the rules do not cover.
 │  ├─ 04_symptom_model.ipynb the questionnaire model
 │  └─ 05_image_model.ipynb   the image model and the fusion
 ├─ src/                      the runnable image-model pipeline (see src/README.md)
-├─ agents/                   tools, prompts, the loop, guardrails          
+├─ agent/                    tools, prompts, the loop, guardrails          
 ├─ evaluation/               eval sets, groundedness, error analysis
 ├─ models/                   model artefacts
 ├─ reports/
@@ -270,6 +271,74 @@ fetch the PAD photographs from the same mirror, so whichever runs first does the
 `src/` holds the runnable image-model pipeline, documented in [src/README.md](src/README.md). The evaluation scripts require a CUDA GPU and the image data in the configured external data directory.
 
 The decisions governing the single held-out test run were frozen in `reports/decisions.md`. The test was executed once on 30.10.2026 in `notebooks/06_test_run.ipynb`, which keeps the run's own output, and its results are preserved in `reports/test_results.json` and summarized in `reports/results.md`.
+
+### Validation-only model to agent demonstration
+
+The reproducible bridge is `build_daily_cases_from_val.py` at repository root.
+It uses **stored validation predictions** by default, not the held-out test set.
+It restricts the 220 validation patients (103 malignant; 46.8%) to 138 with
+exactly one lesion and one photo (47 malignant; 34.1%), so the image, symptom
+data and displayed photo refer to the same lesion. A seeded simulation draws
+100 of those eligible patients with 10 malignant cases (10% scenario
+prevalence), ranks all 100 using the frozen **60% image + 40% questionnaire**
+percentile-rank fusion and exports the top 10. Controlled prevalence does
+**not** correct for selection bias: this subset is for technical integration,
+not an estimate of clinical performance or generalization.
+
+Run from repository root (also works in Colab with `os.chdir(PROJECT)`):
+
+```bash
+python build_daily_cases_from_val.py
+python agent/triage_agent.py --cases data/processed/daily_cases_val.csv --no-agent --out reports/agent/validation_smoke.docx
+```
+
+The second command requires `python-docx` (install with `pip install
+python-docx`). It is a **smoke test without an LLM agent**. The output
+`data/processed/daily_cases_val.csv` has ranked patients and model evidence;
+the audit `data/processed/val_100_candidates_audit.csv` contains diagnoses
+for evaluation by the project team only and must **never** be supplied to
+the agent. The exported relative `risk_score`/`risk_band` are **not calibrated
+malignancy probabilities or validated clinical risk categories**.
+
+**Manual photograph quality review (before enabling the agent).** Open
+`data/processed/val_top10_quality_template.csv` and inspect the actual photo
+named in `image_filename` for each of the ten IDs:
+
+| `image_quality` | Labeling rule |
+| --- | --- |
+| `usable` | The lesion is visible, in focus, and adequately illuminated. |
+| `borderline` | The lesion is visible, but a photo issue may limit assessment. |
+| `unusable` | The photo does not support reasonable visual assessment. |
+| `not_a_lesion` | No skin lesion relevant to the task can be identified. |
+
+Use `image_issues` for specific issues (semicolon-separated), with the
+recognizable terms **`blurred`, `too dark`, `too bright`, `too far`, `glare`,
+`not centred`**; use an empty cell if no issue. Do not substitute `blurry`
+for `blurred`: the retake rules recognize the latter spelling.
+
+Once all ten rows are **manually and genuinely** reviewed, save the CSV
+and commit the completed `data/processed/val_top10_quality_template.csv` to
+GitHub. It is an irreplaceable manual annotation; do not commit an empty
+template as if it were reviewed. The builder checks that its ten patient IDs
+match the selected cases. Then run:
+
+```bash
+python build_daily_cases_from_val.py --quality-file data/processed/val_top10_quality_template.csv
+```
+
+In `notebooks/09_agent_daily_report.ipynb`, set `CASES_FILE` to
+`os.path.join(PROCESSED, "daily_cases_val.csv")` and `USE_AGENT = True`
+only after the photo reviews; confirm the per-patient agent log rather than
+assuming a generated Word file proves the agent ran. With image files, weights
+and dependencies installed, `--fresh-inference` can instead run the trained
+models on the PAD validation photos; it creates separate `_fresh` outputs
+and a fresh quality template. **Do not upload the original photographs**
+as part of this demo or treat the report as a clinical recommendation.
+
+The root builder and the older `agent/make_daily_list.py` helper now use
+the **same** queue-relative bands from `src/fusion.py`. The older helper
+recomputes fusion within its sampled day and defaults unchecked photo quality
+to `not_checked`, rather than silently treating it as usable.
 
 Every notebook asserts the figures this README quotes. If an assertion fires, the archive has changed and
 the number is corrected here, not in the notebook.
