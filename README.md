@@ -399,8 +399,7 @@ the number is corrected here, not in the notebook.
   the test split. ISIC holds 376, all from a single contributor and all in the training pool, so a gap
   there would measure the institution as much as the skin tone. The slice is reported as raw counts and
   a dark-skin evaluation set is the first requirement for any pilot.
-- **Melanoma statistics are thin.** The frozen test split holds 9 melanomas; one miss moves sensitivity by
-  11 points. M2 is stated for skin cancer overall and melanoma is reported separately.
+- **Melanoma statistics are thin.** The frozen test split contains 9 melanoma images from 7 patients. One missed image changes image-level melanoma sensitivity by approximately 11 percentage points, while one missed patient changes patient-level sensitivity by approximately 14 percentage points. M2 is stated for skin cancer overall; melanoma-specific results are reported separately and remain highly uncertain because of the small sample.
 - **Pre-cancer is the hardest boundary.** Actinic keratosis is scored as a negative, and the image model
   still calls some squamous cell carcinoma actinic keratosis. It is the most consequential error the
   system makes.
