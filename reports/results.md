@@ -269,7 +269,23 @@ augmentation has to attack.
 
 ---
 
-## 9 · Not yet measured
+
+## 9 · Agent evaluation and remaining limitations
+
+**M3 — RAG groundedness.** Evaluated on 20 frozen questions, including 5 unanswerable questions. Citation-ID groundedness improved from 0.733 to 0.933 after re-ranking, exceeding the 0.90 target. All 5 out-of-corpus refusal tests passed before re-ranking, but refusal behavior after re-ranking has not been independently re-tested. The metric verifies citation IDs against retrieved passages; it does not establish full semantic or clinical correctness.
+
+**M4 — Agent versus if-else baseline.** Evaluated on 15 frozen workflow scenarios. The Agent achieved 9/15 correct decisions, the system with guardrails achieved 11/15, and the if-else baseline achieved 12/15. The M4 accuracy target was not met. No patient was removed or had their score or rank changed during the evaluation.
+
+**Validation-to-Agent integration (CP3).** Completed on 31 October 2026 using stored PAD validation predictions. Ten selected patients were processed successfully by the Agent, with zero retries and zero fallbacks. The resulting Word report and execution log are committed in `reports/agent/`. This demonstrates technical integration, not clinical validation.
+
+**Still not measured or completed:**
+
+- Surgical-marker ink shortcut analysis: 498 test photographs await manual annotation.
+- M3 refusal behavior after re-ranking.
+- Full fresh-photograph-to-report integration, including automated image-quality assessment.
+- Production operating costs at the assumed patient volume.
+- Independent clinical and generalization evaluation.
+
 
 - **Surgical-marker ink**, a known shortcut visible on some PAD photographs. An automatic detector failed
   validation. After the test run the test photographs are labelled for ink *blind* to diagnosis and score,
