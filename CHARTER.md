@@ -255,10 +255,10 @@ else on the near side of the line is built.**]**
 
 | Hat | Owner | Responsibility |
 |---|---|---|
-| Data | Yuval Rubenchuk | Pipeline architecture, strict patient-level splitting, data cleaning, and leakage mitigation |
+| Data | Ifat Davidson | Pipeline architecture, strict patient-level splitting, data cleaning, and leakage mitigation |
 | Model | Roi Budnitsky | Training baselines, model fine-tuning, threshold tuning, and multi-ethnic performance analysis |
 | Agent | Tami Khazma | Agent tool building, orchestration loops, safety guardrails, and M4 validation set execution |
-| Product | Ifat Davidson | Clinician workflow UX, patient-facing safety copy, README documentation, and final fund presentation deck |
+| Product | Yuval Rubenchuk | Clinician workflow UX, patient-facing safety copy, README documentation, and final fund presentation deck |
 
 ## 8 · Checkpoint updates
 
