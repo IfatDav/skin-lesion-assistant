@@ -278,7 +278,6 @@ decision and leave the agent the texts and the cases the rules do not cover.
 ├─ evaluation/               eval sets, groundedness, error analysis
 ├─ demo/                     the three-case walkthrough
 ├─ models/                   model artefacts
-├─ reports/
 │  ├─ figures/
 │  ├─ decisions.md           the frozen decisions for the single test run
 │  ├─ results.md             the baseline table and the key results
@@ -322,7 +321,7 @@ not an estimate of clinical performance or generalization.
 Run from repository root (also works in Colab with `os.chdir(PROJECT)`):
 
 ```bash
-python build_daily_cases_from_val.py
+python -m src.build_daily_cases_from_val
 python agent/triage_agent.py --cases data/processed/daily_cases_val.csv --no-agent --out reports/agent/validation_smoke.docx
 ```
 
