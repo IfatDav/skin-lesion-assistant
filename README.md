@@ -27,10 +27,11 @@ it hands the dermatologist the evidence for that ordering.
 |---|---|---|
 | **M1** | Median simulated days to appointment for patients with a malignant lesion, under the 10% waiting-list prioritization policy | ≤ 7 days against the arrival-order baseline — **met**: 24.0 → 1.0 days in the primary scenario. The median hides a split distribution; see the note below (`src/simulate_queue.py`, `reports/m1_queue_simulation.json`) |
 | **M2** | Patient-level sensitivity for skin cancer (MEL + BCC + SCC) among patients flagged for priority review, evaluated on held-out PAD-UFES-20 patients | ≥ 0.90 (not met; held-out test sensitivity: 0.664 in the primary evaluation scenario) |
-| **M3** | Groundedness of the agent's guidance on a frozen set of 20 questions, 5 of them unanswerable | ≥ 0.9, and 5/5 refusals — **met**: 0.933 after re-ranking, 5/5 refusals, and every number in an answer traced to its cited chunk (`notebooks/07_rag_nci_m3.ipynb`) |
+| **M3** | Groundedness of the agent's guidance on a frozen set of 20 questions, including 5 unanswerable questions | ≥ 0.90 groundedness and 5/5 refusals. **Groundedness target met:** 0.933 after re-ranking. The 5/5 refusal result was measured before re-ranking only; refusal behavior after re-ranking has not been independently re-tested. The groundedness metric verifies citation IDs against retrieved passages, not full semantic accuracy. (`notebooks/07_rag_nci_m3.ipynb`) |
 | **M4** | Agent decisions on a frozen set of 15 complex workflow cases, measured against an if-else script on the same cases | ≥ 13/15 correct and above the baseline, with no patient suppressed, downgraded or removed. **Not met on accuracy**: agent 9/15, system after guardrails 11/15, if-else 12/15. **Met on safety**: no patient removed, no score or rank changed, no reassuring wording (`notebooks/08_agent_m4_vs_ifelse.ipynb`) |
 
-**M1 and M3 are met; M2 and M4 are not, and both are reported with the number they reached.** M2 is a
+
+**M1 met its simulated median criterion; M2 and M4 did not meet their targets. M3 met its measured groundedness target, while refusal behavior after re-ranking remains to be independently verified.** M2 is a
 capacity statement as much as a ranking one — see the note below. M4 is the more interesting failure: the
 agent does not beat a rule script on decisions, which is a finding about where an agent belongs rather than
 a bug to be tuned away. M1 is met on the median, but the median is the weakest part of that metric and the
@@ -72,7 +73,8 @@ The product's prioritization policy remains unchanged at **10% of the current wa
 |---|---|---|---|
 | **ISIC Archive**, clinical close-ups incl. MILK10k | image-model training | 9,316 clinical close-ups → **6,539** candidates after removing PAD and the unlabelled benchmark → **6,404** after preprocessing exclusions | CC-BY-NC / CC-BY / CC-0 per image |
 | **PAD-UFES-20** | target domain: real phone photos, and the only source with the symptom answers the app collects | 2,298 images · 1,891 lesions · 1,373 patients · 52 melanomas · 47.4% malignant | CC BY 4.0 |
-| **NCI PDQ** patient summaries | guidance corpus for the agent | ~10–20 documents | free of copyright, credit NCI |
+| **NCI PDQ** Health Professional summaries | Guidance corpus for the Agent (RAG) | 7 documents · 224 sections · 724 chunks | NCI public-domain content; credit NCI |
+
 
 Raw images are **not** in this repository. `notebooks/01_eda_isic.ipynb` downloads ISIC through the
 official CLI and PAD from a public mirror, both verified on content; `data/data_dictionary.md` describes
@@ -168,7 +170,7 @@ the list the model ranked, assembles the evidence a dermatologist needs before t
 guidance it used, and returns one of five decisions through a structured JSON contract. The same role, goal
 and task text live in CrewAI Studio, where the prompt was designed; the code adds what Studio cannot do.
 
-**Which tools it may call.** Seven, registered in \build_crew()`, and nothing else:`
+**Which tools it may call.** Seven, registered in `build_crew()`, and nothing else:
 
 | Tool | Returns |
 |---|---|
@@ -192,13 +194,18 @@ Patients 18 and over are never served the two childhood pages.
 has hung, and after 120 seconds falls back to `manual_review` with the fixed model-evidence summary and the
 patient's priority unchanged. Every outcome, attempt count and duration goes to the agent log.
 
-On the ten real validation patients of `notebooks/09_agent_daily_report.ipynb`, all ten were handled by the
-agent, none fell back, and no guardrail had to correct anything. The first patient took **87.7 seconds** of
-the 120-second budget, because the first retrieval call also loads the re-ranking model; the remaining nine
-ran in 5.7 to 10.2 seconds, median 7.6. The budget is therefore sized for the cold start, not for the steady
-state. Earlier runs are kept as the evidence that the failure path itself works: one hit the Gemini free-tier
-request quota and the single retry recovered the patient, and runs with an exhausted quota and with a missing
-API key fell back for every patient and still produced a complete report with no patient dropped.
+
+**Validation Agent run — 31 October 2026.**
+The final committed run in `notebooks/09_agent_daily_report.ipynb` processed all 10 selected PAD validation patients successfully, with **10/10 Agent outcomes, zero retries and zero fallbacks**.
+
+The Agent produced 8 `proceed` and 2 `proceed_with_flag` decisions. No guardrail corrections were required, and patient scores and ranking positions remained unchanged.
+
+The median execution time was **6.85 seconds per patient**. The longest execution was **72.7 seconds (PAT_393)**, within the configured 120-second timeout.
+
+The report and matching execution log are committed in `reports/agent/`.
+
+Earlier, separate runs demonstrated the failure path: recovery from an API quota error, and complete report generation through the fallback mechanism when the Agent was unavailable. These earlier results are historical evidence and are not part of the final validation run.
+
 
 **The system works without it.** `USE_AGENT = False`, and `agent/triage_agent.py --no-agent`, produce the
 same report from the same ranking, with a fixed per-patient summary and the decision `model_evidence_only`.
@@ -242,8 +249,8 @@ decision and leave the agent the texts and the cases the rules do not cover.
 - **Self-reported answers.** The PAD questionnaire was filled in by medical students during a visit; app
   users answer alone. Flipping 10% of the answers lowers patient AUC from 0.867 to 0.823. Every
   questionnaire number here is therefore an upper bound.
-- **Groundedness (M3).** Twenty frozen questions, five of them unanswerable from the corpus, with every
-  cited number checked against its source.
+- **RAG evaluation (M3).** A frozen set of 20 questions, including 5 unanswerable questions, was used to evaluate citation grounding and refusal behavior. Citation-ID groundedness improved from 0.733 to 0.933 after re-ranking. All 5 refusal tests passed before re-ranking; the refusal test has not yet been repeated after re-ranking. Citation-ID matching does not independently establish semantic or clinical correctness.
+
 
 ## 8 · Repository
 
@@ -252,7 +259,6 @@ decision and leave the agent the texts and the cases the rules do not cover.
 ├─ CHARTER.md                the plan, plus the checkpoint updates
 ├─ DATA_DECISIONS.md         every dataset considered, and why it was kept or rejected
 ├─ requirements.txt
-├─ build_daily_cases_from_val.py   validation-only model-to-agent demo
 ├─ data/
 │  └─ data_dictionary.md     every table and column the pipeline writes
 ├─ notebooks/
@@ -265,7 +271,8 @@ decision and leave the agent the texts and the cases the rules do not cover.
 │  ├─ 07_rag_nci_m3.ipynb    the NCI PDQ corpus, retrieval and groundedness (M3)
 │  ├─ 08_agent_m4_vs_ifelse.ipynb   the agent against the if-else baseline (M4)
 │  └─ 09_agent_daily_report.ipynb   the daily report for the dermatologist
-├─ src/                      the runnable image-model pipeline (see src/README.md)
+├─ src/                      the runnable model pipeline (see src/README.md)
+│  └─ build_daily_cases_from_val.py   validation-only model-to-agent demo
 ├─ agent/                    tools, prompts, the loop, guardrails
 ├─ tests/                    regression tests for the shared band policy         
 ├─ evaluation/               eval sets, groundedness, error analysis
@@ -276,7 +283,7 @@ decision and leave the agent the texts and the cases the rules do not cover.
 │  ├─ decisions.md           the frozen decisions for the single test run
 │  ├─ results.md             the baseline table and the key results
 │  └─ results_image_model.md the image model's own report
-└─ presentation/                                                           
+└─ reports/                                                      
 ```
 
 ## 9 · Running it
@@ -300,7 +307,8 @@ The decisions governing the single held-out test run were frozen in `reports/dec
 
 ### Validation-only model to agent demonstration
 
-The reproducible bridge is `build_daily_cases_from_val.py` at repository root.
+
+The reproducible bridge is `src/build_daily_cases_from_val.py`, executed as a Python module from the repository root.
 It uses **stored validation predictions** by default, not the held-out test set.
 It restricts the 220 validation patients (103 malignant; 46.8%) to 138 with
 exactly one lesion and one photo (47 malignant; 34.1%), so the image, symptom
@@ -326,9 +334,14 @@ for evaluation by the project team only and must **never** be supplied to
 the agent. The exported relative `risk_score`/`risk_band` are **not calibrated
 malignancy probabilities or validated clinical risk categories**.
 
-**Manual photograph quality review (before enabling the agent).** Open
-`data/processed/val_top10_quality_template.csv` and inspect the actual photo
-named in `image_filename` for each of the ten IDs:
+
+**Image-quality annotations for the validation demonstration.**
+
+The ten selected images were annotated through an AI-assisted visual review of screenshots. These annotations are used for technical demonstration only. They were not produced by a validated image-quality classifier or independently reviewed by a dermatologist.
+The annotations are stored in `data/processed/val_top10_quality_template.csv`.
+For future runs, original photographs should be reviewed and quality labels validated before they are used by the Agent.
+The following image-quality categories are supported:
+
 
 | `image_quality` | Labeling rule |
 | --- | --- |
@@ -342,14 +355,13 @@ recognizable terms **`blurred`, `too dark`, `too bright`, `too far`, `glare`,
 `not centred`**; use an empty cell if no issue. Do not substitute `blurry`
 for `blurred`: the retake rules recognize the latter spelling.
 
-Once all ten rows are **manually and genuinely** reviewed, save the CSV
-and commit the completed `data/processed/val_top10_quality_template.csv` to
-GitHub. It is an irreplaceable manual annotation; do not commit an empty
-template as if it were reviewed. The builder checks that its ten patient IDs
-match the selected cases. Then run:
+
+The committed validation annotations contain 8 `usable` images and 2 `borderline` images with `glare`.
+To reproduce the daily Agent input using these saved annotations, run the following command from the repository root:
+
 
 ```bash
-python build_daily_cases_from_val.py --quality-file data/processed/val_top10_quality_template.csv
+python -m src.build_daily_cases_from_val --quality-file data/processed/val_top10_quality_template.csv
 ```
 
 In `notebooks/09_agent_daily_report.ipynb`, set `CASES_FILE` to
@@ -361,9 +373,8 @@ models on the PAD validation photos; it creates separate `_fresh` outputs
 and a fresh quality template. **Do not upload the original photographs**
 as part of this demo or treat the report as a clinical recommendation.
 
-The root builder and the older `agent/make_daily_list.py` helper now use
-the **same** queue-relative bands from `src/fusion.py`. The older helper
-recomputes fusion within its sampled day and defaults unchecked photo quality
+
+The builder in `src/` and the legacy `agent/make_daily_list.py` helper use the same queue-relative risk bands defined in `src/fusion.py`. The older helper recomputes fusion within its sampled day and defaults unchecked photo quality
 to `not_checked`, rather than silently treating it as usable.
 
 Every notebook asserts the figures this README quotes. If an assertion fires, the archive has changed and
