@@ -26,23 +26,51 @@ pip install torch==2.11.0 torchvision==0.26.0 --index-url https://download.pytor
 pip install -r requirements.txt
 ```
 
+
 ## Run order
 
+The full training and validation reproduction requires three random seeds (42, 1 and 2). For each seed, the ISIC model is trained once and then fine-tuned on PAD in two variants: standard class weighting (`--scc-boost 1`) and doubled SCC class weighting (`--scc-boost 2`).
+
+Run the following commands from the repository root on a CUDA-enabled machine with the required image files available.
+
 ```bash
-python -m src.build_index --resize-pad            # index + splits, 512 px PAD copies              ~1 min
-python -m src.train --seed 42                     # ISIC training -> models/convnext_milk_s42.pt  ~5 min
-python -m src.finetune_pad --seed 42 --scc-boost 2   # PAD fine-tune -> models/convnext_pad_s42_scc2.pt ~1 min
-python -m src.baseline_dinov2                     # cheapest image baseline                        ~1 min
-python -m src.evaluate                            # decisions, final model, figures                ~5 min
-python -m src.export_model                        # safetensors weights + questionnaire.joblib     <1 min
-python -m src.near_duplicates                     # leakage audit across PAD splits                <1 min
+# 1. Build the index and prepare PAD images
+python -m src.build_index --resize-pad
+
+# 2. Train the ISIC image model with three seeds
+python -m src.train --seed 42
+python -m src.train --seed 1
+python -m src.train --seed 2
+
+# 3. Fine-tune both PAD variants for every seed
+python -m src.finetune_pad --seed 42 --scc-boost 1
+python -m src.finetune_pad --seed 42 --scc-boost 2
+
+python -m src.finetune_pad --seed 1 --scc-boost 1
+python -m src.finetune_pad --seed 1 --scc-boost 2
+
+python -m src.finetune_pad --seed 2 --scc-boost 1
+python -m src.finetune_pad --seed 2 --scc-boost 2
+
+# 4. Evaluate the baselines and select the final model
+python -m src.baseline_dinov2
+python -m src.evaluate
+
+# 5. Export the selected model
+python -m src.export_model
+
+# 6. Run the cross-split near-duplicate audit
+python -m src.near_duplicates
 ```
 
-`src.evaluate` expects seeds 42, 1 and 2 of `train` and of `finetune_pad` with `--scc-boost 1` and `2`.
-**PAD test patients are never loaded by any of these scripts.** The one script that does,
-`python -m src.evaluate_test --frozen`, runs once, on the decisions frozen in `reports/decisions.md`.
-On Windows, run scripts as modules (as above), not from stdin or from notebook cells that define the dataset:
-the data loader starts worker processes that must be able to import the code.
+`src.evaluate` requires all six PAD fine-tuning checkpoints and the three corresponding ISIC training checkpoints. It applies the frozen validation decision rules, compares the SCC-weighting variants and the seed ensemble, and writes the selected model manifest to `models/final_model.json`.
+
+**Held-out test separation.** The training, model-selection and validation scripts do not use held-out PAD test outcomes to select the model. `src.build_index` does process test metadata to construct and verify the frozen splits, while `src.near_duplicates` reads test photographs only for a label-free cross-split leakage audit.
+
+The held-out test was executed once on 30 October 2026 using `python -m src.evaluate_test --frozen`, following the decisions in `reports/decisions.md`. Its results are preserved in `reports/test_results.json`. The test command is not part of routine model selection or validation reproduction.
+
+On Windows, run scripts as modules (as above), not from stdin or notebook cells that define the dataset: data-loader worker processes must be able to import the code.
+
 
 ## Using the model (agent tool `predict_visual_risk`)
 
@@ -69,6 +97,95 @@ release `image-model-v1`, and `src.predict` downloads them into `models/` on fir
 against `models/final_model.json`. The questionnaire model is in git as `models/questionnaire.joblib`; it needs
 the scikit-learn version pinned in `requirements.txt`.
 
+
+## Validation-to-Agent integration (CP3)
+
+`src/build_daily_cases_from_val.py` provides the reproducible connection between PAD validation predictions and the Agent's daily patient list.
+
+By default, the script uses previously computed validation predictions rather than running fresh image inference.
+
+### Demonstration population
+
+The starting point is 220 PAD validation patients, including 103 with malignant lesions.
+
+To ensure that the photograph, symptom answers and prediction correspond to the same lesion, the demonstration includes only patients with exactly one lesion and one photograph. This leaves 138 eligible patients, including 47 with malignant lesions.
+
+A seeded simulation selects 100 candidates, including exactly 10 malignant cases by design. The frozen 60% image / 40% questionnaire percentile-rank fusion ranks these patients and selects the 10 highest-priority cases.
+
+Six of the ten malignant candidates were selected for priority review.
+
+This controlled sampling is intended for technical integration, not for estimating real-world sensitivity or clinical prevalence.
+
+### Reproduce the saved-prediction demonstration
+
+The required processed validation inputs are already committed in the repository:
+
+- `data/processed/val_scores_fused.csv` — stored model predictions.
+- `data/processed/pad_symptom_features.csv` — symptom features.
+- `data/splits/pad_split.csv` — frozen patient and photograph mapping.
+- `data/processed/val_top10_quality_template.csv` — saved image-quality annotations.
+
+Run from the repository root:
+
+```bash
+python -m src.build_daily_cases_from_val --quality-file data/processed/val_top10_quality_template.csv
+```
+
+The script produces:
+
+- `data/processed/daily_cases_val.csv` — ranked Agent input, without diagnostic labels.
+- `data/processed/val_100_candidates_audit.csv` — evaluation audit containing ground-truth labels.
+- `data/processed/val_top10_quality_template.csv` — image-quality annotation template, preserved if already present.
+
+**Do not provide the diagnostic audit file to the Agent.**
+
+The saved image-quality annotations were produced through AI-assisted visual review of screenshots: eight images were marked `usable`, and two were marked `borderline` with `glare`. These labels are demonstration inputs, not results from a validated image-quality classifier or independent dermatologist assessment.
+
+### Generate a report without the Agent
+
+For a deterministic smoke test using the ranked cases:
+
+```bash
+python agent/triage_agent.py --cases data/processed/daily_cases_val.csv --no-agent --out reports/agent/validation_smoke.docx
+```
+
+The report-generation command requires the Agent-layer Python dependencies described in `agent/triage_agent.py`.
+
+The `--no-agent` option generates a report from fixed model evidence. It does not execute an LLM Agent.
+
+### Run the actual Agent
+
+The completed Agent integration is documented in `notebooks/09_agent_daily_report.ipynb`.
+
+Set:
+
+```python
+CASES_FILE = os.path.join(PROCESSED, "daily_cases_val.csv")
+USE_AGENT = True
+```
+
+The executed notebook demonstrates 10 successful Agent reviews out of 10 patients, with zero retries, zero fallbacks and no ranking changes.
+
+The committed outputs are:
+
+- `reports/agent/triage_report_validation_20261031.docx`
+- `reports/agent/triage_report_validation_20261031_agent_log.json`
+
+This establishes technical integration between stored validation predictions, prioritization, the Agent and the final Word report. It does not establish clinical accuracy or deployment readiness.
+
+### Optional fresh inference
+
+The builder also supports:
+
+```bash
+python -m src.build_daily_cases_from_val --fresh-inference
+```
+
+This option requires the original PAD validation photographs, model weights and dependencies. It generates separate `_fresh` outputs and a new quality-review template.
+
+The committed CP3 integration demonstration used stored predictions, not this optional fresh-inference path.
+
+
 ## Files
 
 | File | Purpose |
@@ -84,6 +201,7 @@ the scikit-learn version pinned in `requirements.txt`.
 | `questionnaire.py` | the questionnaire baseline from notebook 02, reproduced for paired comparison |
 | `fusion.py` | 60/40 rank-average fusion |
 | `triage.py` | the final model: ranks a queue from photos and answers |
+| `build_daily_cases_from_val.py` | validation-only bridge from stored model predictions to ranked Agent input; supports optional fresh inference and image-quality annotations |
 | `baseline_dinov2.py` | frozen DINOv2 features + logistic regression |
 | `evaluate.py` | applies the pre-set decision rules, picks the final model, writes results and figures |
 | `evaluate_test.py` | the single run on PAD test patients, written before it runs |
