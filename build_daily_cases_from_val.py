@@ -8,10 +8,13 @@ Place this file in the root of IfatDav/skin-lesion-assistant, then run:
     python build_daily_cases_from_val.py --fresh-inference
     python build_daily_cases_from_val.py --fresh-inference --quality-file data/processed/val_top10_quality_fresh_template.csv
 
-No model training/inference is performed here. The image and questionnaire scores
-were calculated previously by the project's models on PAD validation patients.
+By default, scores come from previously run PAD validation models (no new inference).
+With --fresh-inference, the script re-runs both trained models on PAD photos.
 We restrict this demo to patients with exactly one lesion and one photo, so the
 patient-level score, displayed photo, and symptom form refer to the same lesion.
+This restricts 220 validation patients (103 malignant, 46.8%) to 138 eligible
+patients (47 malignant, 34.1%). Controlled 10% prevalence in the 100-person
+demo does not remove selection bias: this is NOT a representative clinical test.
 The 10% malignancy prevalence is achieved by controlled sampling for a simulated
 day, NEVER by using diagnosis during the ranking stage or agent review.
 The scores and percentile bands are relative ranking values, NOT probabilities.
@@ -23,7 +26,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from src.fusion import fuse
+from src.fusion import fuse, rank_band
 
 ROOT = Path(__file__).resolve().parent
 SCORES_CSV = ROOT / "data/processed/val_scores_fused.csv"
@@ -40,17 +43,6 @@ N_PRIORITY = 10
 W_IMAGE = 0.6  # locked final model in models/final_model.json
 SYMPTOMS = ("itch", "grew", "hurt", "changed", "bleed", "elevation")
 VALID_QUALITY = {"usable", "borderline", "unusable", "not_a_lesion"}
-
-
-def rank_band(pct_rank: float) -> str:
-    """DEMO-ONLY descriptive percentile bands, not validated clinical risk bands."""
-    if pct_rank >= 0.90:
-        return "very high"
-    if pct_rank >= 0.70:
-        return "high"
-    if pct_rank >= 0.40:
-        return "moderate"
-    return "low"
 
 
 def yes_no(value) -> str:
@@ -125,6 +117,11 @@ def build(quality_file: Path | None = None, fresh_inference: bool = False) -> pd
     assert merged.patient_id.is_unique
     assert (merged["y"].astype(int) == merged["label"].astype(int)).all(), "Mismatched outcome labels"
     assert (merged["split"] == "val").all(), "Non-validation patient included"
+    print(f"Demo eligibility: {len(scores)} validation patients "
+          f"({scores['y'].astype(int).mean():.1%} malignant) -> "
+          f"{len(merged)} single-lesion/single-photo patients "
+          f"({merged['y'].astype(int).mean():.1%} malignant). "
+          "This is a non-representative demonstration subset.")
 
     pos, neg = merged.loc[merged.y.eq(1)], merged.loc[merged.y.eq(0)]
     if len(pos) < N_MALIGNANT or len(neg) < (N_CANDIDATES - N_MALIGNANT):
@@ -215,7 +212,10 @@ def build(quality_file: Path | None = None, fresh_inference: bool = False) -> pd
     print(f"Candidate audit:    {audit_file.relative_to(ROOT)}")
     print(f"Quality template:   {quality_template.relative_to(ROOT)}")
     if quality_file is None:
-        print("WARNING: image_quality is 'not_checked'. Use --no-agent for smoke test; annotate all 10 photos first.")
+        print("WARNING: image_quality is 'not_checked'. For a smoke test, set "
+              "CASES_FILE to the generated CSV and USE_AGENT = False in notebook 09 "
+              "(or use --no-agent with agent/triage_agent.py). Review all 10 "
+              "photos and re-run this script with --quality-file before an agent run.")
     else:
         print("Manual image-quality labels loaded. Ready for an agent integration test (not clinical use).")
     return out
