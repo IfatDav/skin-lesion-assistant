@@ -1,0 +1,11 @@
+patient_id,image_filename,image_quality,image_issues
+PAT_840,PAT_840_1595_981.png,borderline,glare
+PAT_687,PAT_687_1304_898.png,usable,
+PAT_887,PAT_887_1688_436.png,usable,
+PAT_210,PAT_210_316_401.png,borderline,glare
+PAT_618,PAT_618_1174_596.png,usable,
+PAT_393,PAT_393_793_852.png,usable,
+PAT_428,PAT_428_845_189.png,usable,
+PAT_708,PAT_708_1333_222.png,usable,
+PAT_2114,PAT_2114_4609_615.png,usable,
+PAT_911,PAT_911_1728_101.png,usable,
