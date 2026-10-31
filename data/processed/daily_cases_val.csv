@@ -1,0 +1,11 @@
+patient_id,rank,risk_score,risk_band,image_risk_band,symptom_risk_band,age,body_site,patient_note,image_path,image_quality,image_issues,itch,grew,hurt,changed,bleed,elevation
+PAT_840,1,0.994,very high,very high,very high,50,ear,,PAT_840_1595_981.png,borderline,glare,yes,unknown,yes,unknown,yes,yes
+PAT_687,2,0.992,very high,very high,very high,49,nose,,PAT_687_1304_898.png,usable,,no,yes,no,yes,no,yes
+PAT_887,3,0.972,very high,very high,very high,52,back,,PAT_887_1688_436.png,usable,,yes,unknown,no,unknown,yes,yes
+PAT_210,4,0.962,very high,very high,very high,38,lip,,PAT_210_316_401.png,borderline,glare,yes,yes,yes,no,yes,yes
+PAT_618,5,0.958,very high,very high,very high,70,ear,,PAT_618_1174_596.png,usable,,no,yes,no,no,yes,yes
+PAT_393,6,0.942,very high,very high,very high,57,neck,,PAT_393_793_852.png,usable,,yes,no,no,no,yes,yes
+PAT_428,7,0.932,very high,very high,high,73,face,,PAT_428_845_189.png,usable,,yes,no,no,no,yes,no
+PAT_708,8,0.928,very high,very high,very high,70,back,,PAT_708_1333_222.png,usable,,yes,unknown,no,unknown,no,yes
+PAT_2114,9,0.916,very high,very high,very high,70,nose,,PAT_2114_4609_615.png,usable,,yes,no,no,no,no,yes
+PAT_911,10,0.878,high,high,high,55,neck,,PAT_911_1728_101.png,usable,,no,unknown,no,unknown,no,yes
