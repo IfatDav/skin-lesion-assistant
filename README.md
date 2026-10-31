@@ -63,8 +63,7 @@ slot, the median returns to **25.0 days**, and the policy becomes slightly **wor
 the urgent slots come out of the routine queue that everyone else, including the other 59%, is waiting in.
 
 Three numbers belong beside the median. **44%** of malignant patients still wait more than 7 days. The 90th
-percentile is **27 days**, against 24 at baseline. And the median wait for a benign lesion rises from 24 to
-**27 days**. The policy moves cancer patients forward by moving everyone else back, and at 30 urgent slots —
+percentile is **27 days**, against 24 at baseline. And the median wait for a benign lesion rises from 25 to 27 days. The policy moves cancer patients forward by moving everyone else back, and at 30 urgent slots —
 where only 5% of cancer patients are left over target — a benign patient waits 34 days. The real question
 is therefore not how many slots the model needs, but how much longer the clinic is willing to make everyone
 else wait. That is a product decision, and the simulation is there to price it.
