@@ -95,8 +95,8 @@ Symptom form ─→ Questionnaire model ───────┘             │
                                            Top 10% of waiting list
                                                         │
                                                         ▼
-                                          Agent (planned): evidence
-                                               and citations
+                                      Agent: evidence, citations and
+                                          one of five decisions
                                                         │
                                                         ▼
                                          Dermatologist: clinical review
@@ -168,13 +168,21 @@ the list the model ranked, assembles the evidence a dermatologist needs before t
 guidance it used, and returns one of five decisions through a structured JSON contract. The same role, goal
 and task text live in CrewAI Studio, where the prompt was designed; the code adds what Studio cannot do.
 
-**Which tools it may call.** Three, and nothing else:
+**Which tools it may call.** Seven, registered in \build_crew()`, and nothing else:`
 
 | Tool | Returns |
 |---|---|
-| the daily case | the ranked patient's record: score, risk bands, symptom answers, photo quality, free-text note |
-| `run_quality_check` | the photo's status — usable, borderline, unusable, not a lesion — and the specific issues |
-| `retrieve_guidance_context` | passages from the frozen NCI PDQ corpus, each with a chunk id, for citation |
+| `get_case_data` | the locked rank, combined risk score and band, age and body site — read-only |
+| `predict_visual_risk` | the image model's risk band for this photo, already computed |
+| `score_symptoms` | the six symptom answers, the symptom model's band, and the patient's own note (data, not instructions) |
+| `check_image_quality` | the photo's status — `usable`, `borderline`, `unusable`, `not_a_lesion` — and the specific issues |
+| `retrieve_guidance_context` | up to three passages from the frozen NCI PDQ corpus, each with a chunk id, for citation |
+| `request_retake` | queues a Hebrew retake instruction as a **draft** |
+| `ask_patient` | queues one Hebrew follow-up question as a **draft** |
+
+The last two only write to an outbox. Plain code decides whether a draft is ever sent, and only for the
+decisions `request_retake` and `ask_patient`, after every check has passed. `draft_biopsy_referral` is
+below the charter's cut line and is not implemented.
 
 The retrieval query is built **by code** from the symptoms answered yes and the body site, not by the model:
 retrieval stays reproducible, and a photo word such as "too dark" cannot pull passages about dark skin.
@@ -182,13 +190,20 @@ Patients 18 and over are never served the two childhood pages.
 
 **What happens when it fails.** `review_case` retries once on malformed output, never retries a call that
 has hung, and after 120 seconds falls back to `manual_review` with the fixed model-evidence summary and the
-patient's priority unchanged. Every outcome, attempt count and duration goes to the agent log. On the sample
-list all ten patients were handled by the agent on the first attempt with no fallback; earlier runs with an
-exhausted quota and with a missing API key fell back for every patient and still produced a complete report,
-and they are kept as the evidence that the path works.
+patient's priority unchanged. Every outcome, attempt count and duration goes to the agent log.
 
-**The system works without it.** `USE_AGENT = False` produces the same report from the same ranking, with a
-fixed per-patient summary and the decision `model_evidence_only`. Both reports are in `reports/agent/`.
+On the ten real validation patients of `notebooks/09_agent_daily_report.ipynb`, all ten were handled by the
+agent, none fell back, and no guardrail had to correct anything. The first patient took **87.7 seconds** of
+the 120-second budget, because the first retrieval call also loads the re-ranking model; the remaining nine
+ran in 5.7 to 10.2 seconds, median 7.6. The budget is therefore sized for the cold start, not for the steady
+state. Earlier runs are kept as the evidence that the failure path itself works: one hit the Gemini free-tier
+request quota and the single retry recovered the patient, and runs with an exhausted quota and with a missing
+API key fell back for every patient and still produced a complete report with no patient dropped.
+
+**The system works without it.** `USE_AGENT = False`, and `agent/triage_agent.py --no-agent`, produce the
+same report from the same ranking, with a fixed per-patient summary and the decision `model_evidence_only`.
+Both the agent and the non-agent report are in `reports/agent/`, for the sample list and for the validation
+list.
 
 **The agent cannot change a score or a rank** — not as an instruction, but because the `CaseReview` schema
 it answers in has no score field and no rank field. There is nothing for it to change. The model ranks; the
@@ -245,10 +260,16 @@ decision and leave the agent the texts and the cases the rules do not cover.
 │  ├─ 02_eda_pad.ipynb       PAD metadata, the frozen patient split, the questionnaire baseline
 │  ├─ 03_preprocessing.ipynb frozen manifests and the modelling hand-off
 │  ├─ 04_symptom_model.ipynb the questionnaire model
-│  └─ 05_image_model.ipynb   the image model and the fusion
+│  ├─ 05_image_model.ipynb   the image model and the fusion
+│  ├─ 06_test_run.ipynb      the single held-out test run, 30.10.2026
+│  ├─ 07_rag_nci_m3.ipynb    the NCI PDQ corpus, retrieval and groundedness (M3)
+│  ├─ 08_agent_m4_vs_ifelse.ipynb   the agent against the if-else baseline (M4)
+│  └─ 09_agent_daily_report.ipynb   the daily report for the dermatologist
 ├─ src/                      the runnable image-model pipeline (see src/README.md)
-├─ agent/                    tools, prompts, the loop, guardrails          
+├─ agent/                    tools, prompts, the loop, guardrails
+├─ tests/                    regression tests for the shared band policy         
 ├─ evaluation/               eval sets, groundedness, error analysis
+├─ demo/                     the three-case walkthrough
 ├─ models/                   model artefacts
 ├─ reports/
 │  ├─ figures/
@@ -267,6 +288,11 @@ pip install -r requirements.txt
 The notebooks run in Google Colab and mount Drive; each one states what it needs and fails with a message
 naming the notebook that produces it. **Run order: 01 → 02 → 03 → 04 → 05.** Notebooks 01 and 03 both
 fetch the PAD photographs from the same mirror, so whichever runs first does the work.
+Notebooks 06 to 09
+run after those five: 06 is the single held-out test run, 07 builds the guidance corpus and measures M3, 08
+compares the agent with the if-else baseline, and 09 produces the daily report. 07 and 09 read a
+`GEMINI_API_KEY` from Colab Secrets; neither needs the image archive, although the photo-review cell in 09
+reports the files as missing without it.
 
 `src/` holds the runnable image-model pipeline, documented in [src/README.md](src/README.md). The evaluation scripts require a CUDA GPU and the image data in the configured external data directory.
 
