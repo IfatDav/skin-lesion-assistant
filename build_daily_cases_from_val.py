@@ -1,12 +1,18 @@
-"""Build a reproducible, validation-only, model-score-to-agent demo.
 
-Place this file in the root of IfatDav/skin-lesion-assistant, then run:
-    python build_daily_cases_from_val.py
-    # review the ten real validation photographs and fill in the quality template
-    python build_daily_cases_from_val.py --quality-file data/processed/val_top10_quality_template.csv
-    # for a fresh image-to-agent run, make and label its own template:
-    python build_daily_cases_from_val.py --fresh-inference
-    python build_daily_cases_from_val.py --fresh-inference --quality-file data/processed/val_top10_quality_fresh_template.csv
+"""Build a reproducible validation-only model-score-to-agent demonstration.
+
+This module belongs in src/build_daily_cases_from_val.py.
+Run the following commands from the repository root:
+
+    python -m src.build_daily_cases_from_val
+
+    # After reviewing the ten real validation photographs and recording quality:
+    python -m src.build_daily_cases_from_val --quality-file data/processed/val_top10_quality_template.csv
+
+    # Optional fresh image-model inference: first generate its list and template,
+    # then review the selected photos and rebuild with their quality annotations.
+    python -m src.build_daily_cases_from_val --fresh-inference
+    python -m src.build_daily_cases_from_val --fresh-inference --quality-file data/processed/val_top10_quality_fresh_template.csv
 
 By default, scores come from previously run PAD validation models (no new inference).
 With --fresh-inference, the script re-runs both trained models on PAD photos.
@@ -28,7 +34,7 @@ import pandas as pd
 
 from src.fusion import fuse, rank_band
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[1]  # repository root; script lives in src/
 SCORES_CSV = ROOT / "data/processed/val_scores_fused.csv"
 FEATURES_CSV = ROOT / "data/processed/pad_symptom_features.csv"
 IMAGES_CSV = ROOT / "data/splits/pad_split.csv"
@@ -229,3 +235,4 @@ if __name__ == "__main__":
                     help="Recompute scores from PAD photographs using both trained models (requires image files)")
     args = ap.parse_args()
     build(args.quality_file, fresh_inference=args.fresh_inference)
+
