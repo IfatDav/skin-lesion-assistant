@@ -1,0 +1,62 @@
+[
+ {
+  "patient_id": "PAT_840",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 87.7
+ },
+ {
+  "patient_id": "PAT_687",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 6.0
+ },
+ {
+  "patient_id": "PAT_887",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 6.7
+ },
+ {
+  "patient_id": "PAT_210",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 8.7
+ },
+ {
+  "patient_id": "PAT_618",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 10.2
+ },
+ {
+  "patient_id": "PAT_393",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 9.1
+ },
+ {
+  "patient_id": "PAT_428",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 6.8
+ },
+ {
+  "patient_id": "PAT_708",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 8.3
+ },
+ {
+  "patient_id": "PAT_2114",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 5.7
+ },
+ {
+  "patient_id": "PAT_911",
+  "outcome": "agent",
+  "attempts": 1,
+  "seconds": 6.3
+ }
+]
