@@ -1,13 +1,22 @@
 # Data Decisions · Skin Lesion Triage for Healthcare Providers
 
-This file backs the data section of [CHARTER.md](CHARTER.md). All numbers come from checks against the original sources, run on 18–19.9.2026 (DDI checked 22.9.2026).
+
+This file backs the data section of [CHARTER.md](CHARTER.md). Initial source checks were performed on 18–19 September 2026 (DDI checked on 22 September). The implementation details and results below were updated through 31 October 2026. Historical source-screening findings are distinguished from the final modelling datasets and evaluations.
+
+
 
 ## 1 · Four checks per source
+
 | Source | Access | Size | Licence | Signal |
 |---|---|---|---|---|
-8,837 labelled images (9,316 clinical close-ups minus the 479 unlabelled benchmark; still includes PAD's ISIC copy): **522 melanomas**, 1,005 nevi.. MILK10k: 5,240 lesions, 95.7% confirmed by histopathology, skin-tone field 0–5 |  Per image: CC-BY-NC 5,719 (all of MILK10k) · CC-BY 3,545 · CC-0 52. Only 72 melanomas are usable commercially | Age + sex + site alone: ROC-AUC 0.74 (GroupKFold) |
-| **PAD-UFES-20** (test set of real phone photos; images from patients **outside** the test split also train the symptom model) | Metadata CSV from Mendeley; images also in ISIC | 2,298 images · 1,641 raw lesion ids = **1,891 distinct lesions** · 1,373 patients · **52 melanomas** | CC BY 4.0 (checked on Mendeley) | Age + site + 6 symptoms: ROC-AUC 0.90 (GroupKFold by patient) — measured before the missingness policy was frozen; the honest baseline is variant D, CV AUC 0.860 and validation patient AUC 0.867 (`reports/results.md` §6) |
-| **NCI PDQ** patient summaries (RAG corpus) | cancer.gov | 10–20 documents | "All text within NCI products is free of copyright"; credit NCI | Coverage checked while writing the M3 question set. The module 5 retrieval work showed why a dedicated corpus is needed: a question about official treatment guidelines correctly returned "I don't know", because arXiv abstracts do not contain them |
+| **ISIC Archive — clinical close-ups, including MILK10k** | ISIC Archive API and image downloads; source metadata recorded in `data/raw/isic_clinical_metadata.csv` | 9,316 clinical images initially identified. Excluding the PAD copy (2,298) and unlabelled benchmark (479) leaves 6,539 candidates. After preprocessing exclusions, **6,404 labelled images** remain (3,687 malignant, 470 melanomas). | CC-BY-NC, CC-BY and CC-0, depending on the image | Main source for image-model training. The ISIC-only model achieved patient AUC 0.778 on PAD validation, compared with 0.956 after PAD fine-tuning. This demonstrates the importance of adapting to the target domain. |
+| **PAD-UFES-20** | Official metadata from Mendeley; photographs from a public mirror verified against PAD images in ISIC | **2,298 images, 1,891 distinct lesions, 1,373 patients, 52 melanomas; 47.4% malignant** | CC BY 4.0 | Target domain of smartphone photographs and the source of symptom answers. Used for patient-level training, validation and held-out testing. The frozen questionnaire baseline achieved patient AUC 0.867 on validation. |
+| **NCI PDQ — Health Professional summaries** | NCI Cancer.gov; frozen text stored in `data/processed/rag/nci_corpus.json` | **7 documents, 224 sections, 724 chunks** | NCI public-domain text; credit NCI | Official clinical guidance corpus for RAG. Citation-ID groundedness improved from 0.733 to 0.933 after re-ranking. The 5/5 out-of-corpus refusals were tested before re-ranking only. |
+
+**ISIC licensing note.** The initial 9,316-image screening pool contained 5,719 CC-BY-NC, 3,545 CC-BY and 52 CC-0 images. These counts describe the initial source pool, not the final 6,404-image dataset. Commercial reuse requires verification of the licences applicable to the actual images and trained model.
+
+**Dataset scope.** The 6,404 ISIC images form the cleaned labelled pool; not all were used for gradient-based training. The training and evaluation subsets are documented in `data/data_dictionary.md`, `src/README.md` and `reports/results_image_model.md`.
+
 
 ## 2 · Rejected sources
 | Source | Reason |
@@ -20,10 +29,11 @@ This file backs the data section of [CHARTER.md](CHARTER.md). All numbers come f
 | **Generative "phone-to-dermoscopic" conversion** | A dermatoscope (≈10× magnification, polarised light) captures subsurface structures that a phone camera cannot. A generator would invent them, which is unsafe for a medical app. |
 
 ## 3 · Findings that shape the design
-- **Missing fields leak the label.** In PAD, fields such as smoking, history and Fitzpatrick type are missing in 60–85% of benign cases and 0% of cancers. The *count of missing fields alone* reaches ROC-AUC 0.83, and "all fields" reaches 0.949, partly through this leak. We use only fields the app always asks.
+- **Missing fields leak the label.** In PAD-UFES-20, optional fields such as medical history, smoking and Fitzpatrick skin type are recorded unevenly, largely because the dataset includes different clinical and biopsy workflows. The count of missing optional fields alone achieves **ROC-AUC 0.839** on development data, revealing an administrative shortcut rather than a clinically meaningful signal. The final questionnaire baseline therefore uses only age, body site and the six symptom questions. Missing answers are imputed inside the training pipeline, without missingness indicators, and `biopsed` is excluded entirely. The frozen questionnaire baseline achieves patient AUC **0.867** on validation (`reports/results.md` §6).
 - **Symptoms separate cancer types.** "Bleeds" and "hurts" point to BCC and SCC (0% melanoma). **"Changed"** is the strongest melanoma signal: 16.8% melanoma when yes vs 0.5% when no.
 - **Leakage through duplicates.** A naive image-level split puts 43% of PAD test images next to their own lesion in train by raw lesion id, and **29.3%** once lesion ids are namespaced by patient, which is the figure the project reports (39% for HAM10000). MILK10k has no patient IDs. PAD reuses **250 of its 1,641 lesion ids across different patients**, so the raw id is not a lesion and the key must be `patient_id::lesion_id` — **1,891 distinct lesions**. PAD also exists twice, on Mendeley and inside ISIC; we use one copy only.
-- **Prevalence mismatch.** 51% of the ISIC clinical images are malignant, because they are lesions that were chosen for biopsy. The product answers this by design: it fills a fixed daily capacity (top-10) instead of applying a probability threshold, so a miscalibrated score shifts every number equally and leaves the ranking intact.
+- **Prevalence mismatch.** The cleaned ISIC pool contains **57.6% malignant images**, and PAD-UFES-20 contains **47.4% malignant images**. Both datasets substantially overrepresent suspicious or biopsy-selected lesions compared with a general dermatology waiting list. The system therefore uses a capacity-based ranking policy rather than a fixed malignancy-probability threshold. The product policy flags the highest-risk **10% of the current waiting list**, while the primary M2 evaluation uses a standardized scenario of **10 priority-review slots per 100 arrivals at an assumed 10% malignancy prevalence**. These are distinct definitions. Capacity-based ranking does not eliminate selection bias or guarantee performance under real-world prevalence shifts.
+
 
 ## 4 · Critical-inquiry experiments, and what became of them
 
