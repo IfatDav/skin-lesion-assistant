@@ -247,6 +247,7 @@ else on the near side of the line is built.**]**
 | 4.10 | Finalized Product Charter & Data Verification |
 | **18.10 · CP1** | Core End-to-End Pipeline (No Agent); Baseline Evaluation incl. re-measured metadata floor; M3 Groundedness Benchmark |
 | **30.10 · CP2** | Agent Orchestration Layer Integrated; M4 Validation; 1-Minute Live Demo |
+| **31.10 · CP3** | Validation Prediction-to-Agent Integration; Real PAD Patient Cases; End-to-End Report Generation and Verification |
 | **1.11** | Repo frozen ahead of the mentoring session |
 | **4.11** | Individual mentoring session (working system + draft deck) |
 | 12.11 | Repository cleanup, final evaluation, and stakeholder presentation deck |
@@ -343,6 +344,107 @@ direction of that error is argued rather than measured: the photograph carries a
 a benign label in the kept row, so a model that scores it highly is charged a false alarm, which can lower
 the reported figure but cannot raise it. The git history carries commits from two of the four team members;
 the other two contributed through files merged under those accounts.
+
+
+### CP3 · 31.10 — validation predictions connected to the Agent
+
+**1. What works end to end.**
+
+The integration gap identified at CP2 has been closed for the validation demonstration.
+
+`src/build_daily_cases_from_val.py` now connects previously computed PAD validation predictions to the Agent's daily-case input.
+
+The demonstration follows this pipeline:
+
+Stored image and questionnaire predictions → 60/40 rank fusion → priority list → image-quality annotations → CrewAI Agent → dermatologist Word report.
+
+The starting point is 220 PAD validation patients (103 malignant). To ensure that each image, symptom form and model score refer to the same lesion, the demonstration is restricted to 138 eligible patients with exactly one lesion and one photograph (47 malignant).
+
+A seeded simulation selects 100 candidates, including 10 malignant cases by design. The frozen 60/40 percentile-rank fusion ranks these candidates and selects the 10 highest-priority patients.
+
+Six of the ten malignant cases were included in the priority list.
+
+Ground-truth diagnoses are stored separately in `data/processed/val_100_candidates_audit.csv` for evaluation purposes. They are never included in the Agent's input.
+
+**2. Agent execution and verification.**
+
+The ten selected patients were processed in `notebooks/09_agent_daily_report.ipynb` with `USE_AGENT = True`.
+
+Results of the final committed run:
+
+| Check | Result |
+|---|---|
+| Patients selected for priority review | 10 |
+| Successful Agent executions | 10/10 |
+| Retries | 0 |
+| Fallbacks | 0 |
+| `proceed` decisions | 8 |
+| `proceed_with_flag` decisions | 2 |
+| Guardrail corrections | 0 |
+| Citations retained | 10 |
+| Distinct cited source chunks | 3 |
+| Patient ranking preserved | Yes |
+| Word report generated | Yes |
+| Regression tests | 4 passed |
+
+Image-quality annotations were produced through an AI-assisted visual review of screenshots: 8 images were labelled `usable` and 2 were labelled `borderline`, both with `glare`.
+
+These annotations are demonstration inputs, not outputs of a validated image-quality classifier or independent dermatologist assessment.
+
+The Agent's two `proceed_with_flag` decisions followed the existing policy: borderline image quality does not automatically delay a patient in the `very high` priority band.
+
+The Word report was verified to include all ten patients in the original model-ranking order. The committed execution log matches the final notebook output.
+
+**3. Committed evidence.**
+
+The reproducible integration and its outputs are documented in:
+
+- `src/build_daily_cases_from_val.py` — validation prediction-to-Agent bridge.
+- `data/processed/daily_cases_val.csv` — ranked Agent input.
+- `data/processed/val_100_candidates_audit.csv` — candidate evaluation audit, including diagnostic labels.
+- `data/processed/val_top10_quality_template.csv` — image-quality annotations.
+- `notebooks/09_agent_daily_report.ipynb` — executed integration notebook and verification checks.
+- `reports/agent/triage_report_validation_20261031.docx` — final dermatologist report.
+- `reports/agent/triage_report_validation_20261031_agent_log.json` — matching Agent execution log.
+- `tests/test_risk_bands.py` — regression tests for the shared priority-band policy.
+
+The original non-Agent report-generation path also remains available and was tested separately.
+
+**4. Metrics and decisions since CP2.**
+
+The integration work did not change the frozen model, evaluation methodology or held-out test results.
+
+- **M1:** Met its simulated median waiting-time target (24.0 to 1.0 days), while some patients experience longer waits because priority appointments are reallocated from existing capacity.
+- **M2:** Not met. Held-out test sensitivity remains 0.664 (95% CI 0.570–0.750), below the target of 0.90.
+- **M3:** Citation-ID groundedness reached 0.933 after re-ranking. The 5/5 out-of-corpus refusals were measured before re-ranking; refusal behavior after re-ranking has not been independently re-tested.
+- **M4:** Not met on decision accuracy. The Agent scored 9/15, the system with guardrails scored 11/15, and the if-else baseline scored 12/15. The tested ranking-preservation safeguards held.
+
+The integration confirms technical execution, not improved clinical sensitivity.
+
+**5. Remaining limitations and next steps.**
+
+The CP3 demonstration is complete for the specific stored-prediction-to-Agent handoff, but it is not a full prospective clinical workflow.
+
+Remaining limitations:
+
+- The final demonstration used stored model predictions rather than executing fresh image inference from the original photographs.
+- The 100-candidate queue was sampled to contain 10 malignant cases and is not representative of real clinical prevalence.
+- Only single-lesion, single-photo patients were eligible.
+- Four of the ten malignant cases were not selected for priority review in the demonstration.
+- Automated image-quality assessment and non-lesion detection are not yet connected.
+- Risk scores and priority bands are queue-relative ranking measures, not calibrated probabilities of malignancy.
+- M3 refusal behavior after re-ranking remains to be re-evaluated.
+- The blind surgical-marker ink analysis remains unfinished; 498 test photographs await manual annotation.
+- Production costs and clinical generalization have not been validated.
+
+**Next steps:** complete the remaining documentation and presentation materials; evaluate the unresolved data and Agent limitations; and, if time permits, demonstrate fresh photograph-to-report inference without changing the frozen test results.
+
+**CP3 conclusion.**
+
+The project now demonstrates a reproducible technical connection between stored validation predictions, deterministic patient prioritization, Agent-generated evidence and a clinician-facing report.
+
+This closes the integration gap documented at CP2 while preserving the distinction between technical success and clinical validation.
+
 
 ---
 ¹ Murad H et al. *Measuring geographical disparities in waiting times for community-based specialist care.* Israel Journal of Health Policy Research, 2025. [doi:10.1186/s13584-025-00702-7](https://doi.org/10.1186/s13584-025-00702-7). Covers all dermatologists in all four health funds, 2019–2023.
