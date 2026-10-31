@@ -7,8 +7,7 @@ import pandas as pd
 
 from src.fusion import rank_band
 from agent.make_daily_list import make_daily_list
-from build_daily_cases_from_val import rank_band as bridge_rank_band
-
+from src.build_daily_cases_from_val import rank_band as bridge_rank_band
 
 class RiskBandTests(unittest.TestCase):
     def test_boundaries(self):
