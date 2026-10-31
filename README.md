@@ -38,7 +38,15 @@ a bug to be tuned away. M1 is met on the median, but the median is the weakest p
 note below says why. `reports/results.md`, `reports/m1_queue_simulation.json` and
 `notebooks/08_agent_m4_vs_ifelse.ipynb` carry the diagnoses.
 
-**Prioritization policy.** Every morning, the system ranks all patients currently on the dermatologist's waiting list by their combined risk score and flags the highest-risk **10% of the waiting list** for priority review. The number of flagged patients scales with the queue size (e.g., 5 out of 50, 10 out of 100, or 30 out of 300). The policy applies to the entire waiting list at the time of ranking, not only to new daily arrivals. Patients who are not flagged retain their existing appointments. The dermatologist makes all clinical and scheduling decisions.
+
+**Prioritization policy.** Every morning, the system ranks all patients currently on the dermatologist's waiting list by their combined risk score and flags the highest-risk **10% of the waiting list** for priority review. The number of flagged patients scales with the queue size (e.g., 5 out of 50, 10 out of 100, or 30 out of 300). The policy applies to the entire waiting list, not only to new daily arrivals.
+
+Flagging a patient for priority review does not automatically change an appointment. The dermatologist makes all clinical and scheduling decisions.
+
+However, the M1 simulation demonstrates an important operational trade-off: when urgent appointments are reallocated from existing daily capacity, some non-prioritized patients experience longer waiting times, even if their relative order in the routine queue is preserved.
+
+Guaranteeing that prioritization does not delay other patients would require additional appointment capacity rather than reallocating existing slots. The current fixed-capacity simulation does not establish such a guarantee.
+
 
 **M1, and what the median hides.** A simulated clinic: 100 appointments a day, 100 arrivals, 10%
 prevalence, the waiting list re-ranked every morning by the final model, and 10 of the day's appointments
