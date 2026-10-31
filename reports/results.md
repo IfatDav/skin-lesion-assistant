@@ -287,9 +287,3 @@ augmentation has to attack.
 - Independent clinical and generalization evaluation.
 
 
-- **Surgical-marker ink**, a known shortcut visible on some PAD photographs. An automatic detector failed
-  validation. After the test run the test photographs are labelled for ink *blind* to diagnosis and score,
-  and benign inked photographs are compared with benign photographs without ink.
-- **Groundedness (M3)** of the agent's guidance, on the frozen set of 20 questions including 5 that the
-  corpus cannot answer.
-- **Running cost** at the assumed volume of 100 arrivals a day.
