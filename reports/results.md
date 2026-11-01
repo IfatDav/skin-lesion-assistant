@@ -278,6 +278,64 @@ augmentation has to attack.
 
 **Validation-to-Agent integration (CP3).** Completed on 31 October 2026 using stored PAD validation predictions. Ten selected patients were processed successfully by the Agent, with zero retries and zero fallbacks. The resulting Word report and execution log are committed in `reports/agent/`. This demonstrates technical integration, not clinical validation.
 
+
+---
+
+## 10 · M1 exploratory follow-up: queue safety and capacity
+
+**Status: Original M1 median target met; operational no-delay safety not demonstrated.**
+
+### Frozen M1 result
+
+The original simulation evaluated 100 daily arrivals, 100 appointments, and 10 reserved priority slots.
+
+- Malignant median wait: 24.0 → 1.0 days.
+- Malignant patients waiting over 7 days: 43.6% with triage.
+- Benign median wait: 25.0 → 27.0 days.
+
+The predefined M1 median target (≤7 days) was met, but prioritization delayed non-prioritized patients.
+
+The original results remain unchanged in `reports/m1_queue_simulation.json`.
+
+### Exploratory additional-capacity scenarios
+
+Adding 10 appointments per day improved waiting times substantially when arrivals remained at 100 per day.
+
+However, capacity exceeded demand, causing the initial backlog to gradually decline. These results cannot establish that the same performance would persist under balanced demand.
+
+With 110 arrivals and 110 appointments per day, prioritization reduced the malignant median wait from 24 to 13 days, while increasing the benign median wait from 25 to 27 days.
+
+Full exploratory results:
+`reports/m1_extra_capacity_exploratory.json`.
+
+### Multi-seed stability analysis
+
+Five random seeds were evaluated with variable daily arrivals (mean 100), capacity 110, and 10 priority slots.
+
+| Metric | Without triage | With triage |
+|---|---:|---:|
+| Malignant waiting >7 days | 21.9% | 10.5% |
+| Benign waiting >7 days | 25.0% | 26.2% |
+| Benign waiting-time P90 | 11.2 days | 12.2 days |
+
+Prioritization reduced delayed malignant cases across all five seeds, but benign waiting-time metrics worsened on average.
+
+Results: `reports/m1_stability_exploratory.json`.
+
+### Conclusions and limitations
+
+1. M1 met its predefined median waiting-time target in the original simulation.
+2. Prioritization improved simulated access for malignant cases across the exploratory comparisons.
+3. The no-delay safety principle was not demonstrated for non-prioritized patients.
+4. Additional capacity improves access but requires real operational resources.
+5. These findings are exploratory simulations, not clinical validation or evidence of real-world effectiveness.
+6. Five seeds, aggregate waiting-time metrics, and the current simulation assumptions do not establish individual-level safety or statistical certainty.
+
+No original M1 evaluation results, model parameters, or frozen test decisions were changed.
+
+Further operational and clinical validation would be required before deployment.
+
+
 **Still not measured or completed:**
 
 - Surgical-marker ink shortcut analysis: 498 test photographs await manual annotation.
