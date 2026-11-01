@@ -1,0 +1,62 @@
+{
+  "status": "exploratory - not a replacement for frozen M1",
+  "assumptions": {
+    "arrivals_per_day": 100,
+    "original_capacity_per_day": 100,
+    "expanded_capacity_per_day": 110,
+    "additional_slots_per_day": 10,
+    "malignancy_prevalence": 0.1,
+    "simulation_days": 400,
+    "burn_in_days": 120,
+    "seed": 42
+  },
+  "limitations": [
+    "Extra capacity exceeds daily arrivals, so the initial backlog gradually drains.",
+    "Results combine backlog clearance and later low-wait periods.",
+    "Median waits do not prove that no individual patient is delayed.",
+    "This is an exploratory operational scenario, not clinical validation."
+  ],
+  "scenarios": [
+    {
+      "scenario": "arrival order (today)",
+      "n_malignant_seen": 2796,
+      "median_days_malignant": 24.0,
+      "p75_days_malignant": 24.0,
+      "p90_days_malignant": 24.0,
+      "share_malignant_over_target": 1.0,
+      "share_malignant_in_urgent_slot": 0.0,
+      "median_days_benign": 25.0
+    },
+    {
+      "scenario": "10 urgent slots per 100",
+      "n_malignant_seen": 2779,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 27.0,
+      "p90_days_malignant": 27.0,
+      "share_malignant_over_target": 0.4364879453040662,
+      "share_malignant_in_urgent_slot": 0.6120906801007556,
+      "median_days_benign": 27.0,
+      "urgent_slots": 10
+    },
+    {
+      "scenario": "110 slots, no triage",
+      "n_malignant_seen": 2916,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 5.0,
+      "p90_days_malignant": 9.0,
+      "share_malignant_over_target": 0.16358024691358025,
+      "share_malignant_in_urgent_slot": 0.0,
+      "median_days_benign": 1.0
+    },
+    {
+      "scenario": "110 slots, 10 additional priority slots",
+      "n_malignant_seen": 2853,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 1.0,
+      "p90_days_malignant": 6.0,
+      "share_malignant_over_target": 0.07220469681037504,
+      "share_malignant_in_urgent_slot": 0.5944619698562916,
+      "median_days_benign": 1.0
+    }
+  ]
+}
