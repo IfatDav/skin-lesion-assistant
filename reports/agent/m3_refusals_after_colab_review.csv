@@ -1,0 +1,6 @@
+question,refused,answer,retrieved_ids
+What is the waiting time for a dermatologist at Clalit?,True,I don't know,pdq:genetics:s82:c01;pdq:genetics:s81:c00;pdq:genetics:s44:c08
+Which smartphone camera takes the best photos of moles?,True,I don't know,pdq:genetics:s50:c00;pdq:screening:s01:c00;pdq:genetics:s71:c01
+How much does a skin biopsy cost in Israel?,True,I don't know,pdq:skin_tx:s27:c02;pdq:screening:s06:c02;pdq:prevention:s17:c02
+What is the recommended ibuprofen dose after a biopsy?,True,I don't know,pdq:melanoma_tx:s35:c17;pdq:melanoma_tx:s35:c16;pdq:melanoma_tx:s38:c04
+Which health fund app supports photo uploads?,True,I don't know,pdq:child_melanoma:s05:c07;pdq:child_skin:s03:c07;pdq:child_skin:s07:c00
