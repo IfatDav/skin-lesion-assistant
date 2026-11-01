@@ -46,3 +46,37 @@ def run_stability():
 
     return results
 
+
+def main():
+    results = run_stability()
+
+    report = {
+        "status": "exploratory - multi-seed stability analysis",
+        "seeds": SEEDS,
+        "assumptions": {
+            "capacity_per_day": 110,
+            "mean_arrivals_per_day": 100,
+            "variable_arrivals": True,
+            "priority_slots_with_triage": 10,
+            "comparison": "with triage vs without triage"
+        },
+        "limitations": [
+            "Same seeds do not guarantee identical patient arrivals across policies.",
+            "Results are simulation estimates, not clinical validation."
+        ],
+        "results": results
+    }
+
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT.write_text(
+        json.dumps(report, indent=2),
+        encoding="utf-8"
+    )
+
+    print(f"Stability results saved to: {OUTPUT}")
+
+
+if __name__ == "__main__":
+    main()
+
+
