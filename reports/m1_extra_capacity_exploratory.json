@@ -77,6 +77,26 @@
       "share_malignant_over_target": 1.0,
       "share_malignant_in_urgent_slot": 0.0,
       "median_days_benign": 25.0
+    },
+    {
+      "scenario": "Variable arrivals (mean 100), 110 slots, 10 priority",
+      "n_malignant_seen": 2931,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 1.0,
+      "p90_days_malignant": 8.0,
+      "share_malignant_over_target": 0.10815421357898328,
+      "share_malignant_in_urgent_slot": 0.5854657113613101,
+      "median_days_benign": 1.0
+    },
+    {
+      "scenario": "Variable arrivals (mean 100), 110 slots, no triage",
+      "n_malignant_seen": 2989,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 7.0,
+      "p90_days_malignant": 10.0,
+      "share_malignant_over_target": 0.2228169956507193,
+      "share_malignant_in_urgent_slot": 0.0,
+      "median_days_benign": 1.0
     }
   ]
 }
