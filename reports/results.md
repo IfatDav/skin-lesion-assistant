@@ -278,7 +278,12 @@ augmentation has to attack.
 
 **Validation-to-Agent integration (CP3).** Completed on 31 October 2026 using stored PAD validation predictions. Ten selected patients were processed successfully by the Agent, with zero retries and zero fallbacks. The resulting Word report and execution log are committed in `reports/agent/`. This demonstrates technical integration, not clinical validation.
 
+**Still not measured or completed:**
 
+- Surgical-marker ink shortcut analysis: 498 test photographs await manual annotation.
+- Full fresh-photograph-to-report integration, including automated image-quality assessment.
+- Production operating costs at the assumed patient volume.
+- Independent clinical and generalization evaluation.
 ---
 
 ## 10 · M1 exploratory follow-up: queue safety and capacity
@@ -336,11 +341,6 @@ No original M1 evaluation results, model parameters, or frozen test decisions we
 Further operational and clinical validation would be required before deployment.
 
 
-**Still not measured or completed:**
 
-- Surgical-marker ink shortcut analysis: 498 test photographs await manual annotation.
-- Full fresh-photograph-to-report integration, including automated image-quality assessment.
-- Production operating costs at the assumed patient volume.
-- Independent clinical and generalization evaluation.
 
 
