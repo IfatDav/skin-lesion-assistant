@@ -69,6 +69,7 @@ def main():
         },
         "limitations": [
             "Same seeds do not guarantee identical patient arrivals across policies.",
+            "Verified since: the triage branch consumes no randomness, so arrival streams are identical and comparisons are paired.",
             "Results are simulation estimates, not clinical validation."
         ],
         "results": results
