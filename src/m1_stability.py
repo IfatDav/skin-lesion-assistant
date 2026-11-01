@@ -8,7 +8,7 @@ Five seeds per configuration, with arrivals matched to capacity so the waiting l
 initial backlog drains. The two configurations differ only in the ratio of priority slots to expected
 malignant arrivals per day, which is the quantity the frozen M1 median turns out to depend on.
 
-Writes reports/m1_stability_exploratory.json. The frozen M1 report is never read or written here.
+Writes reports/m1_stability_balanced_demand_exploratory.json. The frozen M1 report is never read or written here.
 """
 import json
 from pathlib import Path
@@ -19,9 +19,9 @@ from src.simulate_queue import PREVALENCE, SCORES, URGENT_SLOTS, simulate, summa
 
 try:
     from src import config as C
-    OUTPUT = C.REPO_ROOT / "reports" / "m1_stability_exploratory.json"
+    OUTPUT = C.REPO_ROOT / "reports" / "m1_stability_balanced_demand_exploratory.json"
 except ImportError:                                    # runnable as a plain script too
-    OUTPUT = Path(__file__).resolve().parents[1] / "reports" / "m1_stability_exploratory.json"
+    OUTPUT = Path(__file__).resolve().parents[1] / "reports" / "m1_stability_balanced_demand_exploratory.json"
 
 SEEDS = [42, 123, 456, 789, 2026]
 
