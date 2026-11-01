@@ -284,8 +284,11 @@ def main():
             extra_fifo,
             extra_triage,
             stable_demand_triage,
-            stable_demand_fifo
+            stable_demand_fifo,
+            variable_demand_triage,
+            variable_demand_fifo
         ]
+
 
 
     }
