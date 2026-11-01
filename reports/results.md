@@ -272,7 +272,7 @@ augmentation has to attack.
 
 ## 9 · Agent evaluation and remaining limitations
 
-**M3 — RAG groundedness.** Evaluated on 20 frozen questions, including 5 unanswerable questions. Citation-ID groundedness improved from 0.733 to 0.933 after re-ranking, exceeding the 0.90 target. All 5 out-of-corpus refusal tests passed before re-ranking, but refusal behavior after re-ranking has not been independently re-tested. The metric verifies citation IDs against retrieved passages; it does not establish full semantic or clinical correctness.
+**M3 — RAG groundedness.** Evaluated on a frozen set of 20 questions: 15 answerable and 5 out-of-corpus. Across three reported runs, citation-ID groundedness before re-ranking was 0.600 (early run, documented narratively only), 0.733 (committed run), and 0.733 (verification run). After re-ranking, groundedness reached 0.933 in all three runs, exceeding the 0.90 target. The observed improvements were +0.333, +0.200, and +0.200 respectively. In the verification run, all 5 out-of-corpus questions were correctly refused both before and after re-ranking, and numerical-support checks passed for 15/15 answerable questions before and after. Post-reranking refusals were not evaluated in the earlier runs. The early run lacks saved per-question outputs. These automated metrics verify retrieved citation IDs and numerical support, but do not establish full semantic or clinical correctness. Evidence: `notebooks/07_rag_nci_m3.ipynb`, `reports/agent/m3_summary.csv`, `reports/agent/m3_answers_colab_review.csv`, and `reports/agent/m3_refusals_after_colab_review.csv`.
 
 **M4 — Agent versus if-else baseline.** Evaluated on 15 frozen workflow scenarios. The Agent achieved 9/15 correct decisions, the system with guardrails achieved 11/15, and the if-else baseline achieved 12/15. The M4 accuracy target was not met. No patient was removed or had their score or rank changed during the evaluation.
 
@@ -281,7 +281,6 @@ augmentation has to attack.
 **Still not measured or completed:**
 
 - Surgical-marker ink shortcut analysis: 498 test photographs await manual annotation.
-- M3 refusal behavior after re-ranking.
 - Full fresh-photograph-to-report integration, including automated image-quality assessment.
 - Production operating costs at the assumed patient volume.
 - Independent clinical and generalization evaluation.
