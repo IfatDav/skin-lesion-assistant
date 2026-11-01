@@ -247,8 +247,10 @@ def main():
             primary,
             extra_fifo,
             extra_triage,
-            stable_demand_triage
+            stable_demand_triage,
+            stable_demand_fifo
         ]
+
 
     }
 
