@@ -228,12 +228,15 @@ def main():
             "Median waits do not prove that no individual patient is delayed.",
             "This is an exploratory operational scenario, not clinical validation."
         ],
+        
         "scenarios": [
             base,
             primary,
             extra_fifo,
-            extra_triage
+            extra_triage,
+            stable_demand_triage
         ]
+
     }
 
     exploratory_path.write_text(
