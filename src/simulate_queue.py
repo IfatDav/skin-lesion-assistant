@@ -181,6 +181,21 @@ def main():
         "110 slots, 10 additional priority slots"
     )
 
+    
+    # Stability test: higher demand with balanced daily capacity.
+    # 110 arrivals and 110 appointments per day.
+    stable_demand_triage = summarize(
+        simulate(
+            pool,
+            capacity=110,
+            urgent_slots=10,
+            arrivals_per_day=110,
+            triage=True
+        ),
+        "110 arrivals, 110 slots, 10 priority"
+    )
+
+    
     print("\nEXPLORATORY CAPACITY COMPARISON")
     for result in (base, primary, extra_fifo, extra_triage):
         print(
