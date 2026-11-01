@@ -27,11 +27,12 @@ it hands the dermatologist the evidence for that ordering.
 |---|---|---|
 | **M1** | Median simulated days to appointment for patients with a malignant lesion, under the 10% waiting-list prioritization policy | ≤ 7 days against the arrival-order baseline — **met**: 24.0 → 1.0 days in the primary scenario. The median hides a split distribution; see the note below (`src/simulate_queue.py`, `reports/m1_queue_simulation.json`) |
 | **M2** | Patient-level sensitivity for skin cancer (MEL + BCC + SCC) among patients flagged for priority review, evaluated on held-out PAD-UFES-20 patients | ≥ 0.90 (not met; held-out test sensitivity: 0.664 in the primary evaluation scenario) |
-| **M3** | Groundedness of the agent's guidance on a frozen set of 20 questions, including 5 unanswerable questions | ≥ 0.90 groundedness and 5/5 refusals. **Groundedness target met:** 0.933 after re-ranking. The 5/5 refusal result was measured before re-ranking only; refusal behavior after re-ranking has not been independently re-tested. The groundedness metric verifies citation IDs against retrieved passages, not full semantic accuracy. (`notebooks/07_rag_nci_m3.ipynb`) |
+| **M3** | Groundedness of the agent's guidance on a frozen set of 20 questions, including 5 unanswerable questions | ≥ 0.90 groundedness and 5/5 refusals. **Target met in the verification run.** Across three reported runs, citation-ID groundedness after re-ranking was 0.933; baseline scores were 0.600 (early, narrative-only), 0.733 (committed), and 0.733 (verification). In the verification run, all 5 out-of-corpus questions were refused both before and after re-ranking. Post-reranking refusals were not evaluated in the earlier runs. Citation-ID groundedness does not establish full semantic or clinical correctness. (`notebooks/07_rag_nci_m3.ipynb`, `reports/agent/m3_summary.csv`) |
 | **M4** | Agent decisions on a frozen set of 15 complex workflow cases, measured against an if-else script on the same cases | ≥ 13/15 correct and above the baseline, with no patient suppressed, downgraded or removed. **Not met on accuracy**: agent 9/15, system after guardrails 11/15, if-else 12/15. **Met on safety**: no patient removed, no score or rank changed, no reassuring wording (`notebooks/08_agent_m4_vs_ifelse.ipynb`) |
 
 
-**M1 met its simulated median criterion; M2 and M4 did not meet their targets. M3 met its measured groundedness target, while refusal behavior after re-ranking remains to be independently verified.** M2 is a
+**M1 met its simulated median criterion; M2 and M4 did not meet their targets. 
+M3 met its citation-ID groundedness target across the three reported runs, and the 5/5 post-reranking refusal target was independently verified in the final run.** M2 is a
 capacity statement as much as a ranking one — see the note below. M4 is the more interesting failure: the
 agent does not beat a rule script on decisions, which is a finding about where an agent belongs rather than
 a bug to be tuned away. M1 is met on the median, but the median is the weakest part of that metric and the
@@ -256,7 +257,8 @@ decision and leave the agent the texts and the cases the rules do not cover.
 - **Self-reported answers.** The PAD questionnaire was filled in by medical students during a visit; app
   users answer alone. Flipping 10% of the answers lowers patient AUC from 0.867 to 0.823. Every
   questionnaire number here is therefore an upper bound.
-- **RAG evaluation (M3).** A frozen set of 20 questions, including 5 unanswerable questions, was used to evaluate citation grounding and refusal behavior. Citation-ID groundedness improved from 0.733 to 0.933 after re-ranking. All 5 refusal tests passed before re-ranking; the refusal test has not yet been repeated after re-ranking. Citation-ID matching does not independently establish semantic or clinical correctness.
+- **RAG evaluation (M3).** Evaluation used 20 frozen questions: 15 answerable and 5 out-of-corpus. Across three reported runs, citation-ID groundedness before re-ranking was 0.600 (early run, documented narratively only), 0.733 (committed run), and 0.733 (verification run). After re-ranking, groundedness was 0.933 in all three runs, with improvements of +0.333, +0.200, and +0.200 respectively. The verification run independently confirmed 5/5 out-of-corpus refusals both before and after re-ranking, as well as 15/15 numerical-support checks before and after. Post-reranking refusals were not evaluated in the earlier runs. These checks do not establish full semantic or clinical correctness. Evidence: `notebooks/07_rag_nci_m3.ipynb`, `reports/agent/m3_summary.csv`, `reports/agent/m3_answers_colab_review.csv`, and `reports/agent/m3_refusals_after_colab_review.csv`.
+
 
 
 ## 8 · Repository
