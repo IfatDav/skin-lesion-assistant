@@ -75,12 +75,14 @@ def simulate(pool, capacity=CAPACITY, urgent_slots=URGENT_SLOTS, prevalence=PREV
         eligible = queue.index[queue["arrival_day"] < day]
 
         taken = []
+        urgent_taken = []
         if triage and urgent_slots > 0:
             # re-ranked within this morning's list, as src/triage.py does for a day's queue
             waiting = queue.loc[eligible]
             score = (W_IMAGE * waiting["image_score"].rank(pct=True)
                      + (1 - W_IMAGE) * waiting["questionnaire_score"].rank(pct=True))
-            taken += list(score.nlargest(min(urgent_slots, len(score))).index)
+            urgent_taken = list(score.nlargest(min(urgent_slots, len(score))).index)
+            taken += urgent_taken
 
         routine = capacity - len(taken)
         if routine > 0:
@@ -88,7 +90,7 @@ def simulate(pool, capacity=CAPACITY, urgent_slots=URGENT_SLOTS, prevalence=PREV
             taken += list(rest.nsmallest(min(routine, len(rest)), "arrival_day").index)
 
         served = queue.loc[taken].assign(seen_day=day)
-        served["urgent"] = [i in set(taken[:urgent_slots]) if triage else False for i in served.index]
+        served["urgent"] = served.index.isin(urgent_taken)
         if day >= burn_in:
             seen.append(served) 
         
