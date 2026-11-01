@@ -154,6 +154,43 @@ def main():
          "scenarios": rows}, indent=1))
     print(f"\nwrote {OUT_JSON}")
 
+    
+    # Exploratory scenario: 10 additional appointments per day.
+    # This does not replace the frozen M1 evaluation.
+    expanded_capacity = CAPACITY + 10
+
+    extra_fifo = summarize(
+        simulate(
+            pool,
+            capacity=expanded_capacity,
+            urgent_slots=0,
+            arrivals_per_day=CAPACITY,
+            triage=False
+        ),
+        "110 slots, no triage"
+    )
+
+    extra_triage = summarize(
+        simulate(
+            pool,
+            capacity=expanded_capacity,
+            urgent_slots=10,
+            arrivals_per_day=CAPACITY,
+            triage=True
+        ),
+        "110 slots, 10 additional priority slots"
+    )
+
+    print("\nEXPLORATORY CAPACITY COMPARISON")
+    for result in (base, primary, extra_fifo, extra_triage):
+        print(
+            f"{result['scenario']}: "
+            f"malignant median={result['median_days_malignant']:.1f} days, "
+            f"malignant >7 days={result['share_malignant_over_target']:.1%}, "
+            f"benign median={result['median_days_benign']:.1f} days"
+        )
+
+
 
 if __name__ == "__main__":
     main()
