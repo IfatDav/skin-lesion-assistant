@@ -153,15 +153,6 @@ def main():
             f"Frozen M1 report is missing: {OUT_JSON}. "
             "Exploratory simulation must not create or replace it."
         )
-    if False:
-        OUT_JSON.write_text(json.dumps(
-        {"assumptions": {"capacity_per_day": CAPACITY, "arrivals_per_day": CAPACITY,
-                         "prevalence": PREVALENCE, "fusion_w_image": W_IMAGE,
-                         "baseline_median_days": BASELINE_MEDIAN_DAYS, "target_days": TARGET_DAYS,
-                         "days_simulated": DAYS, "burn_in_days": BURN_IN, "seed": SEED,
-                         "patients": "the 220 PAD validation patients, resampled to the prevalence"},
-         "scenarios": rows}, indent=1))
-    print(f"\nwrote {OUT_JSON}")
 
     
     # Exploratory scenario: 10 additional appointments per day.
