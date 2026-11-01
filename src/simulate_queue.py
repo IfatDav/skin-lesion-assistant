@@ -229,6 +229,19 @@ def main():
         "Variable arrivals (mean 100), 110 slots, 10 priority"
     )
 
+    
+    # Control: variable demand without triage.
+    variable_demand_fifo = summarize(
+        simulate(
+            pool,
+            capacity=110,
+            urgent_slots=0,
+            arrivals_per_day=100,
+            variable_arrivals=True,
+            triage=False
+        ),
+        "Variable arrivals (mean 100), 110 slots, no triage"
+    )
 
     print("\nEXPLORATORY CAPACITY COMPARISON") 
     for result in (base, primary, extra_fifo, extra_triage, stable_demand_triage, stable_demand_fifo):
