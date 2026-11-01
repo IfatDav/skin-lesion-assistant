@@ -196,6 +196,18 @@ def main():
     )
 
     
+    # Control scenario: balanced demand without triage.
+    stable_demand_fifo = summarize(
+        simulate(
+            pool,
+            capacity=110,
+            urgent_slots=0,
+            arrivals_per_day=110,
+            triage=False
+        ),
+        "110 arrivals, 110 slots, no triage"
+    )
+
     print("\nEXPLORATORY CAPACITY COMPARISON") 
     for result in (base, primary, extra_fifo, extra_triage, stable_demand_triage):
 
