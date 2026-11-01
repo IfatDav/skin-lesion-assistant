@@ -354,9 +354,37 @@ Results: `reports/m1_stability_exploratory.json`.
 
 Reproducibility: the archived 10-run variable-demand experiment is reproduced by
 `src/m1_stability_variable_demand.py`, which writes to a separate reproduction file and
-preserves `reports/m1_stability_exploratory.json`. The updated balanced-demand experiment
-is defined in `src/m1_stability.py` and writes to
-`reports/m1_stability_balanced_demand_exploratory.json`; its results are not reported here.
+preserves `reports/m1_stability_exploratory.json`.
+
+### Balanced-demand stability follow-up (five seeds per configuration)
+
+The exploratory balanced-demand analysis matched arrivals to total daily appointment capacity,
+with either 100 arrivals / 100 appointments or 110 arrivals / 110 appointments.
+Both settings retained 10 daily priority slots under triage and were compared against FIFO
+using five seeds each (20 simulation runs total). Daily arrivals were fixed, not Poisson-variable.
+
+| Five-seed metric | 100/100 FIFO | 100/100 triage | 110/110 FIFO | 110/110 triage |
+|---|---:|---:|---:|---:|
+| Malignant median wait, mean of seed medians | 24.0 d | 1.4 d (range 1–2) | 24.0 d | 12.8 d (range 9–17) |
+| Malignant waiting >7 days, mean of seed shares | 100.0% | 43.6% | 100.0% | 51.1% |
+| Malignant reaching a priority slot, mean of seed shares | 0.0% | 60.8% | 0.0% | 52.1% |
+| Benign median wait, mean of seed medians | 25.0 d | 27.0 d | 25.0 d | 27.0 d |
+| Benign waiting-time P90, mean of seed P90s | 25.0 d | 27.0 d | 25.0 d | 27.0 d |
+| Benign waiting >7 days, mean of seed shares | 100.0% | 95.7% | 100.0% | 95.9% |
+
+At 100/100, the malignant median stayed below the 7-day M1 threshold in all five triage
+runs. At 110/110, it exceeded 7 days in all five triage runs, despite improving
+against the FIFO baseline. In both settings, the benign median and P90 increased
+by 2 days under triage. Although the benign share above 7 days fell modestly,
+that does not establish the no-delay safety principle for individual patients.
+
+These are simple arithmetic means of per-seed metrics, not pooled patient-level
+estimates or confidence intervals. The five fixed-demand seeds do not establish
+real-world operational effectiveness or clinical safety. The original frozen M1
+target and report are unchanged.
+
+Evidence: `reports/m1_stability_balanced_demand_exploratory.json`.
+Code: `src/m1_stability.py`.
 
 
 ### Conclusions and limitations
