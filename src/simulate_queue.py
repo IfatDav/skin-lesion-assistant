@@ -88,10 +88,15 @@ def simulate(pool, capacity=CAPACITY, urgent_slots=URGENT_SLOTS, prevalence=PREV
         served = queue.loc[taken].assign(seen_day=day)
         served["urgent"] = [i in set(taken[:urgent_slots]) if triage else False for i in served.index]
         if day >= burn_in:
-            seen.append(served)
-
+            seen.append(served) 
         
-        arrivals = draw(rng, arrivals_per_day, pool, prevalence)
+        daily_arrivals = (
+            int(rng.poisson(arrivals_per_day))
+            if variable_arrivals
+            else arrivals_per_day
+        )
+        arrivals = draw(rng, daily_arrivals, pool, prevalence)
+
         arrivals["arrival_day"] = day
         queue = pd.concat([queue.drop(index=taken), arrivals], ignore_index=True)
 
