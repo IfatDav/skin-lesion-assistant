@@ -300,7 +300,7 @@ The original results remain unchanged in `reports/m1_queue_simulation.json`.
 
 Adding 10 appointments per day improved waiting times substantially when arrivals remained at 100 per day.
 
-However, capacity exceeded demand, causing the initial backlog to gradually decline. These results cannot establish that the same performance would persist under balanced demand.
+However, capacity exceeded demand, causing the initial backlog to gradually decline. These results cannot establish that the same performance would persist under balanced demand. Under balanced demand — 110 arrivals against 110 appointments a day, with the ten priority slots unchanged — prioritization reduced the malignant median wait from 24.0 to 13.0 days and raised the benign median wait from 25.0 to 27.0 days. 51.1% of malignant patients still waited longer than the target. This is the scenario the next subsection analyses. Full exploratory results: `reports/m1_extra_capacity_exploratory.json`.
 
 ### Why the frozen median is a knife-edge statistic
 
@@ -380,4 +380,5 @@ Further operational and clinical validation would be required before deployment.
 - Full fresh-photograph-to-report integration, including automated image-quality assessment.
 - Production operating costs at the assumed patient volume.
 - Independent clinical and generalization evaluation.
+
 ---
