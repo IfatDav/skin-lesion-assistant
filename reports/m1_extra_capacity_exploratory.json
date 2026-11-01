@@ -25,7 +25,9 @@
       "p90_days_malignant": 24.0,
       "share_malignant_over_target": 1.0,
       "share_malignant_in_urgent_slot": 0.0,
-      "median_days_benign": 25.0
+      "median_days_benign": 25.0,
+      "p90_days_benign": 25.0,
+      "share_benign_over_target": 1.0
     },
     {
       "scenario": "10 urgent slots per 100",
@@ -36,6 +38,8 @@
       "share_malignant_over_target": 0.4364879453040662,
       "share_malignant_in_urgent_slot": 0.6120906801007556,
       "median_days_benign": 27.0,
+      "p90_days_benign": 27.0,
+      "share_benign_over_target": 0.9571388921930137,
       "urgent_slots": 10
     },
     {
@@ -46,7 +50,9 @@
       "p90_days_malignant": 9.0,
       "share_malignant_over_target": 0.16358024691358025,
       "share_malignant_in_urgent_slot": 0.0,
-      "median_days_benign": 1.0
+      "median_days_benign": 1.0,
+      "p90_days_benign": 10.0,
+      "share_benign_over_target": 0.19146908591903636
     },
     {
       "scenario": "110 slots, 10 additional priority slots",
@@ -56,7 +62,9 @@
       "p90_days_malignant": 6.0,
       "share_malignant_over_target": 0.07220469681037504,
       "share_malignant_in_urgent_slot": 0.5944619698562916,
-      "median_days_benign": 1.0
+      "median_days_benign": 1.0,
+      "p90_days_benign": 11.0,
+      "share_benign_over_target": 0.20633532342092253
     },
     {
       "scenario": "110 arrivals, 110 slots, 10 priority",
@@ -66,7 +74,9 @@
       "p90_days_malignant": 26.0,
       "share_malignant_over_target": 0.5109004739336492,
       "share_malignant_in_urgent_slot": 0.5200631911532385,
-      "median_days_benign": 27.0
+      "median_days_benign": 27.0,
+      "p90_days_benign": 27.0,
+      "share_benign_over_target": 0.9591821964899584
     },
     {
       "scenario": "110 arrivals, 110 slots, no triage",
@@ -76,7 +86,9 @@
       "p90_days_malignant": 24.0,
       "share_malignant_over_target": 1.0,
       "share_malignant_in_urgent_slot": 0.0,
-      "median_days_benign": 25.0
+      "median_days_benign": 25.0,
+      "p90_days_benign": 25.0,
+      "share_benign_over_target": 1.0
     },
     {
       "scenario": "Variable arrivals (mean 100), 110 slots, 10 priority",
@@ -86,7 +98,9 @@
       "p90_days_malignant": 8.0,
       "share_malignant_over_target": 0.10815421357898328,
       "share_malignant_in_urgent_slot": 0.5854657113613101,
-      "median_days_benign": 1.0
+      "median_days_benign": 1.0,
+      "p90_days_benign": 12.0,
+      "share_benign_over_target": 0.2624905087319666
     },
     {
       "scenario": "Variable arrivals (mean 100), 110 slots, no triage",
@@ -96,7 +110,9 @@
       "p90_days_malignant": 10.0,
       "share_malignant_over_target": 0.2228169956507193,
       "share_malignant_in_urgent_slot": 0.0,
-      "median_days_benign": 1.0
+      "median_days_benign": 1.0,
+      "p90_days_benign": 11.0,
+      "share_benign_over_target": 0.25766684422798874
     }
   ]
 }
