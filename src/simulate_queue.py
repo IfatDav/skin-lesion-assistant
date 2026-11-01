@@ -196,8 +196,9 @@ def main():
     )
 
     
-    print("\nEXPLORATORY CAPACITY COMPARISON")
-    for result in (base, primary, extra_fifo, extra_triage):
+    print("\nEXPLORATORY CAPACITY COMPARISON") 
+    for result in (base, primary, extra_fifo, extra_triage, stable_demand_triage):
+
         print(
             f"{result['scenario']}: "
             f"malignant median={result['median_days_malignant']:.1f} days, "
