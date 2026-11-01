@@ -58,9 +58,11 @@ def draw(rng, n, pool, prevalence):
 
 
 
+
 def simulate(pool, capacity=CAPACITY, urgent_slots=URGENT_SLOTS, prevalence=PREVALENCE,
              days=DAYS, burn_in=BURN_IN, seed=SEED, triage=True,
-             arrivals_per_day=CAPACITY):
+             arrivals_per_day=CAPACITY, variable_arrivals=False):
+
     """Returns one row per patient seen after the burn-in: their wait in days and their label."""
     rng = np.random.default_rng(seed)    
     queue = draw(rng, int(round(BASELINE_MEDIAN_DAYS * arrivals_per_day)), pool, prevalence)
