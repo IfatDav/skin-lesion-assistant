@@ -189,6 +189,44 @@ def main():
             f"malignant >7 days={result['share_malignant_over_target']:.1%}, "
             f"benign median={result['median_days_benign']:.1f} days"
         )
+    
+    # Save exploratory results separately from the frozen M1 report.
+    exploratory_path = OUT_JSON.with_name(
+        "m1_extra_capacity_exploratory.json"
+    )
+
+    exploratory_results = {
+        "status": "exploratory - not a replacement for frozen M1",
+        "assumptions": {
+            "arrivals_per_day": CAPACITY,
+            "original_capacity_per_day": CAPACITY,
+            "expanded_capacity_per_day": expanded_capacity,
+            "additional_slots_per_day": 10,
+            "malignancy_prevalence": PREVALENCE,
+            "simulation_days": DAYS,
+            "burn_in_days": BURN_IN,
+            "seed": SEED
+        },
+        "limitations": [
+            "Extra capacity exceeds daily arrivals, so the initial backlog gradually drains.",
+            "Results combine backlog clearance and later low-wait periods.",
+            "Median waits do not prove that no individual patient is delayed.",
+            "This is an exploratory operational scenario, not clinical validation."
+        ],
+        "scenarios": [
+            base,
+            primary,
+            extra_fifo,
+            extra_triage
+        ]
+    }
+
+    exploratory_path.write_text(
+        json.dumps(exploratory_results, indent=2),
+        encoding="utf-8"
+    )
+
+    print(f"Exploratory results saved to: {exploratory_path}")
 
 
 
