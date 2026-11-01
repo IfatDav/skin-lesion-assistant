@@ -209,7 +209,8 @@ def main():
     )
 
     print("\nEXPLORATORY CAPACITY COMPARISON") 
-    for result in (base, primary, extra_fifo, extra_triage, stable_demand_triage):
+    for result in (base, primary, extra_fifo, extra_triage, stable_demand_triage, stable_demand_fifo):
+
 
         print(
             f"{result['scenario']}: "
