@@ -1,3 +1,5 @@
-run,groundedness,numbers_ok,refusals
-before,0.7333333333333333,1.0,5/5
-after (rerank),0.9333333333333333,1.0,5/5
+
+run,groundedness_before,groundedness_after,wrong_refusals_before,refusals_before,refusals_after,evidence,improvement
+early (reported),0.600,0.9333333333333333,6,Not separately documented,Not evaluated,Earlier notebook narrative only,0.333
+committed (2026-10-30),0.7333333333333333,0.9333333333333333,4,5/5,Not evaluated,Original notebook and m3_answers.csv,0.200
+verification (2026-10-31),0.7333333333333333,0.9333333333333333,4,5/5,5/5,New Colab evaluation,0.200
