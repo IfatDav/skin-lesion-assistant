@@ -280,14 +280,6 @@ augmentation has to attack.
 
 ---
 
-## 11 · Still not measured or completed
-
-- Surgical-marker ink shortcut analysis: 498 test photographs await manual annotation.
-- Full fresh-photograph-to-report integration, including automated image-quality assessment.
-- Production operating costs at the assumed patient volume.
-- Independent clinical and generalization evaluation.
----
-
 ## 10 · M1 exploratory follow-up: queue safety and capacity
 
 **Status: Original M1 median target met; operational no-delay safety not demonstrated.**
@@ -360,6 +352,13 @@ Prioritization reduced delayed malignant cases across all five seeds, but benign
 
 Results: `reports/m1_stability_exploratory.json`.
 
+Reproducibility: the archived 10-run variable-demand experiment is reproduced by
+`src/m1_stability_variable_demand.py`, which writes to a separate reproduction file and
+preserves `reports/m1_stability_exploratory.json`. The updated balanced-demand experiment
+is defined in `src/m1_stability.py` and writes to
+`reports/m1_stability_balanced_demand_exploratory.json`; its results are not reported here.
+
+
 ### Conclusions and limitations
 
 1. M1 met its predefined median waiting-time target in the original simulation.
@@ -373,7 +372,12 @@ No original M1 evaluation results, model parameters, or frozen test decisions we
 
 Further operational and clinical validation would be required before deployment.
 
+---
 
+## 11 · Still not measured or completed
 
-
-
+- Surgical-marker ink shortcut analysis: 498 test photographs await manual annotation.
+- Full fresh-photograph-to-report integration, including automated image-quality assessment.
+- Production operating costs at the assumed patient volume.
+- Independent clinical and generalization evaluation.
+---
