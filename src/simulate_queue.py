@@ -144,8 +144,17 @@ def main():
     print(f"  but {primary['share_malignant_over_target']:.0%} of malignant patients still wait "
           f"longer than {TARGET_DAYS} days: the model did not rank them into an urgent slot.")
 
+    
     OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
-    OUT_JSON.write_text(json.dumps(
+    if OUT_JSON.exists():
+        print(f"Preserving frozen M1 report: {OUT_JSON}")
+    else:
+        raise FileNotFoundError(
+            f"Frozen M1 report is missing: {OUT_JSON}. "
+            "Exploratory simulation must not create or replace it."
+        )
+    if False:
+        OUT_JSON.write_text(json.dumps(
         {"assumptions": {"capacity_per_day": CAPACITY, "arrivals_per_day": CAPACITY,
                          "prevalence": PREVALENCE, "fusion_w_image": W_IMAGE,
                          "baseline_median_days": BASELINE_MEDIAN_DAYS, "target_days": TARGET_DAYS,
