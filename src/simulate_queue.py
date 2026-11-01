@@ -57,11 +57,13 @@ def draw(rng, n, pool, prevalence):
     return pool.loc[idx].reset_index(drop=True)
 
 
+
 def simulate(pool, capacity=CAPACITY, urgent_slots=URGENT_SLOTS, prevalence=PREVALENCE,
-             days=DAYS, burn_in=BURN_IN, seed=SEED, triage=True):
+             days=DAYS, burn_in=BURN_IN, seed=SEED, triage=True,
+             arrivals_per_day=CAPACITY):
     """Returns one row per patient seen after the burn-in: their wait in days and their label."""
-    rng = np.random.default_rng(seed)
-    queue = draw(rng, int(round(BASELINE_MEDIAN_DAYS * capacity)), pool, prevalence)
+    rng = np.random.default_rng(seed)    
+    queue = draw(rng, int(round(BASELINE_MEDIAN_DAYS * arrivals_per_day)), pool, prevalence)
     queue["arrival_day"] = rng.integers(-int(round(BASELINE_MEDIAN_DAYS * 2)), 1, len(queue))
     seen = []
 
@@ -88,7 +90,8 @@ def simulate(pool, capacity=CAPACITY, urgent_slots=URGENT_SLOTS, prevalence=PREV
         if day >= burn_in:
             seen.append(served)
 
-        arrivals = draw(rng, capacity, pool, prevalence)
+        
+        arrivals = draw(rng, arrivals_per_day, pool, prevalence)
         arrivals["arrival_day"] = day
         queue = pd.concat([queue.drop(index=taken), arrivals], ignore_index=True)
 
