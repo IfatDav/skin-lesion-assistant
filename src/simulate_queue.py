@@ -244,7 +244,8 @@ def main():
     )
 
     print("\nEXPLORATORY CAPACITY COMPARISON") 
-    for result in (base, primary, extra_fifo, extra_triage, stable_demand_triage, stable_demand_fifo):
+    for result in (base, primary, extra_fifo, extra_triage, stable_demand_triage, stable_demand_fifo, variable_demand_triage, variable_demand_fifo):
+
 
 
         print(
