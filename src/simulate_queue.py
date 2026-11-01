@@ -117,7 +117,10 @@ def summarize(seen, label):
             "p90_days_malignant": float(mal.quantile(0.90)),
             "share_malignant_over_target": float((mal > TARGET_DAYS).mean()),
             "share_malignant_in_urgent_slot": float(m["urgent"].mean()),
-            "median_days_benign": float(ben.median())}
+            "median_days_benign": float(ben.median()),
+            "p90_days_benign": float(ben.quantile(0.90)),
+            "share_benign_over_target": float((ben > TARGET_DAYS).mean())}
+
 
 
 def main():
