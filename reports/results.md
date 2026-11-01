@@ -308,10 +308,41 @@ Adding 10 appointments per day improved waiting times substantially when arrival
 
 However, capacity exceeded demand, causing the initial backlog to gradually decline. These results cannot establish that the same performance would persist under balanced demand.
 
-With 110 arrivals and 110 appointments per day, prioritization reduced the malignant median wait from 24 to 13 days, while increasing the benign median wait from 25 to 27 days.
+### Why the frozen median is a knife-edge statistic
 
-Full exploratory results:
-`reports/m1_extra_capacity_exploratory.json`.
+The wait distribution is bimodal: about one day for a patient the model ranks into a priority slot, and
+the full routine wait of roughly 25–28 days for everyone else. A median over that distribution reports
+whichever mode holds the majority, so it jumps between the two instead of moving with the policy.
+
+The frozen slot sweep in `reports/m1_queue_simulation.json` already shows this, and it was run and
+recorded before any of the exploratory work below:
+
+| Priority slots per malignant arrival | Reached a slot | Malignant median | Malignant > 7 days |
+|---|---:|---:|---:|
+| 0.5 · 5 slots per 100 arrivals | 40.9% | **25.0** | 60.3% |
+| 0.91 · 10 slots, 110 arrivals (exploratory) | 52.0% | **13.0** | 51.1% |
+| 1.00 · 10 slots per 100 arrivals — the primary scenario | 61.2% | **1.0** | 43.6% |
+| 1.50 · 15 slots per 100 arrivals | 81.4% | 1.0 | 20.2% |
+| 2.00 · 20 slots per 100 arrivals | 86.5% | 1.0 | 14.0% |
+| 3.00 · 30 slots per 100 arrivals | 95.3% | 1.0 | 4.7% |
+
+At five slots the reported median is 25.0 days — worse than the arrival-order baseline of 24.0 — because
+fewer than half of malignant patients reach a slot and the rest are pushed one day further back. At ten
+slots the median is 1.0. The median flips when the share reaching a slot crosses 50%; the share of
+malignant patients still waiting longer than the target falls smoothly and monotonically over the same
+sweep.
+
+In the primary scenario the number of priority slots happens to equal the expected number of malignant
+arrivals per day (100 arrivals × 10% prevalence = 10). The balanced-demand scenario above raises demand
+and capacity together by 10% and leaves the slot count untouched, so eleven malignant patients a day
+compete for ten slots: the priority queue itself saturates, and the reported median moves from 1.0 to
+13.0 days without any change to the model, the policy or the fusion weights.
+
+M1 is reported on its frozen definition and the target is met. The headline figure, however, holds only
+while priority slots are at least the expected malignant arrivals per day, and it is a median over a
+split distribution rather than a description of a typical patient. The share of malignant patients over
+target — 43.6% in the primary scenario — is the stabler figure and is reported beside it. This is a
+limitation of the frozen metric, identified after the fact. **The metric itself was not changed.**
 
 ### Multi-seed stability analysis
 
