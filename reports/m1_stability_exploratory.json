@@ -1,0 +1,153 @@
+{
+  "status": "exploratory - multi-seed stability analysis",
+  "seeds": [
+    42,
+    123,
+    456,
+    789,
+    2026
+  ],
+  "assumptions": {
+    "capacity_per_day": 110,
+    "mean_arrivals_per_day": 100,
+    "variable_arrivals": true,
+    "priority_slots_with_triage": 10,
+    "comparison": "with triage vs without triage"
+  },
+  "limitations": [
+    "Same seeds do not guarantee identical patient arrivals across policies.",
+    "Results are simulation estimates, not clinical validation."
+  ],
+  "results": [
+    {
+      "scenario": "without triage",
+      "n_malignant_seen": 2989,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 7.0,
+      "p90_days_malignant": 10.0,
+      "share_malignant_over_target": 0.2228169956507193,
+      "share_malignant_in_urgent_slot": 0.0,
+      "median_days_benign": 1.0,
+      "p90_days_benign": 11.0,
+      "share_benign_over_target": 0.25766684422798874,
+      "seed": 42
+    },
+    {
+      "scenario": "with triage",
+      "n_malignant_seen": 2931,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 1.0,
+      "p90_days_malignant": 8.0,
+      "share_malignant_over_target": 0.10815421357898328,
+      "share_malignant_in_urgent_slot": 0.5854657113613101,
+      "median_days_benign": 1.0,
+      "p90_days_benign": 12.0,
+      "share_benign_over_target": 0.2624905087319666,
+      "seed": 42
+    },
+    {
+      "scenario": "without triage",
+      "n_malignant_seen": 2986,
+      "median_days_malignant": 3.0,
+      "p75_days_malignant": 9.0,
+      "p90_days_malignant": 13.0,
+      "share_malignant_over_target": 0.3077695914266577,
+      "share_malignant_in_urgent_slot": 0.0,
+      "median_days_benign": 4.0,
+      "p90_days_benign": 13.0,
+      "share_benign_over_target": 0.3372470088337247,
+      "seed": 123
+    },
+    {
+      "scenario": "with triage",
+      "n_malignant_seen": 2926,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 3.0,
+      "p90_days_malignant": 10.0,
+      "share_malignant_over_target": 0.14183185235816814,
+      "share_malignant_in_urgent_slot": 0.5717703349282297,
+      "median_days_benign": 4.0,
+      "p90_days_benign": 14.0,
+      "share_benign_over_target": 0.35401093383911636,
+      "seed": 123
+    },
+    {
+      "scenario": "without triage",
+      "n_malignant_seen": 2926,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 6.0,
+      "p90_days_malignant": 10.0,
+      "share_malignant_over_target": 0.18386876281613124,
+      "share_malignant_in_urgent_slot": 0.0,
+      "median_days_benign": 1.0,
+      "p90_days_benign": 10.0,
+      "share_benign_over_target": 0.2100255014653827,
+      "seed": 456
+    },
+    {
+      "scenario": "with triage",
+      "n_malignant_seen": 2870,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 1.0,
+      "p90_days_malignant": 7.0,
+      "share_malignant_over_target": 0.08989547038327526,
+      "share_malignant_in_urgent_slot": 0.5961672473867596,
+      "median_days_benign": 1.0,
+      "p90_days_benign": 11.0,
+      "share_benign_over_target": 0.22872118196665275,
+      "seed": 456
+    },
+    {
+      "scenario": "without triage",
+      "n_malignant_seen": 2879,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 6.0,
+      "p90_days_malignant": 11.0,
+      "share_malignant_over_target": 0.19555401180965612,
+      "share_malignant_in_urgent_slot": 0.0,
+      "median_days_benign": 1.0,
+      "p90_days_benign": 11.0,
+      "share_benign_over_target": 0.21826690705435575,
+      "seed": 789
+    },
+    {
+      "scenario": "with triage",
+      "n_malignant_seen": 2810,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 1.0,
+      "p90_days_malignant": 7.0,
+      "share_malignant_over_target": 0.08967971530249111,
+      "share_malignant_in_urgent_slot": 0.59644128113879,
+      "median_days_benign": 1.0,
+      "p90_days_benign": 12.0,
+      "share_benign_over_target": 0.22618409977810086,
+      "seed": 789
+    },
+    {
+      "scenario": "without triage",
+      "n_malignant_seen": 2929,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 6.0,
+      "p90_days_malignant": 10.0,
+      "share_malignant_over_target": 0.18675315807442813,
+      "share_malignant_in_urgent_slot": 0.0,
+      "median_days_benign": 1.0,
+      "p90_days_benign": 11.0,
+      "share_benign_over_target": 0.22642946935354843,
+      "seed": 2026
+    },
+    {
+      "scenario": "with triage",
+      "n_malignant_seen": 2862,
+      "median_days_malignant": 1.0,
+      "p75_days_malignant": 1.0,
+      "p90_days_malignant": 7.0,
+      "share_malignant_over_target": 0.09503843466107617,
+      "share_malignant_in_urgent_slot": 0.5838574423480084,
+      "median_days_benign": 1.0,
+      "p90_days_benign": 12.0,
+      "share_benign_over_target": 0.2365301314689566,
+      "seed": 2026
+    }
+  ]
+}
