@@ -44,7 +44,7 @@ For each case, the dermatologist decides whether to move the patient to an earli
 |---|---|---|---|
 | M1 | Median simulated days to appointment for patients with malignant lesions (MEL + BCC + SCC), under the predefined waiting-list scenarios and fixed urgent-slot capacity | ≤ 7 days in the primary simulation scenario; always reported alongside the absolute and percentage reduction versus the FIFO baseline | **Met within the simulated fixed-capacity reallocation scenario** · 24.0 → **1.0 median days** (−96%). That scenario delays some non-prioritized patients and therefore does **not** validate the product's no-delay safety principle (§1) |
 | M2 | Patient-level sensitivity for skin cancer (MEL + BCC + SCC → flagged for high-urgency dashboard triage) on held-out PAD-UFES-20 patients (real phone photos) | ≥ 0.90, reported with 95% confidence intervals and absolute TP/FN counts. Melanoma sensitivity is also reported separately. | **Not met** · **0.664** (95% CI 0.570–0.750) at the standard evaluation scenario; 0.820 at 15 slots |
-| M3 | Groundedness on a frozen set of 20 guidance questions (5 unanswerable), plus a check that each number appears in its cited source | ≥ 0.9, and 5/5 refusals | **Met** · **0.933** groundedness after re-ranking and 15/15 numbers traced to their cited chunk. The 5/5 refusals were measured **without** re-ranking and carried across; see §8 CP2 |
+| M3 | Groundedness on a frozen set of 20 guidance questions (5 unanswerable), plus a check that each number appears in its cited source | ≥ 0.9, and 5/5 refusals | **Met** · Citation-ID groundedness reached **0.933** after re-ranking in all three reported runs, compared with baseline scores of 0.600 (early, narrative-only), 0.733 (committed), and 0.733 (verification). The verification run confirmed **5/5 refusals both before and after re-ranking** and 15/15 numerical-support checks. Earlier runs did not evaluate post-reranking refusals. See §8 M3 verification update. |
 | M4 | Agent scenario set of 15 complex workflow cases | ≥ 13/15 correct; zero cases in which the agent suppresses, downgrades or removes a patient who was flagged by the validated deterministic triage policy. | **Split** · accuracy **not met**: agent 9/15, agent behind the code guardrails 11/15, against **12/15 for a plain if-else script**. Safety **met**: no patient removed, no score or rank changed |
 
 **Operating points [amended 26.10; clarified 30.10].** The charter originally gave the metrics without a
@@ -262,6 +262,8 @@ else on the near side of the line is built.**]**
 
 ## 8 · Checkpoint updates
 
+**Reading note (updated 01.11.2026).** CP1, CP2, and CP3 are historical checkpoint records and describe the evidence and open issues as they stood at those dates. Issues resolved in subsequent evaluations are documented in later updates rather than retroactively changing the original checkpoint findings.
+
 ### CP1 · 18.10 — core pipeline, no agent
 
 **1. What works end to end.** ISIC acquisition and audit, the frozen PAD patient split, preprocessing, and
@@ -445,8 +447,51 @@ The project now demonstrates a reproducible technical connection between stored 
 
 This closes the integration gap documented at CP2 while preserving the distinction between technical success and clinical validation.
 
+---
+
+### M3 verification update · 01.11.2026 — post-reranking refusal test completed
+
+**1. Evaluation results.**
+
+The M3 evaluation was reviewed across three reported runs on the same frozen set of 20 questions: 15 answerable and 5 out-of-corpus.
+
+| Run | Groundedness before | Groundedness after | Improvement | Refusals before | Refusals after |
+|---|---:|---:|---:|---|---|
+| Early (reported) | 0.600 | 0.933 | +0.333 | Not separately documented | Not evaluated |
+| Committed (30.10.2026) | 0.733 | 0.933 | +0.200 | 5/5 | Not evaluated |
+| Verification (31.10.2026) | 0.733 | 0.933 | +0.200 | 5/5 | 5/5 |
+
+Citation-ID groundedness after re-ranking was 0.933 in all three reported runs, exceeding the M3 target of 0.90. The observed improvement ranged from +0.200 to +0.333.
+
+The early run is supported by the previous notebook narrative rather than saved per-question outputs. The committed and verification runs have recorded evaluation results.
+
+**2. Refusal verification.**
+
+The verification run independently tested all five frozen out-of-corpus questions after re-ranking. All five were correctly refused (5/5), confirming the previously unmeasured post-reranking refusal criterion on this evaluation set.
+
+Numerical-support checks also passed for 15/15 answerable questions before and after re-ranking in the verification run.
+
+**3. Evidence and limitations.**
+
+The updated evaluation is documented in:
+
+- `notebooks/07_rag_nci_m3.ipynb`
+- `reports/agent/m3_summary.csv`
+- `reports/agent/m3_answers_colab_review.csv`
+- `reports/agent/m3_refusals_after_colab_review.csv`
+
+The earlier committed per-question results remain available in `reports/agent/m3_answers.csv`.
+
+Citation-ID groundedness verifies whether cited chunk IDs were retrieved. It does not independently establish semantic or clinical correctness. Numerical-support checks also have limited scope, and the evaluation set is small.
+
+**4. Decision and status.**
+
+M3 meets its predefined groundedness and refusal targets on the evaluated question set. The post-reranking refusal check previously listed as incomplete in CP2 and CP3 is now resolved.
+
+This evaluation did not change the frozen imaging model, the held-out PAD test results, or the M2 and M4 conclusions.
 
 ---
+
 ¹ Murad H et al. *Measuring geographical disparities in waiting times for community-based specialist care.* Israel Journal of Health Policy Research, 2025. [doi:10.1186/s13584-025-00702-7](https://doi.org/10.1186/s13584-025-00702-7). Covers all dermatologists in all four health funds, 2019–2023.
 
 ² Maccabi, [online dermatologist consultation](https://www.maccabi4u.co.il/31276/digital-services/communication/consultation_dermatologists/): "not intended for urgent cases or for diagnosing moles and skin lesions". Clalit, [online dermatologists](https://www.clalit.co.il/he/online_doctors/Pages/dermatologist_on_line.aspx): excludes "diagnosis and assessment of nevi" and suspected skin cancer. Both checked 18.9.2026.
