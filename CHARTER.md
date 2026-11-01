@@ -447,7 +447,6 @@ The project now demonstrates a reproducible technical connection between stored 
 
 This closes the integration gap documented at CP2 while preserving the distinction between technical success and clinical validation.
 
----
 
 ### M3 verification update · 01.11.2026 — post-reranking refusal test completed
 
