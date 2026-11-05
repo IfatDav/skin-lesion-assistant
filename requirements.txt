@@ -21,3 +21,19 @@ scipy
 nbformat
 nbconvert
 ipykernel
+
+# --- Agent layer (notebooks 07-09 and agent/) ---
+# These run in Colab. crewai is pinned to the version the committed runs used; pin the others
+# from Colab with:  pip freeze | grep -iE "crewai|chromadb|sentence-transformers|openai|python-docx|beautifulsoup4|pydantic"
+crewai==1.15.33
+pydantic>=2
+chromadb
+sentence-transformers
+openai
+python-docx
+beautifulsoup4
+
+scipy
+nbformat
+nbconvert
+ipykernel
