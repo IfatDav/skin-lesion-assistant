@@ -199,9 +199,29 @@ def run_if_else() -> list[dict]:
     return [score(s, if_else(s["case"])) for s in SCENARIOS]
 
 
+def run_system(with_agent: bool = False) -> list[dict]:
+    """The current system: code decides, the agent reports and writes. A regression check, not a new M4:
+    these 15 cases have already been seen. Without the agent the fixed texts from code are used."""
+    import os
+    from pathlib import Path
+    import triage_agent as t
+    t.CASES = {s["case"]["patient_id"]: s["case"] for s in SCENARIOS}
+    check = with_agent and (Path(os.getenv("RAG_DIR", ".")) / "nci_corpus.json").exists()
+    rows = []
+    for s in SCENARIOS:
+        case = s["case"]
+        review = (t.review_case(None, case, check_quotes=check) if with_agent
+                  else t.enforce_guardrails(t.AgentReport(patient_id=case["patient_id"]), case, check_quotes=False))
+        rows.append(score(s, review.model_dump()))
+    return rows
+
+
 if __name__ == "__main__":
-    rows = run_if_else()
+    import sys
+    with_agent = "--with-agent" in sys.argv
+    rows = run_system(with_agent) if with_agent or "--system" in sys.argv else run_if_else()
     for r in rows:
         print(f"{r['id']:>2} {'PASS' if r['pass'] else 'fail'}  {r['expected']:18s} got {r['decision']:18s} "
               f"judgement={'ok' if r['judgement_ok'] else 'NO'}  {r['what']}")
-    print(f"\nif-else: {sum(r['pass'] for r in rows)}/{len(rows)}")
+    name = "system (code decides, with agent)" if with_agent else "system (code only)" if "--system" in sys.argv else "if-else"
+    print(f"\n{name}: {sum(r['pass'] for r in rows)}/{len(rows)}")

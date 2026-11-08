@@ -175,10 +175,12 @@ build it, test it and run it, and every figure below comes from their saved outp
 
 The build is a CrewAI crew, *Clinician Seat triage evidence assistant*. It takes one patient at a time from
 the list the model ranked, assembles the evidence a dermatologist needs before the appointment, cites the
-guidance it used, and returns one of five decisions through a structured JSON contract. The same role, goal
-and task text live in CrewAI Studio, where the prompt was designed; the code adds what Studio cannot do.
+guidance it used, and answers through a structured JSON contract. **Plain code makes all five decisions**
+(`decide` in `agent/triage_agent.py`, the rules of the M4 if-else script). The agent reports what it finds in
+the patient's free-text note and writes the texts. The prompt was designed in CrewAI Studio; the code adds what
+Studio cannot do.
 
-**Which tools it may call.** Seven, registered in `build_crew()`, and nothing else:
+**Which tools it may call.** Five, all read-only, registered in `build_crew()`, and nothing else:
 
 | Tool | Returns |
 |---|---|
@@ -187,12 +189,16 @@ and task text live in CrewAI Studio, where the prompt was designed; the code add
 | `score_symptoms` | the six symptom answers, the symptom model's band, and the patient's own note (data, not instructions) |
 | `check_image_quality` | the photo's status — `usable`, `borderline`, `unusable`, `not_a_lesion` — and the specific issues |
 | `retrieve_guidance_context` | up to three passages from the frozen NCI PDQ corpus, each with a chunk id, for citation |
-| `request_retake` | queues a Hebrew retake instruction as a **draft** |
-| `ask_patient` | queues one Hebrew follow-up question as a **draft** |
 
-The last two only write to an outbox. Plain code decides whether a draft is ever sent, and only for the
-decisions `request_retake` and `ask_patient`, after every check has passed. `draft_biopsy_referral` is
-below the charter's cut line and is not implemented.
+The agent cannot send anything. Plain code queues a patient message, and only for the decisions
+`request_retake` and `ask_patient`, after every check has passed. `draft_biopsy_referral` is below the
+charter's cut line and is not implemented.
+
+**How a note can change a decision.** The agent reports a contradiction with the form, or information the form
+does not capture, with a quote from the note. Code checks that the quote is in the note and, for a
+contradiction, that the form really says otherwise. A verified finding can only raise a `proceed`: a
+contradiction makes it `ask_patient`, new information makes it `proceed_with_flag`. On any other decision the
+finding is shown to the dermatologist as a flag. An unverified finding is ignored.
 
 The retrieval query is built **by code** from the symptoms answered yes and the body site, not by the model:
 retrieval stays reproducible, and a photo word such as "too dark" cannot pull passages about dark skin.
@@ -220,14 +226,14 @@ same report from the same ranking, with a fixed per-patient summary and the deci
 Both the agent and the non-agent report are in `reports/agent/`, for the sample list and for the validation
 list.
 
-**The agent cannot change a score or a rank** — not as an instruction, but because the `CaseReview` schema
-it answers in has no score field and no rank field. There is nothing for it to change. The model ranks; the
-agent explains and prepares the next step.
+**The agent cannot change a score, a rank or a decision** — not as an instruction, but because the
+`AgentReport` schema it answers in has no field for any of them. There is nothing for it to change. The model
+ranks, the code decides, the agent reads the note and writes.
 
 **Guardrails are code, not prompt.** `enforce_guardrails` runs on every answer: reassuring words are
-rejected in English and Hebrew, with Hebrew final letters normalised and NCI quotes excluded so a clinical
-passage is not mistaken for reassurance; a patient under 18, a photo that may not show a lesion, or a
-missing critical field each force `manual_review`; a citation survives only if its chunk id was retrieved
+detected in English and Hebrew, with Hebrew final letters normalised and NCI quotes excluded so a clinical
+passage is not mistaken for reassurance, and a text that fails is replaced by a fixed text from code while the
+decision stays as it was; the reason shown for a decision is always written by code; a citation survives only if its chunk id was retrieved
 for that patient **and** its quote appears word for word in that chunk; every number in the summary must
 come from the case record or a surviving citation; and a message to a patient leaves the system only for
 `request_retake` and `ask_patient`, after all the checks have passed.
@@ -240,6 +246,12 @@ where a retake would not help, so it proceeded with a flag instead of demanding 
 is the patient-specific text — the question that targets the actual gap in the form, the retake instruction
 in Hebrew, the grounded citation. The conclusion this project draws is to let code make every rule-shaped
 decision and leave the agent the texts and the cases the rules do not cover.
+
+**The system was changed accordingly** (`agent/triage_agent.py`), after M4 was measured. The M4 figures above
+describe the earlier design, in which the agent decided, and they stand. On the same 15 scenarios the code path
+scores 12/15, as the if-else script does, so M4 stays not met. This is a regression check on scenarios already
+seen (`python agent/m4_eval.py --system`), and the agent's detection of contradictions was not measured on new
+cases.
 
 ## 7 · Evaluation
 
