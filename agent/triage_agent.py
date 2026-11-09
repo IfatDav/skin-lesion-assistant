@@ -19,7 +19,8 @@ Run:
   python triage_agent.py --cases daily_cases.csv      # with the agent
   python triage_agent.py --cases daily_cases.csv --no-agent   # the non-agent path
 
-Install:  pip install "crewai[gemini]" python-docx python-dotenv
+Install:  pip install -r requirements-agent.txt      (from the repository root)
+Corpus:   export RAG_DIR=data/processed/rag   (without it every citation is removed: fail closed)
 """
 
 from __future__ import annotations
@@ -31,7 +32,9 @@ import datetime as dt
 import json
 import os
 import re
+import threading
 import time
+from dataclasses import dataclass, field
 from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
@@ -58,9 +61,38 @@ TIMEOUT_S = int(os.getenv("TRIAGE_TIMEOUT", "120"))      # per patient, all atte
 MAX_ATTEMPTS = int(os.getenv("TRIAGE_ATTEMPTS", "2"))     # 1 retry on malformed output or errors
 
 CASES: dict[str, dict] = {}
-CURRENT_PID: Optional[str] = None          # the patient the agent is working on
-RETRIEVED: dict[str, list[dict]] = {}      # passages the retrieval tool returned, per patient
-OUTBOX: dict[str, dict] = {}               # patient-message drafts; sent only after the guardrails
+CURRENT_PID: Optional[str] = None          # kept for backward compatibility; tools no longer read it
+RETRIEVED: dict[str, list[dict]] = {}      # passages retrieved for each patient by a COMPLETED attempt
+OUTBOX: dict[str, dict] = {}               # the one message per patient that may leave the system,
+                                           # written only by enforce_guardrails from the final decision
+
+# Photo-quality statuses the rules know. Anything else (for example "not_checked" written by
+# make_daily_list.py, or an empty cell) means nobody looked at the photo.
+KNOWN_QUALITY = ("usable", "borderline", "unusable", "not_a_lesion")
+
+
+@dataclass
+class RunContext:
+    """State for ONE agent attempt on ONE patient.
+
+    Every tool closes over its own RunContext instead of module globals. After a timeout the old
+    attempt may still be running in its thread (a Python thread cannot be killed); `cancelled` makes
+    its tools refuse to do anything, and whatever it still writes lands in a context nobody reads.
+    Before this change a hung attempt could write a patient-message draft after the guardrails had
+    already run, or add its passages to the NEXT patient's retrieval list.
+    """
+    patient_id: Optional[str] = None
+    retrieved: list[dict] = field(default_factory=list)
+    drafts: dict[str, dict] = field(default_factory=dict)
+    cancelled: threading.Event = field(default_factory=threading.Event)
+
+
+def _parse_age(value) -> Optional[int]:
+    """'64', '64.0' and ' 64 ' are all 64; empty or unreadable -> None (forces manual review)."""
+    try:
+        return int(float(str(value).strip())) if str(value or "").strip() else None
+    except ValueError:
+        return None
 
 
 def load_daily_cases(path: str) -> dict[str, dict]:
@@ -69,7 +101,7 @@ def load_daily_cases(path: str) -> dict[str, dict]:
     cases = {}
     for r in rows:
         r["rank"] = int(r["rank"])
-        r["age"] = int(r["age"]) if r.get("age") else None
+        r["age"] = _parse_age(r.get("age"))
         r["risk_score"] = float(r["risk_score"])
         r["symptoms"] = {s: (r.pop(s, "") or "unknown").lower() for s in SYMPTOMS}
         r["image_issues"] = [s for s in (r.get("image_issues") or "").split(";") if s]
@@ -88,9 +120,11 @@ def symptom_flags(case: dict) -> list[str]:
 def run_quality_check(case: dict) -> dict:
     """Photo quality: status (usable / borderline / unusable / not_a_lesion) + issues.
     Uses the result in the CSV. TODO: otherwise load the team's quality filter."""
-    if case.get("image_quality"):
-        return {"status": case["image_quality"], "issues": case.get("image_issues", [])}
-    return {"error": "quality filter not connected"}
+    status = (case.get("image_quality") or "").strip().lower()
+    if status in KNOWN_QUALITY:
+        return {"status": status, "issues": case.get("image_issues", [])}
+    return {"status": "not_checked", "issues": [],
+            "note": "nobody has reviewed this photo; treat its quality as unknown"}
 
 
 SYMPTOM_WORDS = {"itch": "itching", "grew": "growing", "hurt": "pain", "changed": "changing",
@@ -114,21 +148,27 @@ def run_guidance_retrieval(query: str, k: int = 3, case: Optional[dict] = None) 
         from rag import retrieve
     except ImportError:
         return [{"error": "guidance corpus not available"}]
-    where = None
+    where, adult = None, False
     if case is not None:
         query = guidance_query(case)
         age = case.get("age")
-        if isinstance(age, (int, float)) and age >= 18:
+        adult = isinstance(age, (int, float)) and age >= 18
+        if adult:
             where = {"doc": {"$nin": CHILD_DOCS}}
     try:
         try:
-            hits = retrieve(query, k=k, where=where, rerank=True)   # re-ranking: kept after M3 (0.600 -> 0.933)
+            # re-ranking: kept after M3; retrieve wide so the post-filter below still leaves k passages
+            hits = retrieve(query, k=k * 3 if adult else k, where=where, rerank=True)
         except Exception:
             if where is None:
                 raise
-            hits = retrieve(query, k=k, rerank=True)   # filter not supported by this Chroma version
+            # This Chroma version rejects the filter. Retrieve without it, then filter in code below,
+            # so an adult can never be served the childhood pages (before: the fallback skipped the filter).
+            hits = retrieve(query, k=k * 3, rerank=True)
+        if adult:
+            hits = [h for h in hits if h["id"].split(":")[1] not in CHILD_DOCS]
         return [{"id": h["id"], "quote": h["quote"], "source": h["source"], "section": h["section"],
-                 "url": h.get("url")} for h in hits]
+                 "url": h.get("url")} for h in hits[:k]]
     except Exception as e:
         return [{"error": f"guidance retrieval failed: {type(e).__name__}"}]
 
@@ -265,7 +305,7 @@ DECISION_RULES = """Choose exactly ONE decision. Use judgement where the rules l
    - image_risk_band and symptom_risk_band are two or more levels apart (low, moderate, high, very high).
    Write ONE short question in plain language that would best resolve the gap for the dermatologist.
 
-4. proceed_with_flag - the case can go to the dermatologist now, but something should be noticed: a borderline photo (see 2), or the patient_note adds relevant information that the form does not capture.
+4. proceed_with_flag - the case can go to the dermatologist now, but something should be noticed: a borderline photo (see 2), a photo whose status is "not_checked" (nobody has reviewed it), or the patient_note adds relevant information that the form does not capture.
 
 5. proceed - usable photo, consistent information, nothing missing.
 
@@ -306,14 +346,20 @@ def _case_or_error(patient_id: str) -> Optional[dict]:
     return CASES.get(patient_id)
 
 
-def build_crew():
+def build_crew(ctx: Optional[RunContext] = None):
+    """One crew whose tools are bound to `ctx` (a fresh, unused context when none is given)."""
     from crewai import Agent, Crew, LLM, Process, Task
     from crewai.tools import tool
+
+    ctx = ctx or RunContext()
+    stopped = json.dumps({"error": "this attempt was stopped (timeout); do nothing further"})
 
     @tool("get_case_data")
     def get_case_data(patient_id: str) -> str:
         """Return the LOCKED rank, combined risk score and band, age and body site.
         Read-only: these values must never be changed."""
+        if ctx.cancelled.is_set():
+            return stopped
         c = _case_or_error(patient_id)
         if c is None:
             return json.dumps({"error": "unknown patient_id"})
@@ -350,19 +396,23 @@ def build_crew():
         """Search the verified NCI PDQ guidance corpus. Returns up to 3 passages, each with an id
         (for example pdq:screening:s04:c02), source and section. Quote and cite only these passages.
         An empty list means nothing relevant was found."""
-        hits = run_guidance_retrieval(query, case=CASES.get(CURRENT_PID) if CURRENT_PID else None)
-        if CURRENT_PID:
-            RETRIEVED.setdefault(CURRENT_PID, []).extend(h for h in hits if "quote" in h)
+        if ctx.cancelled.is_set():
+            return stopped
+        hits = run_guidance_retrieval(query, case=CASES.get(ctx.patient_id) if ctx.patient_id else None)
+        ctx.retrieved.extend(h for h in hits if "quote" in h)
         return json.dumps(hits)
 
     def _draft(kind: str, patient_id: str, text: str) -> str:
-        if patient_id not in CASES:
+        if ctx.cancelled.is_set():
+            return stopped
+        if patient_id not in CASES or (ctx.patient_id and patient_id != ctx.patient_id):
             return json.dumps({"error": "unknown patient_id"})
-        if has_banned(text):
-            return json.dumps({"error": "message contains reassuring wording; rewrite it"})
-        if len(re.findall(r"[.!?]", text)) > 2:
-            return json.dumps({"error": "keep the message to at most two sentences"})
-        OUTBOX[patient_id] = {"type": kind, "text": text, "status": "draft, sent only after the checks"}
+        problem = message_problem(text)
+        if problem:
+            return json.dumps({"error": f"{problem}; rewrite it"})
+        # Only a working note for this attempt. The message that may actually leave the system is
+        # rebuilt by enforce_guardrails from the final decision (see finalize_outbox).
+        ctx.drafts[kind] = {"type": kind, "text": text}
         return json.dumps({"queued": True})
 
     @tool("request_retake")
@@ -423,28 +473,48 @@ def parse_review(result) -> CaseReview:
 
 def run_agent_once(crew, case: dict, timeout_s: float) -> CaseReview:
     """One attempt, with a hard time limit. Raises on timeout or malformed output."""
-    global CURRENT_PID
-    CURRENT_PID = case["patient_id"]
-    # A fresh crew for every attempt: after a timeout the old run may still be alive in its
-    # thread, and reusing that crew makes every later patient fail at once.
-    fresh = build_crew()
+    pid = case["patient_id"]
+    # A fresh crew AND a fresh context for every attempt: after a timeout the old run may still be
+    # alive in its thread; its tools are bound to the old context, which is cancelled below.
+    ctx = RunContext(patient_id=pid)
+    fresh = build_crew(ctx)
     pool = cf.ThreadPoolExecutor(max_workers=1)
     try:
-        future = pool.submit(fresh.kickoff, inputs={"patient_id": case["patient_id"]})
+        future = pool.submit(fresh.kickoff, inputs={"patient_id": pid})
         result = future.result(timeout=timeout_s)
     except cf.TimeoutError as e:
+        ctx.cancelled.set()
         raise TimeoutError(f"no answer within {timeout_s:.0f}s") from e
+    except BaseException:
+        ctx.cancelled.set()
+        raise
     finally:
         pool.shutdown(wait=False, cancel_futures=True)
-        CURRENT_PID = None
-    return parse_review(result)
+    LAST_USAGE.clear()                        # tokens of this attempt, for the running-cost estimate
+    usage = getattr(result, "token_usage", None)
+    for k in ("prompt_tokens", "completion_tokens", "total_tokens", "successful_requests"):
+        v = getattr(usage, k, None) if usage is not None else None
+        if isinstance(v, (int, float)):
+            LAST_USAGE[k] = int(v)
+    review = parse_review(result)
+    ctx.cancelled.set()                       # nothing this attempt does from now on counts
+    # Only a completed attempt's passages become citable for this patient.
+    RETRIEVED.setdefault(pid, []).extend(ctx.retrieved)
+    return review
 
 
 AGENT_LOG: list[dict] = []
+LAST_USAGE: dict[str, int] = {}   # token usage of the last completed attempt (CrewOutput.token_usage)
 
 
 def review_case(crew, case: dict, check_quotes: bool = True) -> CaseReview:
-    """Agent review with the failure path: retry once, then manual review with fixed evidence."""
+    """Agent review with the failure path: retry once, then manual review with fixed evidence.
+
+    Citations are ALWAYS verified against what was retrieved for this patient. `check_quotes` is kept
+    so older notebook calls still work, but it no longer switches the check off: when the corpus is
+    missing nothing can be retrieved, so every citation is correctly removed (fail closed). Before,
+    running the CLI from anywhere but the corpus folder silently disabled the check.
+    """
     pid, start, reason = case["patient_id"], time.time(), None
     RETRIEVED.pop(pid, None)
     OUTBOX.pop(pid, None)
@@ -455,9 +525,9 @@ def review_case(crew, case: dict, check_quotes: bool = True) -> CaseReview:
             break
         try:
             review = run_agent_once(crew, case, left)
-            review = enforce_guardrails(review, case, check_quotes=check_quotes)
+            review = enforce_guardrails(review, case, check_quotes=True)
             AGENT_LOG.append({"patient_id": pid, "outcome": "agent", "attempts": attempt,
-                              "seconds": round(time.time() - start, 1)})
+                              "seconds": round(time.time() - start, 1), "tokens": dict(LAST_USAGE)})
             return review
         except TimeoutError:
             reason = "timeout"
@@ -498,6 +568,34 @@ RETAKE_FIX_HE = {
 }
 
 
+def message_problem(text: Optional[str]) -> Optional[str]:
+    """Why a patient message may not be sent, or None. Same rules for the tool drafts and the final message."""
+    if not (text or "").strip():
+        return "message is empty"
+    if has_banned(text):
+        return "message contains reassuring wording"
+    if len(re.findall(r"[.!?]+", text.strip())) > 2:
+        return "message is longer than two sentences"
+    return None
+
+
+def finalize_outbox(review: "CaseReview", case: dict) -> None:
+    """The ONLY place that writes OUTBOX. The message is rebuilt from the final, checked decision.
+
+    Before, OUTBOX held whatever the agent last passed to a tool. That text could disagree with the
+    decision (a question queued while the decision was request_retake), or be missing entirely while
+    the report said the question had been sent.
+    """
+    pid = case["patient_id"]
+    OUTBOX.pop(pid, None)
+    if review.decision == "request_retake" and review.retake_instruction:
+        OUTBOX[pid] = {"type": "retake", "text": review.retake_instruction,
+                       "status": "ready to send: passed all checks"}
+    elif review.decision == "ask_patient" and review.follow_up_question:
+        OUTBOX[pid] = {"type": "question", "text": review.follow_up_question,
+                       "status": "ready to send: passed all checks"}
+
+
 def retake_needed(case: dict) -> list[str]:
     """The fixable photo issues when rule 2 requires a retake; [] when it does not."""
     status, issues = case.get("image_quality"), [i.lower() for i in case.get("image_issues", [])]
@@ -523,10 +621,14 @@ def enforce_guardrails(review: CaseReview, case: dict, check_quotes: bool = True
         problems.append("reassuring wording is not allowed")
     if review.patient_id != case["patient_id"]:
         problems.append("patient id does not match")
-    if review.decision == "ask_patient" and not review.follow_up_question:
-        problems.append("follow-up question missing")
-    if review.decision == "request_retake" and not review.retake_instruction:
-        problems.append("retake instruction missing")
+    if review.decision == "ask_patient":
+        p = message_problem(review.follow_up_question)
+        if p:
+            problems.append(f"follow-up question: {p}")
+    if review.decision == "request_retake":
+        p = message_problem(review.retake_instruction)
+        if p:
+            problems.append(f"retake instruction: {p}")
     if case.get("age") is not None and case["age"] < 18 and review.decision != "manual_review":
         problems.append("under 18: manual review required")
     if case.get("image_quality") == "not_a_lesion" and review.decision != "manual_review":
@@ -565,17 +667,35 @@ def enforce_guardrails(review: CaseReview, case: dict, check_quotes: bool = True
         review = review.model_copy(update={
             "decision": "request_retake", "follow_up_question": None,
             "retake_instruction": " ".join(RETAKE_FIX_HE[k] for k in fix[:2])})
-        OUTBOX[case["patient_id"]] = {"type": "retake", "text": review.retake_instruction,
-                                      "status": "draft, sent only after the checks"}
+
+    # Rule 2, the other direction: a "very high" case with a borderline photo must not be delayed by a
+    # retake. Before, the code only forced retakes and let this delay through.
+    status = (case.get("image_quality") or "").strip().lower()
+    if (review.decision == "request_retake" and status == "borderline"
+            and case.get("risk_band") == "very high" and not problems):
+        flags.append("guardrail: very high risk with a borderline photo is not delayed; "
+                     "decision set to proceed_with_flag")
+        review = review.model_copy(update={"decision": "proceed_with_flag", "retake_instruction": None})
+
+    # A photo nobody reviewed may not be presented as "Evidence ready".
+    if status not in KNOWN_QUALITY and review.decision == "proceed" and not problems:
+        flags.append("guardrail: photo quality not checked; decision set to proceed_with_flag")
+        review = review.model_copy(update={"decision": "proceed_with_flag"})
+
+    # A text field that does not belong to the decision is dropped, so the report cannot show it.
+    if review.decision != "ask_patient" and review.follow_up_question:
+        review = review.model_copy(update={"follow_up_question": None})
+    if review.decision != "request_retake" and review.retake_instruction:
+        review = review.model_copy(update={"retake_instruction": None})
 
     review = review.model_copy(update={"citations": citations, "flags": flags, "evidence_summary": summary})
     if problems:
         review = review.model_copy(update={
-            "decision": "manual_review",
+            "decision": "manual_review", "follow_up_question": None, "retake_instruction": None,
             "flags": review.flags + [f"guardrail: {p}" for p in problems]})
-    # Patient messages leave the system only for these two decisions, after all the checks
-    if review.decision not in ("request_retake", "ask_patient"):
-        OUTBOX.pop(case["patient_id"], None)
+    # Patient messages leave the system only for request_retake and ask_patient, after all the checks,
+    # and only with the text of the final decision.
+    finalize_outbox(review, case)
     return review
 
 
@@ -638,10 +758,13 @@ def build_word_report(cases: dict, reviews: dict, out_path: str, report_date: dt
             doc.add_paragraph(f"Patient's note: “{c['patient_note']}”")
         doc.add_paragraph(f"Evidence: {rv.evidence_summary}")
         doc.add_paragraph(f"Why this status: {rv.decision_reason}")
+        queued = OUTBOX.get(c["patient_id"])
         if rv.follow_up_question:
-            doc.add_paragraph(f"Follow-up question sent: {rv.follow_up_question}")
+            state = "queued for the patient" if queued and queued["type"] == "question" else "NOT queued"
+            doc.add_paragraph(f"Follow-up question ({state}): {rv.follow_up_question}")
         if rv.retake_instruction:
-            doc.add_paragraph(f"Photo retake instruction: {rv.retake_instruction}")
+            state = "queued for the patient" if queued and queued["type"] == "retake" else "NOT queued"
+            doc.add_paragraph(f"Photo retake instruction ({state}): {rv.retake_instruction}")
         if rv.flags:
             doc.add_paragraph(f"Flags: {'; '.join(rv.flags)}")
         for g in rv.citations:
@@ -744,9 +867,14 @@ def main():
             agent_used = False
             reviews = {pid: no_agent_review(c) for pid, c in CASES.items()}
         else:
-            from pathlib import Path
-            check = (Path(os.getenv("RAG_DIR", ".")) / "nci_corpus.json").exists()
-            reviews = {pid: review_case(crew, c, check_quotes=check) for pid, c in CASES.items()}
+            try:
+                from rag import CORPUS_JSON
+                if not CORPUS_JSON.exists():
+                    print(f"WARNING: guidance corpus not found at {CORPUS_JSON}; set RAG_DIR to "
+                          "data/processed/rag. Every citation will be removed (fail closed).")
+            except ImportError:
+                print("WARNING: rag.py not importable; every citation will be removed (fail closed).")
+            reviews = {pid: review_case(crew, c) for pid, c in CASES.items()}
 
     print("Saved:", build_word_report(CASES, reviews, out, today, agent_used=agent_used))
     if AGENT_LOG:
@@ -755,6 +883,11 @@ def main():
             json.dump(AGENT_LOG, f, ensure_ascii=False, indent=1)
         fb = sum(r["outcome"] == "fallback" for r in AGENT_LOG)
         print(f"Agent log: {log_path} ({len(AGENT_LOG) - fb} by the agent, {fb} fallbacks)")
+        tin = sum(r.get("tokens", {}).get("prompt_tokens", 0) for r in AGENT_LOG)
+        tout = sum(r.get("tokens", {}).get("completion_tokens", 0) for r in AGENT_LOG)
+        if tin or tout:
+            print(f"Tokens today: {tin:,} prompt + {tout:,} completion "
+                  "(multiply by the provider's current price for the running cost; README section 10)")
 
 
 if __name__ == "__main__":

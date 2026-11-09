@@ -1,0 +1,23 @@
+# The demo app. Streamlit Community Cloud reads this file (it sits next to the entry point).
+streamlit>=1.36
+pandas
+numpy
+pillow
+scikit-learn==1.9.1        # load-bearing: models/questionnaire.joblib was saved with it
+joblib
+pydantic>=2
+python-docx
+# The real image model (optional switch in the app). CPU builds are enough.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.11.0
+torchvision==0.26.0
+timm==1.0.30
+safetensors
+# The live agent (needs GEMINI_API_KEY). crewai 1.x has no 'gemini' extra: Gemini comes through google-genai / litellm.
+crewai
+google-genai
+litellm
+python-dotenv
+# The guidance index the agent cites from (built once by agent/rag.py build)
+chromadb
+sentence-transformers
