@@ -72,12 +72,19 @@ tab_patient, tab_inside, tab_doctor = st.tabs(["① המטופל שולח", "②
 with tab_patient:
     choice = st.selectbox("מטופל", list(SAMPLES), index=0)
     s = SAMPLES[choice]
+    # Outside the form on purpose: a widget inside a form only reports its value on submit,
+    # so an uploaded photo would not show (or replace the sample's) until "שליחה".
+    upload = st.file_uploader("תמונה של הנגע", type=["jpg", "jpeg", "png"], key=f"up_{choice}",
+                              help="תמונה שמעלים מחליפה את התמונה של המטופל לדוגמה")
     with st.form("send", border=True):
         left, right = st.columns([1, 1])
         with left:
-            upload = st.file_uploader("תמונה של הנגע", type=["jpg", "jpeg", "png"], key=f"up_{choice}")
-            if s:
+            if upload is not None:
+                st.image(Image.open(upload), caption="התמונה שהעלית: היא זו שתישלח", width=360)
+            elif s:
                 st.image(Image.open(EXAMPLES / s["file"]), caption="התמונה של המטופל לדוגמה", width=360)
+            else:
+                st.info("העלו תמונה של הנגע.")
         with right:
             age = st.number_input("גיל", 0, 110, value=(s or {}).get("age", 50), key=f"age_{choice}")
             site = st.selectbox("מיקום הנגע", list(E.SITES), format_func=E.SITES.get, key=f"site_{choice}",
@@ -93,6 +100,8 @@ with tab_patient:
         if src is None:
             st.error("צריך תמונה: העלו תמונה של הנגע או בחרו מטופל לדוגמה.")
             st.stop()
+        if upload is not None:
+            upload.seek(0)                  # the preview above already read the file once
         photo = Image.open(src).convert("RGB")
         digest = hashlib.md5(photo.tobytes()).hexdigest()[:10]
         path = Path(tempfile.gettempdir()) / f"lesion_{digest}.jpg"
