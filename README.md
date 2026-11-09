@@ -1,5 +1,13 @@
 # Skin Lesion Triage for Healthcare Providers
 
+   ## Live demo
+
+   [![Open the MVP demo in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IfatDav/skin-lesion-assistant/blob/mvp-demo/app/10_mvp_demo.ipynb)
+
+   Open the notebook → Runtime → Run all → the last cell prints a link to the app.
+   A patient sends a photo and six answers; the app ranks today's queue, the AI agent prepares the case,
+   and the dermatologist gets the morning list and a Word report. Needs a free Gemini API key (Cell 4).
+
 **A dermatologist's waiting list, re-ordered by risk.** A patient photographs a skin lesion with their phone
 inside the health-fund app and answers six questions. Every morning, the system ranks all patients currently
 on the dermatologist's waiting list and flags the highest-risk 10% for priority review. The dermatologist

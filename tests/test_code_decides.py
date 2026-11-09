@@ -85,6 +85,32 @@ class Findings(unittest.TestCase):
             self.assertTrue(any("on my shirt" in f for f in r.flags))   # the dermatologist still sees it
 
 
+class UncheckedPhoto(unittest.TestCase):
+    """make_daily_list.py writes "not_checked" when nobody reviewed the photo."""
+
+    def test_flagged_not_sent_to_manual_review(self):
+        for status in ("not_checked", "", None):
+            self.assertEqual(t.decide(case(image_quality=status))["decision"], "proceed_with_flag", status)
+
+    def test_other_rules_still_apply(self):
+        self.assertEqual(t.decide(case(image_quality="not_checked", age=16))["decision"], "manual_review")
+        self.assertEqual(t.decide(case(image_quality="not_checked", symptom_risk_band="low",
+                                       image_risk_band="very high"))["decision"], "ask_patient")
+
+    def test_verified_contradiction_still_raises_it(self):
+        c = case(image_quality="not_checked", patient_note="something on my shirt")
+        self.assertEqual(run(c, note_findings=[contradiction("on my shirt")]).decision, "ask_patient")
+
+    def test_status_is_read_loosely(self):
+        self.assertEqual(t.decide(case(image_quality=" Unusable "))["decision"], "request_retake")
+
+
+class Age(unittest.TestCase):
+    def test_parse(self):
+        self.assertEqual([t._parse_age(v) for v in ("64", "64.0", " 64 ", "", None, "n/a")],
+                         [64, 64, 64, None, None, None])
+
+
 class Texts(unittest.TestCase):
     def test_agent_text_is_used_when_it_passes(self):
         c = case(image_quality="unusable", image_issues=["too dark"])
