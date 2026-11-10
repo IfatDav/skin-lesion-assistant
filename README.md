@@ -2,7 +2,7 @@
 
    ## Live demo
 
-   [![Open the MVP demo in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IfatDav/skin-lesion-assistant/blob/mvp-demo/app/10_mvp_demo.ipynb)
+   [![Open the MVP demo in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/IfatDav/skin-lesion-assistant/blob/main/app/10_mvp_demo.ipynb)
 
    Open the notebook → Runtime → Run all → the last cell prints a link to the app.
    A patient sends a photo and six answers; the app ranks today's queue, the AI agent prepares the case,
@@ -225,6 +225,9 @@ review) and scenarios 3 and 15 (its patient texts were weaker than the fixed one
 the code's decision stands. Nothing the agent returns can now make the outcome worse than code alone; tests
 in `tests/test_code_decides.py` (`AgentOnlyAdds`) check this on all 15 scenarios. Raw output:
 `reports/agent/m4_code_decides_with_agent_2026-11-10.txt`.
+Rerun after the change, same 15 scenarios: code alone **12/15**, with the agent **13/15**. The agent adds
+scenario 12 and loses none. Scenarios 9 and 11 remain; both need a change in code, not in the agent.
+Raw output: `reports/agent/m4_agent_only_adds_2026-11-10.txt`.
 
 
 **Validation Agent run — 31 October 2026.**
