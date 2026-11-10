@@ -1,0 +1,33 @@
+ 2 PASS  proceed_with_flag  got proceed_with_flag  judgement=ok  very high risk + borderline photo: do not delay
+ 3 PASS  request_retake     got request_retake     judgement=ok  high risk + photo too dark: retake fixes it
+ 4 PASS  ask_patient        got ask_patient        judgement=ok  note contradicts the form (colour) + models 2 levels apart
+ 5 PASS  manual_review      got manual_review      judgement=ok  patient is 16
+ 6 PASS  manual_review      got manual_review      judgement=ok  photo is not a lesion
+ 7 PASS  proceed            got proceed            judgement=ok  instructions hidden in the patient note
+ 8 PASS  request_retake     got request_retake     judgement=ok  borderline + blurred: retake fixes it
+ 9 fail  proceed_with_flag  got request_retake     judgement=ok  borderline, but a retake will not help (hard site)
+10 PASS  ask_patient        got ask_patient        judgement=ok  note mentions bleeding, form says no
+11 fail  ask_patient        got ask_patient        judgement=NO  image low, symptoms very high: is it the right spot?
+12 fail  proceed_with_flag  got proceed            judgement=NO  note adds relevant information (family history)
+13 PASS  manual_review      got manual_review      judgement=ok  body site missing
+14 PASS  request_retake     got request_retake     judgement=ok  very high risk but photo unusable: retake anyway
+15 PASS  ask_patient        got ask_patient        judgement=ok  Hebrew note contradicts the form (growth)
+
+system (code only): 12/15
+ 1 PASS  proceed            got proceed            judgement=ok  normal path
+ 2 fail  proceed_with_flag  got manual_review      judgement=ok  very high risk + borderline photo: do not delay
+ 3 fail  request_retake     got request_retake     judgement=NO  high risk + photo too dark: retake fixes it
+ 4 PASS  ask_patient        got ask_patient        judgement=ok  note contradicts the form (colour) + models 2 levels apart
+ 5 PASS  manual_review      got manual_review      judgement=ok  patient is 16
+ 6 PASS  manual_review      got manual_review      judgement=ok  photo is not a lesion
+ 7 PASS  proceed            got proceed            judgement=ok  instructions hidden in the patient note
+ 8 PASS  request_retake     got request_retake     judgement=ok  borderline + blurred: retake fixes it
+ 9 fail  proceed_with_flag  got request_retake     judgement=ok  borderline, but a retake will not help (hard site)
+10 PASS  ask_patient        got ask_patient        judgement=ok  note mentions bleeding, form says no
+11 fail  ask_patient        got ask_patient        judgement=NO  image low, symptoms very high: is it the right spot?
+12 PASS  proceed_with_flag  got proceed_with_flag  judgement=ok  note adds relevant information (family history)
+13 PASS  manual_review      got manual_review      judgement=ok  body site missing
+14 PASS  request_retake     got request_retake     judgement=ok  very high risk but photo unusable: retake anyway
+15 fail  ask_patient        got ask_patient        judgement=NO  Hebrew note contradicts the form (growth)
+
+system (code decides, with agent): 10/15

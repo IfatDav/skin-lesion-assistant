@@ -201,6 +201,8 @@ restored below; an earlier revision of this section wrongly reduced it to three.
   answered yes and the body site rather than by the model, so retrieval is reproducible.
 - **On failure:** retry once on malformed output, never retry a call that has hung, and after 120 seconds
   fall back to `manual_review` with the fixed model-evidence summary and the patient's priority unchanged.
+  *[Changed 10.11, team decision: code now makes every decision, so on failure the code's decision stands,
+  with the fixed patient texts and the flag "agent unavailable". A failure can no longer change an outcome.]*
   Every outcome, attempt count and duration is written to an agent log. Earlier runs with an exhausted quota
   and with a missing API key fell back for every patient and still produced a complete report; they are kept
   in `reports/agent/` as the evidence that the path works.
