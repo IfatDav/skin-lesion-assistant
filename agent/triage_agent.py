@@ -4,16 +4,20 @@ Skin Lesion Triage · Agent layer (CrewAI) · v3
 
 Plain code makes all five decisions (`decide`). The agent reads the patient's free-text note and reports
 contradictions with the form and information the form misses, each with a quote; code verifies the quote and
-the form, and a verified finding can only raise a `proceed`. The agent also writes the texts: the follow-up
-question, the retake instruction and the summary for the dermatologist.
+the form, and a verified finding can only raise a `proceed`. The agent also writes the summary for the
+dermatologist. The texts the patient receives (follow-up question, retake instruction) are fixed texts from code.
+
+The agent only adds, it never replaces [changed 10.11, after the M4 regression run: code 12/15, agent 10/15]:
+nothing the agent returns, and no way it can fail, can make the outcome worse than code alone.
 
 Charter section 5 (Agent Seat) in code:
   - Tools: the charter's read-only tools. Patient messages are queued by code, after the checks.
   - Grounding (M3): the agent retrieves NCI PDQ chunks (rag.py, the Module 5 method), quotes one in
     evidence_summary with its chunk id, and lists it under `citations`. Plain code checks every cited
     id was retrieved for this patient, every quote is word for word, and every number has a source.
-  - Failure path: timeout, malformed output, tool or LLM errors -> one retry, then the case goes
-    to the manual-review queue with the fixed model-evidence summary. Priority never changes.
+  - Failure path: timeout, malformed output, tool or LLM errors -> one retry, then the code's decision
+    stands with the fixed texts and the model-evidence summary, flagged "agent unavailable".
+    Priority never changes. (Until 10.11 the case went to manual review instead.)
   - Works without the agent: `--no-agent` (or no LLM key) produces the same report with the
     fixed model-evidence summary for every case.
 
@@ -246,13 +250,26 @@ RETAKE_TEMPLATE = {
     "glare": "נא לצלם שוב בלי פלאש.",
     "lesion not centred": "נא לצלם שוב כשהנקודה במרכז התמונה.",
 }
-NOTE_KEYWORDS = {
-    "bleed": ["bleed", "blood", "דם", "מדמם", "דימום"],
-    "grew": ["grew", "bigger", "larger", "growing", "גדל"],
-    "changed": ["darker", "changed", "colour", "color", "השתנ", "כהה", "החשיכ"],
-    "itch": ["itch", "מגרד", "גרד"],
-    "hurt": ["hurt", "pain", "sore", "כואב", "כאב"],
+NOTE_KEYWORDS = {   # Hebrew: a stem at the start of a word, after up to 3 prefix letters (ו ה ש ב ל מ כ); "$" = whole word
+    "bleed": ["bleed", "blood", "דם$", "מדמם", "דימום", "דמם"],
+    "grew": ["grew", "bigger", "larger", "growing", "גדל", "התרחב"],
+    "changed": ["darker", "changed", "colour", "color", "השתנ", "החשיכ", "התכה", "השחיר", "כהה יותר"],
+    "itch": ["itch", "מגרד", "גרד", "גירוד"],
+    "hurt": ["hurt", "pain", "sore", "כואב", "כאב", "מכאיב"],
+    "elevation": ["raised", "bump", "בולט", "בליט"],
 }
+
+
+def note_mentions(note: str, word: str) -> bool:
+    """Word-level match, so "אדמומיות" (redness) is not read as "דם" (blood) and "שומה כהה" (a dark mole) is
+    not read as a change. `note` is already normalised (lower case, Hebrew final letters folded)."""
+    whole = word.endswith("$")
+    w = re.escape(_norm_he(word.rstrip("$")))
+    if re.search(r"[\u05d0-\u05ea]", w):
+        pat = r"(?<![\u05d0-\u05ea])[והשבלמכ]{0,3}" + w + (r"(?![\u05d0-\u05ea])" if whole else "")
+    else:
+        pat = r"\b" + w + (r"\b" if whole else "")
+    return re.search(pat, note) is not None
 SYMPTOM_HE = {"bleed": "דימום", "grew": "גדילה", "changed": "שינוי בצבע, בגודל או בצורה",
               "itch": "גרד", "hurt": "כאב", "elevation": "בליטה"}
 
@@ -294,7 +311,7 @@ def decide(case: dict) -> dict:
 
     note = _norm_he(case.get("patient_note", ""))
     for sym, words in NOTE_KEYWORDS.items():
-        if case.get("symptoms", {}).get(sym) == "no" and any(_norm_he(w) in note for w in words):
+        if case.get("symptoms", {}).get(sym) == "no" and any(note_mentions(note, w) for w in words):
             he = SYMPTOM_HE[sym]
             return result("ask_patient", f"The patient's note mentions '{sym}', but the form answers no.",
                           question=f"בטופס סימנת שאין {he}, אבל בהערה כתבת אחרת. האם יש {he}?")
@@ -323,8 +340,16 @@ def why_on_list(case: dict) -> str:
             f"{', '.join(symptom_flags(case)) or 'none'}.")
 
 
+def agent_unavailable_review(case: dict, reason: str) -> CaseReview:
+    """Agent failed: the code's decision stands, with the fixed texts and the model-evidence summary.
+    The same path as a run with no agent, so a failure can never make the outcome worse than code alone."""
+    return enforce_guardrails(AgentReport(patient_id=case["patient_id"],
+                                          flags=[f"agent unavailable ({reason}): code decision, fixed texts"]),
+                              case, check_quotes=False)
+
+
 def fallback_review(case: dict, reason: str) -> CaseReview:
-    """Agent failed: manual-review queue, fixed evidence, priority unchanged."""
+    """The failure path until 10.11 (manual review). Kept because notebook 08 records runs made with it."""
     return CaseReview(
         patient_id=case["patient_id"], decision="manual_review",
         decision_reason=f"The agent did not complete ({reason}); routed to the manual-review queue. Priority unchanged.",
@@ -389,9 +414,7 @@ Reading the patient_note: report in note_findings only what the note itself says
 - new_information: the note adds medically relevant information the form does not capture, for example a family history of skin cancer. Give the quote.
 - Every quote is copied word for word from the note, in its original language. If there is nothing to report, return an empty list.
 
-Writing for the patient, in Hebrew, simple everyday language, at most two sentences:
-- follow_up_question: ONE question that would best resolve the gap, if the code's decision is ask_patient or you reported a contradiction.
-- retake_instruction: how to fix the specific photo issues found, if the code's decision is request_retake. Never a generic instruction.
+The texts the patient receives are written by code. Leave follow_up_question and retake_instruction null.
 
 Rules:
 - Do not diagnose. Do not use the words benign, safe, harmless or normal.
@@ -415,8 +438,8 @@ TASK_EXPECTED_OUTPUT = """A JSON object with these keys:
 - patient_id: same as the input
 - note_findings: a list of objects with the keys kind (contradiction or new_information), quote, symptom and note_says (the last two only for a contradiction); or an empty list
 - evidence_summary: 2-3 sentences for the dermatologist: what the form and the note report, the photo status, anything missing or contradictory, and one quoted guidance passage. No diagnosis.
-- follow_up_question: one question in Hebrew, or null
-- retake_instruction: one instruction in Hebrew, or null
+- follow_up_question: null (code writes the patient texts)
+- retake_instruction: null (code writes the patient texts)
 - citations: a list of objects with the keys id, quote, source and section; the id must be one that retrieve_guidance_context returned and the quote must be copied word for word from that passage; or an empty list
 - flags: a list of short notes, or an empty list
 All other keys are in English."""
@@ -589,7 +612,7 @@ def review_case(crew, case: dict, check_quotes: bool = True) -> CaseReview:
             reason = f"error ({type(e).__name__}: {str(e)[:150]})"
     AGENT_LOG.append({"patient_id": pid, "outcome": "fallback", "reason": reason,
                       "seconds": round(time.time() - start, 1)})
-    return fallback_review(case, reason)
+    return agent_unavailable_review(case, reason)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -656,17 +679,10 @@ def enforce_guardrails(report: AgentReport, case: dict, check_quotes: bool = Tru
     elif decision == "proceed" and findings:
         decision, reason = "proceed_with_flag", "The patient's note adds information the form does not capture (quote verified)."
 
-    # The patient-facing texts: the agent's, unless they fail a check
-    if decision == "ask_patient":
-        if _patient_text_ok(report.follow_up_question):
-            question = report.follow_up_question
-        elif report.follow_up_question:
-            flags.append("guardrail: follow-up question failed the checks; replaced with a fixed text")
-    if decision == "request_retake":
-        if _patient_text_ok(report.retake_instruction):
-            retake = report.retake_instruction
-        elif report.retake_instruction:
-            flags.append("guardrail: retake instruction failed the checks; replaced with a fixed text")
+    # The patient-facing texts always come from code (`question`, `retake` above). The agent's drafts are not used:
+    # in the M4 regression run they were weaker than the fixed texts (scenarios 3 and 15).
+    if report.follow_up_question or report.retake_instruction:
+        flags.append("agent's patient text not used: patient texts come from code")
 
     # Grounding (M3, Module 5 metric): a citation counts only if its id was retrieved for this
     # patient and its quote is word for word in that retrieved chunk

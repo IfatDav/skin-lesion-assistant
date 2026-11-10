@@ -213,8 +213,18 @@ retrieval stays reproducible, and a photo word such as "too dark" cannot pull pa
 Patients 18 and over are never served the two childhood pages.
 
 **What happens when it fails.** `review_case` retries once on malformed output, never retries a call that
-has hung, and after 120 seconds falls back to `manual_review` with the fixed model-evidence summary and the
-patient's priority unchanged. Every outcome, attempt count and duration goes to the agent log.
+has hung, and after 120 seconds the code's decision stands, with the fixed patient texts, the fixed
+model-evidence summary, the flag "agent unavailable" and the patient's priority unchanged. Every outcome,
+attempt count and duration goes to the agent log. (Until 10.11 a failure sent the case to `manual_review`.)
+
+**M4 regression run, code-decides design [added 10.11].** Same 15 scenarios, so a regression check and not
+a new M4: code alone **12/15**, with the agent (Gemini) **10/15**. The agent added scenario 12 (it read
+"My father had melanoma" as relevant); it lost scenario 2 (the agent failed and the case went to manual
+review) and scenarios 3 and 15 (its patient texts were weaker than the fixed ones). Two changes followed:
+**the agent only adds, it never replaces.** The patient texts always come from code, and when the agent fails
+the code's decision stands. Nothing the agent returns can now make the outcome worse than code alone; tests
+in `tests/test_code_decides.py` (`AgentOnlyAdds`) check this on all 15 scenarios. Raw output:
+`reports/agent/m4_code_decides_with_agent_2026-11-10.txt`.
 
 
 **Validation Agent run — 31 October 2026.**

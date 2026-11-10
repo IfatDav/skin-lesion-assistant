@@ -105,13 +105,26 @@ RETAKE_TEMPLATE = {
     "glare": "נא לצלם שוב בלי פלאש.",
     "lesion not centred": "נא לצלם שוב כשהנקודה במרכז התמונה.",
 }
-NOTE_KEYWORDS = {
-    "bleed": ["bleed", "blood", "דם", "מדמם", "דימום"],
-    "grew": ["grew", "bigger", "larger", "growing", "גדל"],
-    "changed": ["darker", "changed", "colour", "color", "השתנ", "כהה", "החשיכ"],
-    "itch": ["itch", "מגרד", "גרד"],
-    "hurt": ["hurt", "pain", "sore", "כואב", "כאב"],
+NOTE_KEYWORDS = {   # Hebrew: a stem at the start of a word, after up to 3 prefix letters (ו ה ש ב ל מ כ); "$" = whole word
+    "bleed": ["bleed", "blood", "דם$", "מדמם", "דימום", "דמם"],
+    "grew": ["grew", "bigger", "larger", "growing", "גדל", "התרחב"],
+    "changed": ["darker", "changed", "colour", "color", "השתנ", "החשיכ", "התכה", "השחיר", "כהה יותר"],
+    "itch": ["itch", "מגרד", "גרד", "גירוד"],
+    "hurt": ["hurt", "pain", "sore", "כואב", "כאב", "מכאיב"],
+    "elevation": ["raised", "bump", "בולט", "בליט"],
 }
+
+
+def note_mentions(note: str, word: str) -> bool:
+    """Word-level match, so "אדמומיות" (redness) is not read as "דם" (blood) and "שומה כהה" (a dark mole) is
+    not read as a change. `note` is already normalised (lower case, Hebrew final letters folded)."""
+    whole = word.endswith("$")
+    w = re.escape(_norm(word.rstrip("$")))
+    if re.search(r"[\u05d0-\u05ea]", w):
+        pat = r"(?<![\u05d0-\u05ea])[והשבלמכ]{0,3}" + w + (r"(?![\u05d0-\u05ea])" if whole else "")
+    else:
+        pat = r"\b" + w + (r"\b" if whole else "")
+    return re.search(pat, note) is not None
 SYMPTOM_HE = {"bleed": "דימום", "grew": "גדילה", "changed": "שינוי בצבע, בגודל או בצורה",
               "itch": "גרד", "hurt": "כאב", "elevation": "בליטה"}
 
@@ -139,7 +152,7 @@ def if_else(case: dict) -> dict:
 
     note = _norm(case.get("patient_note", ""))
     for sym, words in NOTE_KEYWORDS.items():
-        if case["symptoms"].get(sym) == "no" and any(_norm(w) in note for w in words):
+        if case["symptoms"].get(sym) == "no" and any(note_mentions(note, w) for w in words):
             he = SYMPTOM_HE[sym]
             return {**out, "decision": "ask_patient",
                     "follow_up_question": f"בטופס סימנת שאין {he}, אבל בהערה כתבת אחרת. האם יש {he}?"}

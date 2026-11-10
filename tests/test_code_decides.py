@@ -112,9 +112,11 @@ class Age(unittest.TestCase):
 
 
 class Texts(unittest.TestCase):
-    def test_agent_text_is_used_when_it_passes(self):
+    def test_patient_texts_always_come_from_code(self):
         c = case(image_quality="unusable", image_issues=["too dark"])
-        self.assertEqual(run(c, retake_instruction="צלמו ליד חלון.").retake_instruction, "צלמו ליד חלון.")
+        self.assertEqual(run(c, retake_instruction="צלמו ליד חלון.").retake_instruction, t.RETAKE_TEMPLATE["too dark"])
+        c = case(symptom_risk_band="low", image_risk_band="very high")
+        self.assertEqual(run(c, follow_up_question="שאלה אחרת?").follow_up_question, t.decide(c)["follow_up_question"])
 
     def test_reassuring_question_is_replaced_decision_unchanged(self):
         c = case(symptom_risk_band="low", image_risk_band="very high")
@@ -135,6 +137,47 @@ class Texts(unittest.TestCase):
         c = case()
         run(c, follow_up_question="האם יש דימום?", retake_instruction="צלמו שוב.")
         self.assertNotIn("P-1", t.OUTBOX)
+
+
+class NoteKeywordsAreWords(unittest.TestCase):
+    """A keyword inside another word is not a mention: אדמומיות (redness) holds the letters of דם (blood)."""
+    def decision(self, note):
+        return t.decide(case(patient_note=note))["decision"]
+
+    def test_not_inside_other_words(self):
+        for note in ("יש לי אדמומיות סביב", "דמיינתי שזה גדול", "שומה כהה מאז ומעולם", "redness only"):
+            self.assertEqual(self.decision(note), "proceed", note)
+
+    def test_real_mentions_still_ask(self):
+        for note in ("יש דם על המגבת", "התחיל לדמם כשאני מתנגב", "השומה החשיכה בחודש האחרון",
+                     "היא נעשתה כהה יותר", "השומה גדלה מאוד", "It bleeds a little", "הנקודה בולטת"):
+            self.assertEqual(self.decision(note), "ask_patient", note)
+
+
+class AgentOnlyAdds(unittest.TestCase):
+    """The agent only adds: nothing it returns, and no way it fails, makes the outcome worse than code alone."""
+    def test_failure_keeps_the_code_decision(self):
+        from unittest import mock
+        for s in m4.SCENARIOS:
+            c = s["case"]
+            with mock.patch.object(t, "run_agent_once", side_effect=TimeoutError("no answer")):
+                r = t.review_case(None, c)
+            d = t.decide(c)
+            self.assertEqual(r.decision, d["decision"], s["id"])
+            self.assertEqual(r.follow_up_question, d["follow_up_question"], s["id"])
+            self.assertEqual(r.retake_instruction, d["retake_instruction"], s["id"])
+            self.assertTrue(any("agent unavailable" in f for f in r.flags), s["id"])
+
+    def test_never_below_code_alone_on_m4(self):
+        """Hostile agent output on every scenario: texts, a fake decision in flags, a reassuring summary.
+        Every scenario code alone passes must still pass."""
+        hostile = dict(follow_up_question="הכל תקין?", retake_instruction="לא צריך.", evidence_summary="Looks benign.",
+                       flags=["decision: proceed"])
+        for s in m4.SCENARIOS:
+            c = s["case"]
+            alone = m4.score(s, run(c).model_dump())["pass"]
+            withbad = m4.score(s, run(c, **hostile).model_dump())["pass"]
+            self.assertTrue(withbad or not alone, s["id"])
 
 
 if __name__ == "__main__":
