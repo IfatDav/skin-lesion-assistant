@@ -62,7 +62,7 @@ st.title("Skin Lesion Triage")
 st.markdown("**רשימת ההמתנה לרופא עור, מסודרת לפי סיכון.** מטופל מצלם נגע ועונה על שש שאלות; "
             "כל בוקר המערכת מעלה לראש התור את 10% הדחופים, והרופאה מחליטה.")
 chips = [("סוכן AI: פעיל" if agent_mode == "live" and live_ok else "סוכן AI: מצב גיבוי", agent_mode == "live" and live_ok),
-         ("מודל תמונה: ConvNeXt" if use_real_image_model else "מודל תמונה: ידני", use_real_image_model)]
+         ("מודל תמונה: ConvNeXt" if use_real_image_model else "מצב הדגמה: ציון תמונה מדומה", use_real_image_model)]
 st.markdown(" ".join(f"<span class='chip {'ok' if good else 'warn'}'>{t}</span>" for t, good in chips),
             unsafe_allow_html=True)
 
@@ -96,6 +96,8 @@ with tab_patient:
         sent = st.form_submit_button("שליחה", type="primary", use_container_width=True)
 
     if sent:
+        # Do not leave an old successful ranking visible after a failed submission.
+        st.session_state.pop("result", None)
         src = upload or (EXAMPLES / s["file"] if s else None)
         if src is None:
             st.error("צריך תמונה: העלו תמונה של הנגע או בחרו מטופל לדוגמה.")
@@ -111,13 +113,19 @@ with tab_patient:
             quality = E.photo_quality(photo)
             st.write("מחשבת את ציון השאלון")
             q_score = E.questionnaire_score(age, site, {k: (v if v != "unknown" else None) for k, v in answers.items()})
-            img_score, real_image = None, False
-            if use_real_image_model:
+            real_image = use_real_image_model
+            if real_image:
                 st.write("מריצה את מודל התמונה")
-                img_score = E.image_score(str(path))
-                real_image = img_score is not None
-            if not real_image:
+                try:
+                    img_score = E.image_score(str(path))
+                except Exception as exc:
+                    st.error("מודל התמונה האמיתי אינו זמין או שהחיזוי נכשל. לא בוצע דירוג ולא נעשה שימוש בציון מדומה. נסו שוב לאחר תיקון התקלה, או בחרו במפורש מצב הדגמה.")
+                    st.caption(f"פרטי תקלה למפעיל: {type(exc).__name__}")
+                    st.stop()
+            else:
+                # Simulation only: never silently replace a failed real inference.
                 img_score = (s or {}).get("img", 0.5)
+                st.warning("מצב הדגמה בלבד: ציון התמונה מדומה, ולכן הדירוג והדוח אינם תוצאות של מודל התמונה האמיתי.")
             st.write("מדרגת את המטופל בתור של היום")
             r = E.rank_today(img_score, q_score)
             case = E.make_case("NEW-01", r["rank"], r, int(age), site, answers, note, str(path), quality)
@@ -137,6 +145,8 @@ with tab_inside:
     if not res:
         st.info("שלחו מטופל בלשונית ①.")
     else:
+        if not res["real_image"]:
+            st.warning("מצב הדגמה בלבד — ציון התמונה מדומה; הדירוג אינו תחזית של מודל התמונה.")
         q, r, rv = res["quality"], res["r"], res["rv"]
         a, b = st.columns([1, 2])
         a.image(res["photo"], width=260)
@@ -144,7 +154,7 @@ with tab_inside:
             c1, c2, c3 = st.columns(3)
             c1.metric("איכות התמונה", {"usable": "תקינה", "borderline": "גבולית", "unusable": "לא שמישה"}[q["status"]])
             c2.metric("ציון השאלון", f"{res['q_score']:.0%}")
-            c3.metric("ציון התמונה", f"{res['img_score']:.2f}", help=None if res["real_image"] else "נקבע ידנית: מודל התמונה לא נטען")
+            c3.metric("ציון התמונה", f"{res['img_score']:.2f}", help=None if res["real_image"] else "ציון הדגמה מדומה — לא חיזוי של מודל התמונה")
             c1, c2, c3 = st.columns(3)
             c1.metric("מקום בתור היום", f"{r['rank']} מתוך {E.QUEUE_SIZE}")
             c2.metric("ציון משולב", f"{r['fused']:.2f}")
@@ -172,6 +182,8 @@ with tab_doctor:
     if not res:
         st.info("שלחו מטופל בלשונית ①.")
     else:
+        if not res["real_image"]:
+            st.warning("מצב הדגמה בלבד — הדירוג והדוח מתבססים על ציון תמונה מדומה.")
         r, rv = res["r"], res["rv"]
         st.subheader("רשימת הבוקר · 10 מתוך 100 פניות")
         top = r["queue"].head(E.SLOTS).copy()
