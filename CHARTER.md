@@ -335,6 +335,8 @@ below: the end-to-end handoff, notebook 09's committed run, the M3 refusal re-me
 surgical-marker ink check, whose blind labelling sheet was written by the test run and awaits 498 manual
 labels.
 
+**[15.11.2026 follow-up: completed]** All 498 PAD held-out photographs were blind-labelled for surgical-marker ink, and the unchanged image model was analysed using `src.ink_effect`. No consistent positive association with cancer scores was detected within the four eligible diagnoses; MEL and BKL had insufficient inked examples. Evidence: `evaluation/ink_labeling_test.csv`, `reports/ink_effect_test.json`, `reports/results.md` §11. This post-checkpoint result does not change CP2's historical status.
+
 **5. Next three steps.** Run `make_daily_list.py` on the real scored patients and re-run notebook 09 with the
 agent, closing the integration gap · label the ink sheet and run `src/ink_effect.py` · build the 10-slide
 deck and the one-minute demo recording.
@@ -438,7 +440,7 @@ Remaining limitations:
 - Automated image-quality assessment and non-lesion detection are not yet connected.
 - Risk scores and priority bands are queue-relative ranking measures, not calibrated probabilities of malignancy.
 - M3 refusal behavior after re-ranking remains to be re-evaluated.
-- The blind surgical-marker ink analysis remains unfinished; 498 test photographs await manual annotation.
+- The blind surgical-marker ink analysis remained unfinished as of CP3; 498 test photographs awaited manual annotation. **[15.11.2026 follow-up: completed]** All 498 photographs were labelled and analysed, with no consistent positive association detected within the four eligible diagnoses; MEL and BKL lacked sufficient inked examples. See `reports/results.md` §11.
 - Production costs and clinical generalization have not been validated.
 
 **Next steps:** complete the remaining documentation and presentation materials; evaluate the unresolved data and Agent limitations; and, if time permits, demonstrate fresh photograph-to-report inference without changing the frozen test results.
