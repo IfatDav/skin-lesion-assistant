@@ -287,6 +287,17 @@ cases.
 - **The contributor shortcut.** Inside ISIC a classifier given nothing but the contributor name reaches
   **AUC 0.729**. Any ISIC-internal score must be read against that number, which is why model selection
   happens on PAD patients and why the largest benign contributor is excluded from training entirely.
+- **Surgical-marker ink shortcut (post-test audit, 15.11.2026).** All 498 held-out PAD photographs
+  were blind-labelled for visible marker ink: 134 (26.9%) contained ink. Ink was present in
+  24.6% of malignant versus 29.0% of non-malignant photographs, with particularly high
+  prevalence in actinic keratosis (AK; 70/152, 46.1%), which is non-malignant under the
+  frozen label policy. Four within-diagnosis comparisons found no consistent association
+  between ink and higher image-model cancer scores (none reached p < 0.05); however,
+  **melanoma was not testable** (2/9 inked), nor was BKL (2/49 inked), so the result does
+  not establish the absence of shortcut learning. The AK pattern suggests ink may reflect
+  clinical attention or preparation for an intervention, not cancer alone; this explanation
+  is observational and unverified. Evidence: `evaluation/ink_labeling_test.csv`,
+  `reports/ink_effect_test.json`, `reports/results.md` §11.
 - **Self-reported answers.** The PAD questionnaire was filled in by medical students during a visit; app
   users answer alone. Flipping 10% of the answers lowers patient AUC from 0.867 to 0.823. Every
   questionnaire number here is therefore an upper bound.
