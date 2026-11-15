@@ -30,6 +30,10 @@ never silently inserts a demo score. The presenter can explicitly turn off real 
 use a simulated image score for demonstrations. In that mode, the header, case analysis, and
 doctor tab mark the ranking/report as simulation, not a clinical or model-derived result.
 
+## Run the Colab MVP demo from GitHub
+
+Open [`app/10_mvp_demo.ipynb`](10_mvp_demo.ipynb) in Colab and run all cells. Cell 2 creates a fresh clone of GitHub `main` and prints the exact commit; it does not mount Drive or overlay local MVP files. The notebook clears previous run outputs in GitHub to avoid displaying stale results. For the live Agent, configure `GEMINI_API_KEY` in Colab Secrets with notebook access enabled. The generated public tunnel is for synthetic/example cases only: do not submit identifiable patient data or real clinical photographs.
+
 ## Put it online (Streamlit Community Cloud, free)
 
 1. Sign in at share.streamlit.io with GitHub.
