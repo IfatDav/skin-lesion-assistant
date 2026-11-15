@@ -276,6 +276,18 @@ augmentation has to attack.
 
 **M4 — Agent versus if-else baseline.** Evaluated on 15 frozen workflow scenarios. The Agent achieved 9/15 correct decisions, the system with guardrails achieved 11/15, and the if-else baseline achieved 12/15. The M4 accuracy target was not met. No patient was removed or had their score or rank changed during the evaluation.
 
+**M4 follow-up — code-decides redesign (10 November 2026; regression on the same 15 scenarios, not a new independent M4).** Following the original result, the five workflow decisions were moved into deterministic code (`decide()` in `agent/triage_agent.py`). The Agent now supplies evidence and note findings rather than a decision, score, or rank. Code verifies quoted note findings, permits a verified finding to raise a `proceed` to `ask_patient` or `proceed_with_flag`, generates patient-facing texts, and preserves the code decision when the Agent fails.
+
+| Regression on the 15 previously used M4 cases | Passed scenarios |
+|---|---:|
+| Code-only decision path | 12/15 |
+| First code-decides run with Agent (before final safeguards) | 10/15 |
+| Final code-decides run with Agent (agent only adds) | **13/15** |
+
+In the final run the Agent contributed one additional pass, scenario 12 (a family-history statement in the patient note), without losing any of the code-only passes. Scenarios 9 and 11 still failed. The safeguards were revised between the two Agent runs: patient messages now always use fixed code-generated text, and an Agent failure leaves the code decision in place rather than sending the case to `manual_review`. Regression tests cover decision preservation and Agent failure paths. Because the same 15 scenarios were reused after observing their outcomes, the 13/15 result **does not replace the original frozen M4 evaluation or establish that its accuracy target was met on unseen cases**. No new independent workflow evaluation has been reported.
+
+Evidence: `reports/agent/m4_code_decides_with_agent_2026-11-10.txt`, `reports/agent/m4_agent_only_adds_2026-11-10.txt`, `agent/m4_eval.py`, and `tests/test_code_decides.py`.
+
 **Validation-to-Agent integration (CP3).** Completed on 31 October 2026 using stored PAD validation predictions. Ten selected patients were processed successfully by the Agent, with zero retries and zero fallbacks. The resulting Word report and execution log are committed in `reports/agent/`. This demonstrates technical integration, not clinical validation.
 
 ---
