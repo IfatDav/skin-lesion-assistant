@@ -445,13 +445,14 @@ Photographs are not necessarily independent across lesions/patients, and the ana
 adjust for other image-level confounders or multiple comparisons. The model's scores remain
 ranking scores, **not calibrated cancer probabilities**.
 
-The result was generated from the user's completed blind visual annotations in Colab;
-the numerical JSON output is preserved in `reports/ink_effect_test.json`. The underlying
-498-row *completed* annotation CSV is currently saved separately in the project Google Drive
-(`evaluation/ink_labeling_test.csv`); the GitHub version still contains the original blank
-labelling template. **The numeric report is available in GitHub, but the full analysis cannot
-be independently reproduced from GitHub alone until the completed CSV is committed.**
-The frozen model, frozen split, and original held-out evaluation results were not changed.
+The result was generated from the completed blind visual annotations in Colab.
+Both the **498-row completed annotation sheet** (`evaluation/ink_labeling_test.csv`) and the
+numerical output (`reports/ink_effect_test.json`) are now committed, together with the
+analysis code (`src/ink_effect.py`). The annotations preserve the original image IDs,
+random order, and blinded columns; no diagnoses or model scores were inserted into the sheet.
+Reproduction additionally requires the original PAD photographs and the frozen model
+weights described in `src/README.md`. No independent second-annotator agreement has been
+measured. The frozen model, frozen split, and original held-out evaluation results were not changed.
 
 ---
 
@@ -460,7 +461,7 @@ The frozen model, frozen split, and original held-out evaluation results were no
 - Full fresh-photograph-to-report integration, including automated image-quality assessment.
 - Deployment-grade operating cost measurement and secure production architecture (see README §10 for a scenario estimate).
 - Independent clinical and generalization evaluation.
-- Archive the completed blind ink-annotation CSV in this repository and, if desired, audit a sample of uncertain labels.
+- Optional follow-up: second-annotator review of ambiguous ink marks and patient/lesion-level sensitivity analyses.
 
 ---
 
