@@ -1,0 +1,36 @@
+{
+  "labelled": 498,
+  "with_ink": 134,
+  "ink_rate_cancer": 0.2457627118644068,
+  "ink_rate_non_cancer": 0.2900763358778626,
+  "within_class": {
+    "AK": {
+      "n_ink": 70,
+      "n_no_ink": 82,
+      "median_score_ink": 0.3206,
+      "median_score_no_ink": 0.2804,
+      "mannwhitney_p": 0.8058239818503601
+    },
+    "BCC": {
+      "n_ink": 48,
+      "n_no_ink": 147,
+      "median_score_ink": 0.8397,
+      "median_score_no_ink": 0.8858,
+      "mannwhitney_p": 0.1191722846449077
+    },
+    "NEV": {
+      "n_ink": 4,
+      "n_no_ink": 57,
+      "median_score_ink": 0.15555,
+      "median_score_no_ink": 0.1091,
+      "mannwhitney_p": 0.4229893355539185
+    },
+    "SCC": {
+      "n_ink": 8,
+      "n_no_ink": 24,
+      "median_score_ink": 0.63895,
+      "median_score_no_ink": 0.8368,
+      "mannwhitney_p": 0.23664508523240452
+    }
+  }
+}
