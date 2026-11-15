@@ -421,6 +421,14 @@ visible surgical-marker ink *after* the frozen test evaluation. Of 498 photograp
 were marked as containing ink and **364 (73.1%)** as not containing ink. Ink was observed in
 **58/236 (24.6%)** photographs labelled malignant and **76/262 (29.0%)** labelled non-malignant.
 Thus, in these labelled photographs, ink was not more prevalent in the malignant group.
+The largest contribution to the non-malignant inked group came from actinic keratosis
+(AK): **70/152 AK photographs (46.1%)** were marked with ink, compared with
+58/236 (24.6%) malignant photographs overall. AK is counted as non-malignant under
+the project's predefined label policy. A plausible explanation is that surgical
+marker ink reflects clinical attention, preparation for a procedure, or selection
+for treatment, rather than cancer alone; however, neither the reason for marking
+nor whether treatment occurred was assessed, so this is a hypothesis, not a
+demonstrated causal mechanism.
 
 The unchanged final image model was applied through `python -m src.ink_effect`, comparing
 model-produced cancer scores between inked and un-inked images **within each diagnosis**.
@@ -438,7 +446,13 @@ No within-diagnosis comparison reached conventional p < 0.05, and the difference
 not consistently point toward *higher* cancer scores for inked photographs. **This check did
 not detect a consistent positive association between visible surgical-marker ink and the
 model's malignancy score. It does not demonstrate that the model is free of an ink shortcut.**
-Several groups were small, especially NEV (4 inked) and SCC (8 inked), and the tests are
+**Melanoma (MEL), the class of greatest clinical concern, could not be tested
+within diagnosis:** only **2 of its 9 photographs** were inked, below the script's
+minimum of three per group. Seborrheic keratosis (BKL) was also excluded
+(**2 of 49 inked**). Thus, the comparisons above cover **440 of 498 photographs**;
+the remaining 58 (MEL and BKL) have no within-class ink effect test. Of the
+four tested classes, AK (152) and BCC (195) provide the largest comparison
+groups, while NEV (4 inked) and SCC (8 inked) are sparse. The tests are
 exploratory, observational comparisons rather than controlled removal/addition of ink. The
 annotation rule classifies uncertain marks as ink, and no inter-rater reliability was assessed.
 Photographs are not necessarily independent across lesions/patients, and the analysis did not
