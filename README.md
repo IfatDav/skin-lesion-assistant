@@ -425,8 +425,101 @@ the number is corrected here, not in the notebook.
 
 ## 10 · Running cost, order of magnitude
 
-> *To be completed before the final submission: monthly API, storage and compute for the agent layer and
-> the inference path, at the assumed volume of 100 arrivals a day.*
+**Scenario estimate, 15 November 2026 — not a measured production bill.** The implementation has
+been demonstrated with validation patients, not deployed as a clinical service. Prices below are USD,
+illustrative public list prices; provider region, account tier, free allowances, usage and architecture
+will change the actual invoice. No real patient information is needed for this estimate.
+
+### Volume and architecture assumed
+
+- **100 new patients/day for 30 days = 3,000 arrivals/month.** Budget for one new
+  image-model inference and one questionnaire score per patient. Additional photographs, retries,
+  re-inference or queue-wide rescoring would increase the workload. The saved ConvNeXt weights run
+  in our own Python process (`src.predict.VisualRiskModel`), so there is **no external image
+  prediction API charge**; image inference consumes our compute.
+- **10 priority cases/day = 300 Agent reviews/month**, using the demo's 10 daily review slots
+  as a *budgeting assumption*. This is **not** equivalent to 10% of the entire waiting list:
+  the product policy prioritizes 10% of the **current waiting list**, which may be much larger
+  than 100 new arrivals. If the number reviewed daily increases, Agent cost scales with it.
+  Routine patients are not sent through the Agent in the current demo.
+- RAG searches the project's locally stored NCI PDQ corpus; it does not require paid web
+  search. Hosting the embedding model and its index still consumes compute, memory and storage.
+
+### Agent API (Gemini)
+
+The code defaults to `gemini-3.5-flash-lite` (`agent/triage_agent.py`, override via
+`TRIAGE_MODEL`). Google AI Studio's **paid standard tier** lists **$0.30 per million input
+tokens** and **$2.50 per million output tokens**, including thinking tokens. The following
+token budgets are explicit *assumptions per completed patient review*, summed over all
+model/tool turns; they are **not measurements** from the archived runs.
+
+| Hypothetical tokens per Agent case (input / output) | 300 reviews/month, paid API |
+|---|---:|
+| 5,000 / 1,000 | **$1.20** |
+| 10,000 / 2,000 (illustrative planning case) | **$2.40** |
+| 30,000 / 6,000 | **$7.20** |
+
+Formula: `monthly Agent API = N_reviews * (input_tokens * $0.30 + output_tokens * $2.50) / 1,000,000`.
+Retries, repeated tool calls, longer notes and future model changes may increase cost.
+The current Agent code can record usage (`LAST_USAGE` / `AGENT_LOG`), but the committed
+31 October validation log records durations rather than prompt/completion token totals.
+Consequently none of these token budgets should be presented as observed consumption.
+
+### Image inference, hosting and data storage
+
+For a **hypothetical CPU-only, request-billed Cloud Run worker in us-central1**, allocate
+**2 vCPU and 4 GiB RAM** and assume an average of **15 billed seconds per new patient
+submission**, with no always-on minimum instances. At Google's listed active-time rates
+($0.000024/vCPU-second and $0.0000025/GiB-second), 3,000 requests cost
+approximately **$2.61/month in CPU and memory**, before any free allowances, plus less than
+one cent in the base request fee. This is a *resource-time arithmetic example*, **not a measured
+ConvNeXt latency, a deployed Cloud Run service, or a guarantee that the model fits these
+CPU/RAM/timeout assumptions**. It also excludes warm-up, parallel load, RAG initialization,
+network traffic and any separate Agent worker billing.
+
+If a continuously running service is needed (for example a persistent interactive
+web app), the cost profile changes dramatically. At the listed **instance-based** rates
+($0.000018/vCPU-second and $0.000002/GiB-second), the **same 2 vCPU / 4 GiB allocation
+running continuously for 30 days** is about **$114.05/month**, before free allowances.
+Streamlit Community Cloud offers free public-demo hosting, but free demo hosting is **not**
+a basis for estimating a compliant, supported clinical production service.
+
+**Storage assumption:** one retained 1 MiB image per new patient and a rolling 30-day
+retention period -> roughly 2.93 GiB at steady state. Google Cloud Storage
+Standard single-region pricing of about $0.020/GiB-month implies approximately
+**$0.06/month** for these images alone. The current demo only uses temporary files; it does
+not implement this persistent image store. Larger images, longer retention, backups,
+RAG/model artefacts, object operations and egress have not been priced.
+
+### Combined illustration, not a production quotation
+
+| Component per 30-day month | Request-billed illustration | Always-on illustration |
+|---|---:|---:|
+| Agent API (10k input + 2k output tokens per review) | $2.40 | $2.40 |
+| 2 vCPU + 4 GiB CPU/RAM hosting | $2.61 | $114.05 |
+| Rolling 30-day image storage, 1 MiB/image | ~$0.06 | ~$0.06 |
+| **Illustrative subtotal before free credits and excluded costs** | **~$5.07** | **~$116.51** |
+
+The request-billed subtotal varies from about **$3.87 to
+$9.87** for the three hypothetical Agent token budgets, *holding the
+unverified 15-second compute assumption fixed*. These figures are **not** a realistic
+all-in healthcare operating budget: they exclude secure identity and authorization,
+medical review labor, databases, encryption/key management, audit retention, backups,
+monitoring, support, network egress, taxes, compliance/legal review and reliability
+engineering. Patient data must not be sent to free public demos or third-party services
+without an appropriate privacy/security assessment and contractual safeguards.
+
+**Before a credible deployment quote:** benchmark actual CPU/GPU latency and memory
+(including cold starts and multi-photo cases), log tokens and calls **without patient
+content** on a representative *synthetic* workload, measure retries and the actual daily
+priority-review count, and choose a secure hosting/retention design. The training and
+frozen evaluation costs are one-off research costs, not recurring operating charges.
+
+**Public pricing references (checked 15 November 2026):**
+[Google AI Studio / Gemini API](https://ai.google.dev/gemini-api/docs/pricing),
+[Google Cloud Run](https://cloud.google.com/run/pricing),
+[Google Cloud Storage](https://cloud.google.com/storage/pricing),
+[Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud).
 
 ## 11 · What we would not claim
 
