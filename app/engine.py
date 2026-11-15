@@ -77,21 +77,20 @@ def questionnaire_score(age, site, answers: dict) -> float:
     return float(score(questionnaire_model(), pd.DataFrame([row]))[0])
 
 
-# ── 3. image model: the project's VisualRiskModel, when torch and the weights are available ──
+# ── 3. image model: real inference must fail closed, never return a demo score ────────────
 @lru_cache(maxsize=1)
 def image_model():
-    """None when torch/timm are missing or the weights cannot be fetched; the app then asks for a score."""
-    try:
-        from src.predict import VisualRiskModel
-        return VisualRiskModel()            # GPU when Colab gives one, else CPU
-    except Exception as e:  # noqa: BLE001
-        print(f"image model unavailable: {type(e).__name__}: {e}")
-        return None
+    """Load the real model; propagate missing-dependency or weight errors to the caller."""
+    from src.predict import VisualRiskModel
+    return VisualRiskModel()  # GPU when available, else CPU
 
 
-def image_score(photo_path: str) -> float | None:
-    m = image_model()
-    return None if m is None else float(m.predict([photo_path])["cancer_score"])
+def image_score(photo_path: str) -> float:
+    """Return an actual image-model score or raise; no silent simulated fallback."""
+    score = float(image_model().predict([photo_path])["cancer_score"])
+    if not np.isfinite(score) or not 0.0 <= score <= 1.0:
+        raise ValueError(f"Image model produced an invalid cancer score: {score!r}")
+    return score
 
 
 # ── 4. today's queue: 99 real validation patients + the new one ──────────────────────────
