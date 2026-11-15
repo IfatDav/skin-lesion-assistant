@@ -6,7 +6,7 @@ A patient sends a photo and six answers; the app shows what happens next, using 
 |---|---|---|
 | Photo quality | brightness and sharpness check in `engine.py` | demo heuristic (the project has no quality classifier yet) |
 | Questionnaire score | `models/questionnaire.joblib` via `src.questionnaire` | real |
-| Image score | `src.predict.VisualRiskModel` (ConvNeXt, CPU) when the switch is on; otherwise a slider | real when switched on |
+| Image score | `src.predict.VisualRiskModel` (ConvNeXt, CPU) when selected; otherwise an explicitly simulated example score | Real mode fails closed if inference is unavailable. Demo mode is visibly labelled and is not a real model prediction. |
 | Today's queue | `src.fusion.fuse` + `rank_band` against 99 real validation patients | real |
 | Decision | `decide` in `agent/triage_agent.py`, plain code | real |
 | Agent | reads the note and writes the texts: live CrewAI agent (needs `GEMINI_API_KEY`), or fixed texts without a key | live or fixed; both pass the real `enforce_guardrails` |
@@ -23,6 +23,12 @@ streamlit run app/streamlit_app.py
 
 The browser opens at http://localhost:8501. The first time the image-model switch is turned on, the weights
 (about 110 MB) are downloaded from the project's GitHub release.
+
+**Image-model failure policy.** The default is real-image inference. If the model cannot load or its
+prediction fails, submission stops without a ranking, patient decision, or Word report; the app
+never silently inserts a demo score. The presenter can explicitly turn off real inference to
+use a simulated image score for demonstrations. In that mode, the header, case analysis, and
+doctor tab mark the ranking/report as simulation, not a clinical or model-derived result.
 
 ## Put it online (Streamlit Community Cloud, free)
 
