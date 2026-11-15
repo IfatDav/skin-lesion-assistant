@@ -48,4 +48,4 @@ changes; anything learned afterwards goes into the report as a finding, not into
 
 1. ~~Team approves this file.~~ **Approved 26.10.2026.**
 2. ~~`python -m src.evaluate_test --frozen` — once.~~ **Run 30.10.2026.** `reports/test_results.json`.
-3. Ink labelling of the test photos (`evaluation/INK_LABELING.md`), then `python -m src.ink_effect`.
+3. ~~Ink labelling of the test photos (`evaluation/INK_LABELING.md`), then `python -m src.ink_effect`.~~ **Labelled and run 15.11.2026**, all 498 photographs: `evaluation/ink_labeling_test.csv`, `reports/ink_effect_test.json`, `reports/results.md` §11. No consistent positive ink association was detected within the four diagnoses eligible for comparison; melanoma and BKL lacked sufficient inked photographs for within-diagnosis testing.
