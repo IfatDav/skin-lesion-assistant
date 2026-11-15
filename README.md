@@ -14,8 +14,8 @@ on the dermatologist's waiting list and flags the highest-risk 10% for priority 
 reviews these cases and decides whether an earlier appointment or further assessment is warranted.
 The system does not make clinical decisions autonomously.
 
-**BIU DS23 capstone.** Ifat Davidson (Product) · Yuval Rubenchuk (Data) · Roi Budnitsky (Model) ·
-Tami Khazma (Agent)
+**BIU DS23 capstone.** Ifat Davidson (Data) · Roi Budnitsky (Model) · Tami Khazma (Agent) ·
+Yuval Rubenchuk (Product)
 
 ---
 
