@@ -414,11 +414,54 @@ Further operational and clinical validation would be required before deployment.
 
 ---
 
-## 11 · Still not measured or completed
+## 11 · Post-test surgical-marker ink shortcut check (15 November 2026)
 
-- Surgical-marker ink shortcut analysis: 498 test photographs await manual annotation.
+The 498 PAD held-out test photographs on the blinded ink-labeling sheet were visually annotated for
+visible surgical-marker ink *after* the frozen test evaluation. Of 498 photographs, **134 (26.9%)**
+were marked as containing ink and **364 (73.1%)** as not containing ink. Ink was observed in
+**58/236 (24.6%)** photographs labelled malignant and **76/262 (29.0%)** labelled non-malignant.
+Thus, in these labelled photographs, ink was not more prevalent in the malignant group.
+
+The unchanged final image model was applied through `python -m src.ink_effect`, comparing
+model-produced cancer scores between inked and un-inked images **within each diagnosis**.
+The script uses two-sided Mann–Whitney U tests for classes with at least three photographs
+in each ink group.
+
+| Diagnosis | Inked / uninked photographs | Median image score with ink | Median without ink | Mann–Whitney p |
+|---|---:|---:|---:|---:|
+| AK | 70 / 82 | 0.3206 | 0.2804 | 0.8058 |
+| BCC | 48 / 147 | 0.8397 | 0.8858 | 0.1192 |
+| NEV | 4 / 57 | 0.1556 | 0.1091 | 0.4230 |
+| SCC | 8 / 24 | 0.6390 | 0.8368 | 0.2366 |
+
+No within-diagnosis comparison reached conventional p < 0.05, and the differences did
+not consistently point toward *higher* cancer scores for inked photographs. **This check did
+not detect a consistent positive association between visible surgical-marker ink and the
+model's malignancy score. It does not demonstrate that the model is free of an ink shortcut.**
+Several groups were small, especially NEV (4 inked) and SCC (8 inked), and the tests are
+exploratory, observational comparisons rather than controlled removal/addition of ink. The
+annotation rule classifies uncertain marks as ink, and no inter-rater reliability was assessed.
+Photographs are not necessarily independent across lesions/patients, and the analysis did not
+adjust for other image-level confounders or multiple comparisons. The model's scores remain
+ranking scores, **not calibrated cancer probabilities**.
+
+The result was generated from the user's completed blind visual annotations in Colab;
+the numerical JSON output is preserved in `reports/ink_effect_test.json`. The underlying
+498-row *completed* annotation CSV is currently saved separately in the project Google Drive
+(`evaluation/ink_labeling_test.csv`); the GitHub version still contains the original blank
+labelling template. **The numeric report is available in GitHub, but the full analysis cannot
+be independently reproduced from GitHub alone until the completed CSV is committed.**
+The frozen model, frozen split, and original held-out evaluation results were not changed.
+
+---
+
+## 12 · Still not measured or completed
+
 - Full fresh-photograph-to-report integration, including automated image-quality assessment.
-- Production operating costs at the assumed patient volume.
+- Deployment-grade operating cost measurement and secure production architecture (see README §10 for a scenario estimate).
 - Independent clinical and generalization evaluation.
+- Archive the completed blind ink-annotation CSV in this repository and, if desired, audit a sample of uncertain labels.
+
+---
 
 ---
