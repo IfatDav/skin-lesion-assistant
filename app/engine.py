@@ -145,10 +145,12 @@ REVIEW = ("תודה, קיבלנו. הפנייה הועברה לבדיקה ידנ
 def patient_message(case: dict, rv=None) -> tuple[str, str]:
     """What the patient sees after sending: ("retake", text), ("question", text), ("review", text)
     or ("receipt", text).
-    The photo check runs for EVERY patient: a score from a bad photo cannot be trusted, so a retake is asked
-    for even when the patient is not on today's urgent list. The texts are the code's fixed texts
-    (agent/triage_agent.py decide). A question is sent only for patients on the urgent list, as before."""
-    if rv is not None:                                   # urgent list: the full review already decided
+    Both checks run for EVERY patient, not only for today's urgent list. A score from a bad photo cannot
+    be trusted, and a form the patient's own note contradicts cannot be trusted either — and unlike a bad
+    photo, a wrong answer moves the rank itself, so a patient can stay off the urgent list because of the
+    very answer nobody asked them about. The texts are the code's fixed texts (agent/triage_agent.py
+    decide); the agent's own drafts are never shown to the patient."""
+    if rv is not None and rv.decision != "model_evidence_only":   # a full review decided this case
         if rv.decision == "request_retake" and rv.retake_instruction:
             return "retake", rv.retake_instruction
         if rv.decision == "ask_patient" and rv.follow_up_question:
@@ -156,9 +158,12 @@ def patient_message(case: dict, rv=None) -> tuple[str, str]:
         if rv.decision == "manual_review":
             return "review", REVIEW
         return "receipt", RECEIPT
-    d = T.decide(case)                                   # not urgent: only the photo part of the decision
+    # Not on the urgent list, or the agent is off and made no decision: let code decide.
+    d = T.decide(case)
     if d["decision"] == "request_retake" and d["retake_instruction"]:
         return "retake", d["retake_instruction"]
+    if d["decision"] == "ask_patient" and d["follow_up_question"]:
+        return "question", d["follow_up_question"]
     if d["decision"] == "manual_review":
         return "review", REVIEW
     return "receipt", RECEIPT
