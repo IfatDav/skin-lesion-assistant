@@ -137,6 +137,26 @@ def no_llm_report(case: dict) -> "T.AgentReport":
                          note_findings=[T.NoteFinding(kind="new_information", quote=note)] if len(note) >= 3 else [])
 
 
+RECEIPT = "תודה, קיבלנו. רופא/ת עור יעברו על זה."
+
+
+def patient_message(case: dict, rv=None) -> tuple[str, str]:
+    """What the patient sees after sending: ("retake", text), ("question", text) or ("receipt", text).
+    The photo check runs for EVERY patient: a score from a bad photo cannot be trusted, so a retake is asked
+    for even when the patient is not on today's urgent list. The texts are the code's fixed texts
+    (agent/triage_agent.py decide). A question is sent only for patients on the urgent list, as before."""
+    if rv is not None:                                   # urgent list: the full review already decided
+        if rv.decision == "request_retake" and rv.retake_instruction:
+            return "retake", rv.retake_instruction
+        if rv.decision == "ask_patient" and rv.follow_up_question:
+            return "question", rv.follow_up_question
+        return "receipt", RECEIPT
+    d = T.decide(case)                                   # not urgent: only the photo part of the decision
+    if d["decision"] == "request_retake" and d["retake_instruction"]:
+        return "retake", d["retake_instruction"]
+    return "receipt", RECEIPT
+
+
 def live_agent_ready() -> tuple[bool, str]:
     """Can the live CrewAI agent run here? (an API key and crewai installed)"""
     import importlib.util
