@@ -98,6 +98,12 @@ with tab_patient:
     if sent:
         # Do not leave an old successful ranking visible after a failed submission.
         st.session_state.pop("result", None)
+        # Under 18: refuse before the photo is opened, saved or scored. The models were fitted
+        # and measured on adult PAD patients; nothing here establishes that they transfer.
+        if int(age) < 18:
+            st.error("השירות מיועד לבני 18 ומעלה. לא בוצעה בדיקה והתמונה לא נשמרה. "
+                     "לבדיקת נגע אצל קטין יש לפנות לרופא/ת המשפחה או לרופא/ת עור.")
+            st.stop()
         src = upload or (EXAMPLES / s["file"] if s else None)
         if src is None:
             st.error("צריך תמונה: העלו תמונה של הנגע או בחרו מטופל לדוגמה.")
@@ -147,9 +153,12 @@ with tab_patient:
             st.warning(f"📷 **צריך לצלם שוב:** {text}")
         elif kind == "question":
             st.info(f"❓ **שאלה קצרה:** {text}")
+        elif kind == "review":
+            st.info(f"👩‍⚕️ **הועבר לבדיקה ידנית:** {text}")
         else:
             st.success(text)
-    st.caption("המטופל לא רואה ציון ולא אבחנה. הוא מקבל רק אישור, בקשה לצלם שוב או שאלת הבהרה.")
+    st.caption("המטופל לא רואה ציון ולא אבחנה. הוא מקבל אישור, בקשה לצלם שוב, שאלת הבהרה "
+               "או הודעה שהפנייה עברה לבדיקה ידנית.")
 
 res = st.session_state.get("result")
 
@@ -177,7 +186,7 @@ with tab_inside:
             st.markdown("<p class='big'>לא דחוף היום</p>", unsafe_allow_html=True)
             st.write("המטופל שומר על התור הרגיל, ומחר ידורג שוב. הסוכן מכין תיקים רק למטופלים ברשימה הדחופה.")
             kind, text = res["patient_msg"]
-            if kind == "retake":
+            if kind in ("retake", "review"):
                 st.markdown(f"<div class='msg'><b>הודעה למטופל:</b> {text}</div>", unsafe_allow_html=True)
                 st.caption("איכות התמונה נבדקת לכל מטופל, גם כשהוא לא ברשימה הדחופה: ציון מתמונה פגומה לא אמין.")
         else:
