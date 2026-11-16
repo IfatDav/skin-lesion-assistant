@@ -135,8 +135,21 @@ with tab_patient:
                 rv, how = E.review(case, agent_mode)
             status.update(label="נשלח. עברו ללשונית ② כדי לראות מה קרה.", state="complete", expanded=False)
         st.session_state["result"] = dict(photo=photo, quality=quality, q_score=q_score, img_score=img_score,
-                                          real_image=real_image, r=r, case=case, rv=rv, how=how)
-    st.caption("המטופל רואה רק: ״תודה, קיבלנו. רופא/ת עור יעברו על זה.״ הוא לא רואה ציון ולא אבחנה.")
+                                          real_image=real_image, r=r, case=case, rv=rv, how=how,
+                                          patient_msg=E.patient_message(case, rv))
+
+    # What the patient sees after sending: a retake request or a question only when the code decided one,
+    # otherwise a neutral receipt. Never a score or a diagnosis.
+    res_now = st.session_state.get("result")
+    if res_now:
+        kind, text = res_now["patient_msg"]
+        if kind == "retake":
+            st.warning(f"📷 **צריך לצלם שוב:** {text}")
+        elif kind == "question":
+            st.info(f"❓ **שאלה קצרה:** {text}")
+        else:
+            st.success(text)
+    st.caption("המטופל לא רואה ציון ולא אבחנה. הוא מקבל רק אישור, בקשה לצלם שוב או שאלת הבהרה.")
 
 res = st.session_state.get("result")
 
@@ -163,6 +176,10 @@ with tab_inside:
         if not r["flagged"]:
             st.markdown("<p class='big'>לא דחוף היום</p>", unsafe_allow_html=True)
             st.write("המטופל שומר על התור הרגיל, ומחר ידורג שוב. הסוכן מכין תיקים רק למטופלים ברשימה הדחופה.")
+            kind, text = res["patient_msg"]
+            if kind == "retake":
+                st.markdown(f"<div class='msg'><b>הודעה למטופל:</b> {text}</div>", unsafe_allow_html=True)
+                st.caption("איכות התמונה נבדקת לכל מטופל, גם כשהוא לא ברשימה הדחופה: ציון מתמונה פגומה לא אמין.")
         else:
             st.markdown(f"<p class='big'>{DECISION_HE[rv.decision]}</p>", unsafe_allow_html=True)
             st.write(rv.decision_reason)
